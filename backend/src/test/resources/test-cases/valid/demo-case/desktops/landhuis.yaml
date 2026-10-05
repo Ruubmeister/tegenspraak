@@ -1,0 +1,23 @@
+ownerName: Landhuis
+ownerType: organisation
+description: Computer in de hal.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: brief
+        folder: Inbox
+        from: a@example.nl
+        to: b@example.nl
+        subject: Diner
+        sentAt: 2026-01-01T20:00:00
+        body: Om acht uur.
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: menu
+        folder: Documenten
+        name: menu.txt
+        content: Soep

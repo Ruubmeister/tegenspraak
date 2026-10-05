@@ -1,0 +1,10 @@
+name: De Butler
+role: Butler
+description: Altijd aanwezig.
+personality: Stijf
+speechStyle: Formeel
+knownFacts:
+  - Het diner begon om acht uur.
+secrets:
+  - fact: Hij was in de bibliotheek.
+    revealWhen: De speler noemt de bibliotheek.

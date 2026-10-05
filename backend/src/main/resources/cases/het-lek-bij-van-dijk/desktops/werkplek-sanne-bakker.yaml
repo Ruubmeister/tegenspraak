@@ -1,0 +1,74 @@
+ownerName: Sanne Bakker
+ownerType: person
+description: Werklaptop van Sanne Bakker, officemanager.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: deadline-herinnering
+        folder: Inbox
+        from: pieter@vandijkvastgoed.nl
+        to: sanne@vandijkvastgoed.nl
+        subject: Bod Oude Suikerfabriek
+        sentAt: 2026-03-11T16:02:00
+        body: |
+          Hoi Sanne,
+
+          Mehmet en ik zijn eruit: we gaan voor 4.250.000. Kun jij het bod morgen definitief maken?
+          Deadline is vrijdag 12:00. Niet rondsturen, dit blijft tussen ons drieën.
+
+          Pieter
+      - id: etentje-zaterdag
+        folder: Inbox
+        from: dennis.devries@kramerbouw.nl
+        to: sanne@vandijkvastgoed.nl
+        subject: zaterdag
+        sentAt: 2026-03-12T13:15:00
+        body: |
+          Hé schat, zaterdag eten bij mijn ouders, niet vergeten he. Ik neem de laptop vanavond even mee naar
+          boven, mijn werklaptop is weer eens stuk.
+
+          x Dennis
+      - id: doorgestuurd-bod
+        folder: Verzonden
+        from: sanne@vandijkvastgoed.nl
+        to: sanne.bakker84@gmail.com
+        subject: "FW: Bod Oude Suikerfabriek - DEFINITIEF"
+        sentAt: 2026-03-12T21:47:00
+        body: |
+          [bijlage: Bod_Oude_Suikerfabriek_DEFINITIEF.pdf]
+
+          even thuis afmaken
+      - id: bod-ingediend
+        folder: Verzonden
+        from: sanne@vandijkvastgoed.nl
+        to: pieter@vandijkvastgoed.nl
+        subject: "Re: Bod Oude Suikerfabriek"
+        sentAt: 2026-03-13T10:31:00
+        body: |
+          Ingediend via het portaal om 10:30. Duimen!
+
+          Sanne
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: notities
+        folder: Documenten
+        name: notities.txt
+        content: |
+          - bod definitief maken (4.250.000)
+          - handtekening Pieter ophalen
+          - thuis: bijlage B checken
+          - zaterdag etentje ouders Dennis
+      - id: bod-concept
+        folder: Documenten/Aanbestedingen
+        name: Bod_Oude_Suikerfabriek_DEFINITIEF.txt
+        content: |
+          Van Dijk Vastgoed B.V.
+          Inschrijving herontwikkeling Oude Suikerfabriek, Leiden
+
+          Inschrijvingssom: EUR 4.250.000,- excl. btw
+          Opgesteld door: S. Bakker
+          Datum: 12 maart 2026

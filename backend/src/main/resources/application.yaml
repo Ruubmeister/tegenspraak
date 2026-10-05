@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: tegenspraak
+  docker:
+    compose:
+      file: ../compose.yaml
+      lifecycle-management: start-only
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  mvc:
+    problemdetails:
+      enabled: true
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      chat:
+        model: claude-opus-5-5
+        max-tokens: 16000
+
+server:
+  port: 8081
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        http-only: true
+        same-site: lax
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+tegenspraak:
+  cases:
+    location: classpath:cases
+  chat:
+    max-history-messages: 40

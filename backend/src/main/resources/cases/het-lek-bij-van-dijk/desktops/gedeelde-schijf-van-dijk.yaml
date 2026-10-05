@@ -1,0 +1,31 @@
+ownerName: Van Dijk Vastgoed
+ownerType: organisation
+description: Gedeelde netwerkschijf van Van Dijk Vastgoed.
+apps:
+  - type: files
+    id: schijf
+    title: Gedeelde schijf
+    files:
+      - id: uitslag-aanbesteding
+        folder: Aanbestedingen/Oude Suikerfabriek
+        name: Uitslag_aanbesteding.txt
+        content: |
+          Gemeente Leiden - uitslag aanbesteding Oude Suikerfabriek
+
+          1. Kramer Bouw B.V.          EUR 4.240.000,-
+          2. Van Dijk Vastgoed B.V.    EUR 4.250.000,-
+          3. Hoekstra Ontwikkeling     EUR 4.610.000,-
+      - id: personeelslijst
+        folder: HR
+        name: Personeelslijst.txt
+        content: |
+          Pieter van Dijk     - directeur
+          Mehmet Yilmaz       - calculator
+          Sanne Bakker        - officemanager
+          Joyce Verbeek       - administratie (parttime)
+      - id: ict-beleid
+        folder: Beleid
+        name: ICT-beleid.txt
+        content: |
+          Vertrouwelijke documenten mogen niet naar privé-mailadressen worden doorgestuurd.
+          Thuiswerken alleen via de bedrijfslaptop en de VPN.
