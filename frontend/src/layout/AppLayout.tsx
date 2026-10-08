@@ -23,7 +23,8 @@ export function AppLayout() {
           Tegenspraak
         </Link>
         <div className="app-header-player">
-          <span>{player?.username}</span>
+          {player?.role === 'ADMIN' && <Link to="/beheer/gebruikers">Gebruikersbeheer</Link>}
+          <Link to="/account">{player?.username}</Link>
           <button type="button" className="link-button" onClick={() => logoutMutation.mutate()}>
             Uitloggen
           </button>

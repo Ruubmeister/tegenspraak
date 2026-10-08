@@ -19,7 +19,7 @@ class CaseControllerIT extends IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        player = registerPlayer();
+        player = createPlayer();
     }
 
     @Test

@@ -6,7 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
 import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
+import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.SolutionOption;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
@@ -64,6 +66,30 @@ class CaseFileLoaderTest {
                 .isInstanceOfSatisfying(
                         FilesApp.class,
                         files -> assertThat(files.files().getFirst().name()).isEqualTo("menu.txt"));
+    }
+
+    @Test
+    void loadAll_givenCaseWithSolution_expectQuestionsAndEpilogueLoaded() {
+        CaseSolution solution = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .manifest()
+                .solution();
+
+        assertThat(solution.epilogue()).isEqualTo("De butler bekende alles.");
+        assertThat(solution.questions()).singleElement().satisfies(question -> {
+            assertThat(question.id()).isEqualTo("dader");
+            assertThat(question.options()).extracting(SolutionOption::id).containsExactly("de-butler", "de-tuinman");
+            assertThat(question.answer()).isEqualTo("de-butler");
+        });
+    }
+
+    @Test
+    void loadAll_givenSolutionAnswerThatIsNotAnOption_expectStartupFailure() {
+        assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-solution"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("case.yaml")
+                .rootCause()
+                .hasMessageContaining("dader");
     }
 
     @Test

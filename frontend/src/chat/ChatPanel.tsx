@@ -5,13 +5,16 @@ import { useConversation, useSendMessage } from './chatApi'
 const MAX_MESSAGE_LENGTH = 1000
 
 interface ChatPanelProps {
+  teamId: string
   caseId: string
   character: CharacterSummary
+  currentUsername: string
 }
 
-export function ChatPanel({ caseId, character }: ChatPanelProps) {
-  const { data: messages, isPending, isError } = useConversation(caseId, character.id)
-  const sendMessage = useSendMessage(caseId, character.id)
+/** The team's shared conversation with a character. Messages of teammates appear through regular refreshes. */
+export function ChatPanel({ teamId, caseId, character, currentUsername }: ChatPanelProps) {
+  const { data: messages, isPending, isError } = useConversation(teamId, caseId, character.id)
+  const sendMessage = useSendMessage(teamId, caseId, character.id)
   const [draft, setDraft] = useState('')
   const endOfMessages = useRef<HTMLDivElement>(null)
 
@@ -40,7 +43,12 @@ export function ChatPanel({ caseId, character }: ChatPanelProps) {
         {isError && <p className="status error">Het gesprek kon niet worden geladen.</p>}
         {messages?.length === 0 && <p className="status">Stuur {character.name} een bericht.</p>}
         {messages?.map((message) => (
-          <ChatBubble key={message.id} message={message} />
+          <ChatBubble
+            key={message.id}
+            message={message}
+            characterName={character.name}
+            currentUsername={currentUsername}
+          />
         ))}
         {sendMessage.isPending && (
           <>
@@ -78,10 +86,21 @@ export function ChatPanel({ caseId, character }: ChatPanelProps) {
   )
 }
 
-function ChatBubble({ message }: { message: ChatMessage }) {
+interface ChatBubbleProps {
+  message: ChatMessage
+  characterName: string
+  currentUsername: string
+}
+
+/** Own messages on the right; teammates and the character on the left, with their name. */
+function ChatBubble({ message, characterName, currentUsername }: ChatBubbleProps) {
   const time = new Date(message.sentAt).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+  const isOwn = message.sender === 'PLAYER' && message.authorName === currentUsername
+  const bubbleKind = isOwn ? 'player' : message.sender === 'PLAYER' ? 'teammate' : 'character'
+  const authorName = message.sender === 'PLAYER' ? message.authorName : characterName
   return (
-    <div className={`chat-bubble ${message.sender === 'PLAYER' ? 'player' : 'character'}`}>
+    <div className={`chat-bubble ${bubbleKind}`}>
+      {!isOwn && <span className="chat-author">{authorName}</span>}
       <p>{message.content}</p>
       <time dateTime={message.sentAt}>{time}</time>
     </div>

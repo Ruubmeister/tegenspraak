@@ -22,8 +22,13 @@ export function login(credentials: Credentials): Promise<Player> {
   return apiRequest<Player>('POST', '/api/auth/login', credentials)
 }
 
-export function register(credentials: Credentials): Promise<Player> {
-  return apiRequest<Player>('POST', '/api/auth/register', credentials)
+export interface PasswordChange {
+  currentPassword: string
+  newPassword: string
+}
+
+export function changePassword(passwordChange: PasswordChange): Promise<void> {
+  return apiRequest<void>('PUT', '/api/auth/password', passwordChange)
 }
 
 export function logout(): Promise<void> {

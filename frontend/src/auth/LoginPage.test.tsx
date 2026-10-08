@@ -42,7 +42,7 @@ describe('LoginPage', () => {
   it('LoginPage_givenValidCredentials_expectNavigatedToCaseList', async () => {
     const fetchMock = mockFetch({
       'GET /api/auth/me': () => statusResponse(401),
-      'POST /api/auth/login': () => jsonResponse({ username: 'rechercheur' }),
+      'POST /api/auth/login': () => jsonResponse({ username: 'rechercheur', role: 'PLAYER' }),
     })
     renderLoginPage()
 
@@ -54,7 +54,7 @@ describe('LoginPage', () => {
   })
 
   it('LoginPage_givenAlreadyLoggedIn_expectRedirectToCaseList', async () => {
-    mockFetch({ 'GET /api/auth/me': () => jsonResponse({ username: 'rechercheur' }) })
+    mockFetch({ 'GET /api/auth/me': () => jsonResponse({ username: 'rechercheur', role: 'PLAYER' }) })
 
     renderLoginPage()
 

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link, Navigate, useNavigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
 import { isApiError } from '../api/http'
 import { login } from './authApi'
 import { AuthForm } from './AuthForm'
@@ -32,9 +32,7 @@ export function LoginPage() {
         errorMessage={loginErrorMessage(loginMutation.error)}
         onSubmit={(credentials) => loginMutation.mutate(credentials)}
       />
-      <p>
-        Nog geen account? <Link to="/registreren">Registreer je hier</Link>.
-      </p>
+      <p>Nog geen account? Vraag de beheerder om een account aan te maken.</p>
     </main>
   )
 }

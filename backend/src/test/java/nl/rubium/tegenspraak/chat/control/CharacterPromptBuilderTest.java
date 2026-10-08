@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
-import nl.rubium.tegenspraak.casefile.entity.CaseManifest;
+import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import org.junit.jupiter.api.Test;
@@ -40,6 +40,17 @@ class CharacterPromptBuilderTest {
     }
 
     @Test
+    void buildSystemPrompt_givenCase_expectTeamChatWithNamedMessagesExplained() {
+        CharacterProfile character = character(List.of());
+
+        String prompt = builder.buildSystemPrompt(caseWith(character), character);
+
+        assertThat(prompt)
+                .contains("Je chat met een team van rechercheurs")
+                .contains("naam van de rechercheur tussen blokhaken");
+    }
+
+    @Test
     void buildSystemPrompt_givenCharacterWithoutSecretsOrStyle_expectSectionsOmitted() {
         CharacterProfile character = character(List.of());
 
@@ -62,9 +73,6 @@ class CharacterPromptBuilderTest {
 
     private static CaseDefinition caseWith(CharacterProfile character) {
         return new CaseDefinition(
-                "demo",
-                new CaseManifest("Demo", "Kort", "Intro", "De butler deed het."),
-                List.of(character),
-                List.of());
+                "demo", CaseFixtures.manifestWithSetting("De butler deed het."), List.of(character), List.of());
     }
 }

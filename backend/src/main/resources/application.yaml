@@ -39,3 +39,6 @@ tegenspraak:
     location: classpath:cases
   chat:
     max-history-messages: 40
+  admin:
+    username: admin
+    initial-password: ${TEGENSPRAAK_ADMIN_PASSWORD:}

@@ -1,27 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '../api/http'
 import type { ChatMessage } from '../api/types'
+import { teamPath } from '../teams/teamsApi'
 
-function messagesPath(caseId: string, characterId: string): string {
-  return `/api/cases/${encodeURIComponent(caseId)}/characters/${encodeURIComponent(characterId)}/messages`
+/** Teammates write to the same conversation, so it is refreshed regularly while open. */
+const CONVERSATION_REFRESH_MS = 3_000
+
+function messagesPath(teamId: string, caseId: string, characterId: string): string {
+  return `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/characters/${encodeURIComponent(characterId)}/messages`
 }
 
-function conversationQueryKey(caseId: string, characterId: string) {
-  return ['conversation', caseId, characterId] as const
+function conversationQueryKey(teamId: string, caseId: string, characterId: string) {
+  return ['conversation', teamId, caseId, characterId] as const
 }
 
-export function useConversation(caseId: string, characterId: string) {
+export function useConversation(teamId: string, caseId: string, characterId: string) {
   return useQuery({
-    queryKey: conversationQueryKey(caseId, characterId),
-    queryFn: () => apiRequest<ChatMessage[]>('GET', messagesPath(caseId, characterId)),
+    queryKey: conversationQueryKey(teamId, caseId, characterId),
+    queryFn: () => apiRequest<ChatMessage[]>('GET', messagesPath(teamId, caseId, characterId)),
+    refetchInterval: CONVERSATION_REFRESH_MS,
   })
 }
 
 /** Sends a message and refreshes the conversation, which then contains both the message and the reply. */
-export function useSendMessage(caseId: string, characterId: string) {
+export function useSendMessage(teamId: string, caseId: string, characterId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (content: string) => apiRequest<ChatMessage>('POST', messagesPath(caseId, characterId), { content }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: conversationQueryKey(caseId, characterId) }),
+    mutationFn: (content: string) =>
+      apiRequest<ChatMessage>('POST', messagesPath(teamId, caseId, characterId), { content }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: conversationQueryKey(teamId, caseId, characterId) }),
   })
 }

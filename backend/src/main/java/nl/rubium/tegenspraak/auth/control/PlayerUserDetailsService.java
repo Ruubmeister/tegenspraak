@@ -21,6 +21,6 @@ public class PlayerUserDetailsService implements UserDetailsService {
         PlayerAccount account = playerAccountRepository
                 .findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Unknown player"));
-        return new PlayerPrincipal(account.getId(), account.getUsername(), account.getPasswordHash());
+        return PlayerPrincipal.from(account);
     }
 }

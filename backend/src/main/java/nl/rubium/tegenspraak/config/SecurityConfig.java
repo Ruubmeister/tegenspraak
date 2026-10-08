@@ -1,6 +1,7 @@
 package nl.rubium.tegenspraak.config;
 
 import java.util.List;
+import nl.rubium.tegenspraak.auth.entity.PlayerRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +21,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -25,6 +29,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 /**
  * Session cookie authentication for the single page app. The SPA reads the XSRF-TOKEN cookie and sends it back in the
@@ -37,11 +42,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             SecurityContextRepository securityContextRepository,
-            CsrfTokenRepository csrfTokenRepository)
+            CsrfTokenRepository csrfTokenRepository,
+            SessionRegistry sessionRegistry)
             throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login")
                         .permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole(PlayerRole.ADMIN.name())
                         .requestMatchers("/actuator/health", "/error")
                         .permitAll()
                         .anyRequest()
@@ -49,6 +57,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.spa().csrfTokenRepository(csrfTokenRepository))
                 .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
                 .securityContext(context -> context.securityContextRepository(securityContextRepository))
+                .sessionManagement(session -> session.maximumSessions(-1)
+                        .sessionRegistry(sessionRegistry)
+                        .expiredSessionStrategy(
+                                event -> event.getResponse().setStatus(HttpStatus.UNAUTHORIZED.value())))
                 .exceptionHandling(exceptions ->
                         exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .logout(logout -> logout.logoutUrl("/api/auth/logout")
@@ -82,10 +94,30 @@ public class SecurityConfig {
         return CookieCsrfTokenRepository.withHttpOnlyFalse();
     }
 
-    /** Applied on login: new session id against session fixation and a fresh CSRF token. */
+    /**
+     * Tracks the sessions per player, so deleting a player or resetting their password can end their sessions. The
+     * event publisher keeps the registry in sync when sessions time out or change id.
+     */
     @Bean
-    SessionAuthenticationStrategy sessionAuthenticationStrategy(CsrfTokenRepository csrfTokenRepository) {
+    SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    /**
+     * Applied on login: new session id against session fixation, a fresh CSRF token and registration of the new
+     * session id. Registration comes last so the registry stores the changed id.
+     */
+    @Bean
+    SessionAuthenticationStrategy sessionAuthenticationStrategy(
+            CsrfTokenRepository csrfTokenRepository, SessionRegistry sessionRegistry) {
         return new CompositeSessionAuthenticationStrategy(List.of(
-                new ChangeSessionIdAuthenticationStrategy(), new CsrfAuthenticationStrategy(csrfTokenRepository)));
+                new ChangeSessionIdAuthenticationStrategy(),
+                new CsrfAuthenticationStrategy(csrfTokenRepository),
+                new RegisterSessionAuthenticationStrategy(sessionRegistry)));
     }
 }

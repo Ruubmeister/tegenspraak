@@ -3,7 +3,6 @@ package nl.rubium.tegenspraak.casefile.entity;
 import com.fasterxml.jackson.annotation.JacksonInject;
 import java.util.List;
 
-
 public record CharacterProfile(
         @JacksonInject("id") String id,
         String name,

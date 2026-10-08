@@ -1,6 +1,9 @@
 package nl.rubium.tegenspraak.chat.boundary;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.UUID;
 import nl.rubium.tegenspraak.IntegrationTest;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +25,15 @@ import org.springframework.http.MediaType;
 
 class ChatControllerIT extends IntegrationTest {
 
-    private static final String MESSAGES = "/api/cases/het-lek-bij-van-dijk/characters/sanne-bakker/messages";
-
     private PlayerPrincipal player;
+    private UUID teamId;
+    private String messages;
 
     @BeforeEach
     void setUp() {
-        player = registerPlayer();
+        player = createPlayer();
+        teamId = createTeam(player);
+        messages = messagesPath(teamId, "sanne-bakker");
     }
 
     @Test
@@ -36,7 +42,7 @@ class ChatControllerIT extends IntegrationTest {
                 .thenReturn(
                         new ChatResponse(List.of(new Generation(new AssistantMessage("Hoi, waarmee kan ik helpen?")))));
 
-        mockMvc.perform(post(MESSAGES)
+        mockMvc.perform(post(messages)
                         .with(user(player))
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -45,32 +51,60 @@ class ChatControllerIT extends IntegrationTest {
                 .andExpect(jsonPath("$.sender").value("CHARACTER"))
                 .andExpect(jsonPath("$.content").value("Hoi, waarmee kan ik helpen?"));
 
-        mockMvc.perform(get(MESSAGES).with(user(player)))
+        mockMvc.perform(get(messages).with(user(player)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].sender").value("PLAYER"))
                 .andExpect(jsonPath("$[0].content").value("Hallo Sanne"))
+                .andExpect(jsonPath("$[0].authorName").value(player.getUsername()))
                 .andExpect(jsonPath("$[1].sender").value("CHARACTER"));
     }
 
     @Test
-    void getConversation_givenOtherPlayersConversation_expectEmpty() throws Exception {
-        when(chatModel.call(any(Prompt.class)))
-                .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage("Hoi")))));
-        mockMvc.perform(post(MESSAGES)
-                .with(user(player))
-                .with(spaCsrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"content\": \"Hallo\"}"));
+    void getConversation_givenTeammateSentMessage_expectSharedConversationWithAuthor() throws Exception {
+        PlayerPrincipal teammate = createPlayer();
+        UUID sharedTeamId = createTeam(player, teammate);
+        givenCharacterReplies("Hoi");
 
-        mockMvc.perform(get(MESSAGES).with(user(registerPlayer())))
+        sendHallo(player, messagesPath(sharedTeamId, "sanne-bakker"));
+
+        mockMvc.perform(get(messagesPath(sharedTeamId, "sanne-bakker")).with(user(teammate)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].authorName").value(player.getUsername()))
+                .andExpect(jsonPath("$[1].authorName").value(nullValue()));
+    }
+
+    @Test
+    void getConversation_givenOtherTeamsConversation_expectEmpty() throws Exception {
+        givenCharacterReplies("Hoi");
+        sendHallo(player, messages);
+
+        mockMvc.perform(get(messagesPath(createTeam(player), "sanne-bakker")).with(user(player)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
+    void getConversation_givenNonMember_expectNotFound() throws Exception {
+        mockMvc.perform(get(messages).with(user(createPlayer()))).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void sendMessage_givenNonMember_expectNotFoundAndModelNotCalled() throws Exception {
+        mockMvc.perform(post(messages)
+                        .with(user(createPlayer()))
+                        .with(spaCsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\": \"Hallo\"}"))
+                .andExpect(status().isNotFound());
+
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
     void sendMessage_givenBlankContent_expectBadRequest() throws Exception {
-        mockMvc.perform(post(MESSAGES)
+        mockMvc.perform(post(messages)
                         .with(user(player))
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,7 +116,7 @@ class ChatControllerIT extends IntegrationTest {
     void sendMessage_givenModelFailure_expectBadGateway() throws Exception {
         when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
 
-        mockMvc.perform(post(MESSAGES)
+        mockMvc.perform(post(messages)
                         .with(user(player))
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,8 +126,25 @@ class ChatControllerIT extends IntegrationTest {
 
     @Test
     void getConversation_givenUnknownCharacter_expectNotFound() throws Exception {
-        mockMvc.perform(get("/api/cases/het-lek-bij-van-dijk/characters/onbekend/messages")
-                        .with(user(player)))
+        mockMvc.perform(get(messagesPath(teamId, "onbekend")).with(user(player)))
                 .andExpect(status().isNotFound());
+    }
+
+    private void givenCharacterReplies(String reply) {
+        when(chatModel.call(any(Prompt.class)))
+                .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(reply)))));
+    }
+
+    private void sendHallo(PlayerPrincipal sender, String path) throws Exception {
+        mockMvc.perform(post(path)
+                        .with(user(sender))
+                        .with(spaCsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\": \"Hallo\"}"))
+                .andExpect(status().isOk());
+    }
+
+    private static String messagesPath(UUID teamId, String characterId) {
+        return "/api/teams/" + teamId + "/cases/het-lek-bij-van-dijk/characters/" + characterId + "/messages";
     }
 }

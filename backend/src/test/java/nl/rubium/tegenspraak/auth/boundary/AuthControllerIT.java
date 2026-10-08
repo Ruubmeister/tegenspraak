@@ -3,13 +3,14 @@ package nl.rubium.tegenspraak.auth.boundary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
-import java.util.UUID;
 import nl.rubium.tegenspraak.IntegrationTest;
+import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -17,47 +18,17 @@ import org.springframework.mock.web.MockHttpSession;
 class AuthControllerIT extends IntegrationTest {
 
     @Test
-    void register_givenNewUsername_expectCreatedAndLoggedIn() throws Exception {
-        String username = uniqueUsername();
-
-        MockHttpSession session = (MockHttpSession) mockMvc.perform(post("/api/auth/register")
-                        .with(spaCsrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username, "geheim-wachtwoord")))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value(username))
-                .andReturn()
-                .getRequest()
-                .getSession();
-
-        mockMvc.perform(get("/api/auth/me").session(session))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value(username));
-    }
-
-    @Test
-    void register_givenTakenUsernameInOtherCase_expectConflict() throws Exception {
-        String username = registerPlayer().getUsername();
-
+    void register_givenAnonymousRequest_expectUnauthorizedBecauseSelfRegistrationIsDisabled() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username.toUpperCase(), "geheim-wachtwoord")))
-                .andExpect(status().isConflict());
+                        .content(credentials(uniqueUsername(), PLAYER_PASSWORD)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void register_givenTooShortPassword_expectBadRequest() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                        .with(spaCsrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(uniqueUsername(), "kort")))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void login_givenValidCredentials_expectSessionWithNewId() throws Exception {
-        String username = registerPlayer().getUsername();
+    void login_givenValidCredentials_expectSessionWithNewIdAndRole() throws Exception {
+        String username = createPlayer().getUsername();
         MockHttpSession anonymousSession = new MockHttpSession();
         String anonymousSessionId = anonymousSession.getId();
 
@@ -65,8 +36,10 @@ class AuthControllerIT extends IntegrationTest {
                         .session(anonymousSession)
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username, "geheim-wachtwoord")))
+                        .content(credentials(username, PLAYER_PASSWORD)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.role").value("PLAYER"))
                 .andReturn()
                 .getRequest()
                 .getSession();
@@ -76,7 +49,7 @@ class AuthControllerIT extends IntegrationTest {
 
     @Test
     void login_givenCsrfCookieFromEarlierRequest_expectLoginAcceptedAndTokenRotated() throws Exception {
-        String username = registerPlayer().getUsername();
+        String username = createPlayer().getUsername();
         Cookie csrfCookie =
                 mockMvc.perform(get("/api/auth/me")).andReturn().getResponse().getCookie("XSRF-TOKEN");
 
@@ -84,7 +57,7 @@ class AuthControllerIT extends IntegrationTest {
                         .cookie(csrfCookie)
                         .header("X-XSRF-TOKEN", csrfCookie.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username, "geheim-wachtwoord")))
+                        .content(credentials(username, PLAYER_PASSWORD)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -97,7 +70,7 @@ class AuthControllerIT extends IntegrationTest {
 
     @Test
     void login_givenWrongPassword_expectUnauthorized() throws Exception {
-        String username = registerPlayer().getUsername();
+        String username = createPlayer().getUsername();
 
         mockMvc.perform(post("/api/auth/login")
                         .with(spaCsrf())
@@ -108,11 +81,11 @@ class AuthControllerIT extends IntegrationTest {
 
     @Test
     void login_givenNoCsrfToken_expectForbidden() throws Exception {
-        String username = registerPlayer().getUsername();
+        String username = createPlayer().getUsername();
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username, "geheim-wachtwoord")))
+                        .content(credentials(username, PLAYER_PASSWORD)))
                 .andExpect(status().isForbidden());
     }
 
@@ -124,15 +97,60 @@ class AuthControllerIT extends IntegrationTest {
     }
 
     @Test
-    void logout_givenLoggedInPlayer_expectSessionEnded() throws Exception {
-        String username = registerPlayer().getUsername();
-        MockHttpSession session = (MockHttpSession) mockMvc.perform(post("/api/auth/login")
+    void currentPlayer_givenAdminSession_expectAdminRole() throws Exception {
+        MockHttpSession session = logIn(admin().getUsername(), ADMIN_PASSWORD);
+
+        mockMvc.perform(get("/api/auth/me").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test
+    void changePassword_givenCorrectCurrentPassword_expectNewPasswordWorks() throws Exception {
+        PlayerPrincipal player = createPlayer();
+        MockHttpSession session = logIn(player.getUsername(), PLAYER_PASSWORD);
+
+        mockMvc.perform(put("/api/auth/password")
+                        .session(session)
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(credentials(username, "geheim-wachtwoord")))
-                .andReturn()
-                .getRequest()
-                .getSession();
+                        .content(passwordChange(PLAYER_PASSWORD, "nieuw-wachtwoord")))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(post("/api/auth/login")
+                        .with(spaCsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(credentials(player.getUsername(), "nieuw-wachtwoord")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void changePassword_givenWrongCurrentPassword_expectUnprocessableContent() throws Exception {
+        MockHttpSession session = logIn(createPlayer().getUsername(), PLAYER_PASSWORD);
+
+        mockMvc.perform(put("/api/auth/password")
+                        .session(session)
+                        .with(spaCsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(passwordChange("fout-wachtwoord", "nieuw-wachtwoord")))
+                .andExpect(status().isUnprocessableContent());
+    }
+
+    @Test
+    void changePassword_givenTooShortNewPassword_expectBadRequest() throws Exception {
+        MockHttpSession session = logIn(createPlayer().getUsername(), PLAYER_PASSWORD);
+
+        mockMvc.perform(put("/api/auth/password")
+                        .session(session)
+                        .with(spaCsrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(passwordChange(PLAYER_PASSWORD, "kort")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void logout_givenLoggedInPlayer_expectSessionEnded() throws Exception {
+        MockHttpSession session = logIn(createPlayer().getUsername(), PLAYER_PASSWORD);
 
         mockMvc.perform(post("/api/auth/logout").session(session).with(spaCsrf()))
                 .andExpect(status().isNoContent());
@@ -140,13 +158,9 @@ class AuthControllerIT extends IntegrationTest {
         assertThat(session.isInvalid()).isTrue();
     }
 
-    private static String uniqueUsername() {
-        return "speler-" + UUID.randomUUID().toString().substring(0, 8);
-    }
-
-    private static String credentials(String username, String password) {
+    private static String passwordChange(String currentPassword, String newPassword) {
         return """
-                {"username": "%s", "password": "%s"}
-                """.formatted(username, password);
+                {"currentPassword": "%s", "newPassword": "%s"}
+                """.formatted(currentPassword, newPassword);
     }
 }

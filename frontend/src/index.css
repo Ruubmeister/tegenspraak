@@ -154,20 +154,150 @@ textarea {
   color: var(--color-text-muted);
 }
 
-/* Case list */
+/* Account and user management */
 
-.case-list {
+.account-page,
+.admin-page {
   max-width: 48rem;
   width: 100%;
   margin: 2rem auto;
   padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.case-list ul {
+.account-page .auth-form {
+  max-width: 24rem;
+}
+
+.admin-page section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.inline-form p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.user-table th,
+.user-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.user-table th {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.user-actions .inline-form {
+  flex-basis: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Teams and case list */
+
+.team-list,
+.team-page {
+  max-width: 48rem;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.team-list ul,
+.case-cards {
   list-style: none;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 1rem;
+}
+
+.team-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.team-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.team-header p {
+  margin: 0;
+}
+
+.team-code code {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.team-code-hint,
+.team-members {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.case-nav .case-nav-team {
+  flex-direction: row;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-accent);
 }
 
 .case-card {
@@ -295,6 +425,20 @@ textarea {
   background: var(--color-player-bubble);
   color: #ffffff;
   border-bottom-right-radius: 0.25rem;
+}
+
+.chat-author {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.chat-bubble.teammate {
+  align-self: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 0.25rem;
 }
 
 .chat-bubble.character {
@@ -457,4 +601,83 @@ textarea {
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 0.9rem;
   white-space: pre-wrap;
+}
+
+/* Verdict */
+
+.case-nav .case-nav-verdict {
+  margin-top: auto;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+  text-align: center;
+}
+
+.case-nav .case-nav-verdict.active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.verdict {
+  max-width: 42rem;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.verdict h3 {
+  margin-top: 1.5rem;
+}
+
+.verdict-attempts,
+.verdict-score {
+  color: var(--color-text-muted);
+}
+
+.verdict-score {
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius);
+}
+
+.verdict-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.verdict-form fieldset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.verdict-form legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+.verdict-form label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  cursor: pointer;
 }

@@ -5,11 +5,10 @@ interface AuthFormProps {
   submitLabel: string
   isSubmitting: boolean
   errorMessage: string | null
-  passwordMinLength?: number
   onSubmit: (credentials: Credentials) => void
 }
 
-export function AuthForm({ submitLabel, isSubmitting, errorMessage, passwordMinLength, onSubmit }: AuthFormProps) {
+export function AuthForm({ submitLabel, isSubmitting, errorMessage, onSubmit }: AuthFormProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -37,9 +36,8 @@ export function AuthForm({ submitLabel, isSubmitting, errorMessage, passwordMinL
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          autoComplete={passwordMinLength ? 'new-password' : 'current-password'}
+          autoComplete="current-password"
           required
-          minLength={passwordMinLength}
           maxLength={72}
         />
       </label>

@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> {
 
-    List<ChatMessage> findByPlayerIdAndCaseIdAndCharacterIdOrderBySentAtAsc(
-            UUID playerId, String caseId, String characterId);
+    List<ChatMessage> findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtAsc(
+            UUID teamId, String caseId, String characterId);
 
-    List<ChatMessage> findByPlayerIdAndCaseIdAndCharacterIdOrderBySentAtDesc(
-            UUID playerId, String caseId, String characterId, Limit limit);
+    List<ChatMessage> findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtDesc(
+            UUID teamId, String caseId, String characterId, Limit limit);
 }
