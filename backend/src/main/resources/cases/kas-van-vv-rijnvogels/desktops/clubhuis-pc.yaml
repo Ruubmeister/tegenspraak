@@ -1,0 +1,62 @@
+ownerName: Clubhuis VV Rijnvogels
+ownerType: organisation
+description: De pc achter de bar in het clubhuis, gebruikt voor de kassa, het rooster en het alarm.
+apps:
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: alarmlog-juni
+        folder: Alarm
+        name: Alarmlog_juni_2026.txt
+        content: |
+          Alarmsysteem Clubhuis VV Rijnvogels - export gebeurtenissen
+          Gebruikers worden getoond met hun gebruikerscode.
+
+          13-06-2026 15:02   UITGESCHAKELD   gebruiker 02
+          14-06-2026 00:58   INGESCHAKELD    gebruiker 02
+          14-06-2026 01:12   UITGESCHAKELD   gebruiker 03
+          14-06-2026 01:31   INGESCHAKELD    gebruiker 03
+          14-06-2026 10:04   UITGESCHAKELD   gebruiker 05
+          14-06-2026 12:47   INGESCHAKELD    gebruiker 05
+          15-06-2026 08:31   UITGESCHAKELD   gebruiker 03
+      - id: kasopmaak
+        folder: Kassa
+        name: Kasopmaak_seizoensafsluiting_13-06.txt
+        content: |
+          Kasopmaak seizoensafsluiting zaterdag 13 juni 2026
+
+          Omzet bar (contant)        EUR 6.135,-
+          Loterij                    EUR 2.325,-
+          ---------------------------------------
+          Totaal contant             EUR 8.460,-
+
+          Geteld om 00:45 door K. Bos en R. Verhoef.
+          In verzegelde geldzak nr. 0417, kluis afgesloten om 00:50.
+          Afstorten bij de bank: maandag 15 juni (R. Verhoef).
+
+          Paraaf: KB  RV
+      - id: barrooster
+        folder: Bar
+        name: Barrooster_13-06.txt
+        content: |
+          Barrooster seizoensafsluiting 13 juni
+
+          15:00 - 19:00   Kevin Bos, Annelies de Jong
+          19:00 - 23:00   Kevin Bos, Mo Haddou, Sem Vink
+          23:00 - 00:30   Kevin Bos, Sem Vink
+          Opruimen        Kevin Bos, Fatima El Amrani, Sem Vink
+          Kas tellen      Kevin Bos, Ronald Verhoef
+
+          Zondag 14 juni 10:00: schoonmaak clubhuis (Schoonmaakbedrijf Duinrand)
+      - id: mededeling-kluis
+        folder: Bar
+        name: Mededeling_kluis.txt
+        content: |
+          Aan alle vrijwilligers,
+
+          Na een evenement gaat het geld ALTIJD in de kluis in de bestuurskamer.
+          De kluiscode is alleen bekend bij de voorzitter, de penningmeester en de barbeheerder.
+          Laat nooit geld achter in de kassalade.
+
+          Het bestuur

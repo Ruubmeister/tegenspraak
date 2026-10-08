@@ -16,7 +16,7 @@ spring:
     anthropic:
       api-key: ${ANTHROPIC_API_KEY:}
       chat:
-        model: claude-opus-5-5
+        model: claude-sonnet-5-5
         max-tokens: 16000
 
 server:
@@ -42,3 +42,7 @@ tegenspraak:
   admin:
     username: admin
     initial-password: ${TEGENSPRAAK_ADMIN_PASSWORD:}
+  locks:
+    # A team may enter this many wrong codes per locked item within the window, then it has to wait
+    max-wrong-attempts: 5
+    wrong-attempt-window: 1m

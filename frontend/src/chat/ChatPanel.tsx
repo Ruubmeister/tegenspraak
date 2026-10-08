@@ -42,14 +42,20 @@ export function ChatPanel({ teamId, caseId, character, currentUsername }: ChatPa
         {isPending && <p className="status">Gesprek laden...</p>}
         {isError && <p className="status error">Het gesprek kon niet worden geladen.</p>}
         {messages?.length === 0 && <p className="status">Stuur {character.name} een bericht.</p>}
-        {messages?.map((message) => (
-          <ChatBubble
-            key={message.id}
-            message={message}
-            characterName={character.name}
-            currentUsername={currentUsername}
-          />
-        ))}
+        {messages?.map((message) =>
+          message.sender === 'NOTICE' ? (
+            <p key={message.id} className="chat-notice" role="status">
+              {message.content}
+            </p>
+          ) : (
+            <ChatBubble
+              key={message.id}
+              message={message}
+              characterName={character.name}
+              currentUsername={currentUsername}
+            />
+          ),
+        )}
         {sendMessage.isPending && (
           <>
             <div className="chat-bubble player pending">{sendMessage.variables}</div>

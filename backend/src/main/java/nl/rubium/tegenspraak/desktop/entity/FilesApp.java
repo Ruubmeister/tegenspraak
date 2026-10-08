@@ -6,5 +6,11 @@ public record FilesApp(String id, String title, List<FileEntry> files) implement
 
     public FilesApp {
         files = files == null ? List.of() : List.copyOf(files);
+        UniqueIds.require(files.stream().map(FileEntry::id).toList(), "file", id);
+    }
+
+    @Override
+    public List<FileEntry> items() {
+        return files;
     }
 }

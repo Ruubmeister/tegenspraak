@@ -1,0 +1,121 @@
+title: Het laatste experiment (moeilijk)
+summary: >-
+  Een jonge onderzoeker wordt dood gevonden in de stikstofopslag van een biotechinstituut. De politie houdt het op een
+  tragisch ongeluk. Maar waarom kon ze de ruimte niet uit?
+introduction: >-
+  Het is maandag 15 juni. Rechercheur Daan Hofman van de politie Midden-Nederland heeft jullie team gevraagd om met
+  een frisse blik naar een zaak te kijken die hij bijna wil afsluiten. Op dinsdag 9 juni om 07:40 werd dr. Eva Brink
+  (34), postdoc in de onderzoeksgroep van prof. dr. Arjen Kuiper aan het Hollands Biotech Instituut (HBI) in Utrecht,
+  dood gevonden in cryo-opslagruimte B0.14. Ze is gestikt door zuurstoftekort tijdens de automatische vulling van de
+  stikstofvaten. Het zuurstofalarm ging niet af. De voorlopige conclusie is een ongeval, maar Eva's zus blijft bellen
+  en Daan heeft een onrustig gevoel. Jullie hebben toegang tot het politiedossier, de werkplek van Eva, de gedeelde
+  schijf van de onderzoeksgroep en het facilitaire systeem van het HBI. De in beslag genomen laptop van Arjen Kuiper
+  is beveiligd.
+setting: >-
+  Prof. dr. Arjen Kuiper (56) leidt een onderzoeksgroep aan het Hollands Biotech Instituut (HBI) in Utrecht. Zijn
+  Nature-artikel uit 2024 over een biomarker voor alvleesklierkanker, met figuur 3 als kern, is gebaseerd op 112
+  patiëntmonsters van "cohort B". In werkelijkheid bestaan er maar 74; 38 monsters zijn verzonnen. Kuiper is finalist
+  voor een ERC Advanced Grant van 2,5 miljoen euro, met een interview op 22 juni. Postdoc dr. Eva Brink ontdekte de
+  fraude in mei door de biobankregistratie te vergelijken met de dataset. Op vrijdag 5 juni belde ze met de
+  vertrouwenspersoon wetenschappelijke integriteit, dr. Hanneke Smit, en maakte een afspraak voor woensdag 10 juni
+  om 09:00, zonder namen te noemen. Ook op 5 juni mailde technicus Ruud Kamphuis aan Kuiper dat de zuurstofsensor van
+  cryo-ruimte B0.14 in bypass stond tot er een nieuw onderdeel was, en vroeg hem zijn mensen te waarschuwen. Kuiper
+  waarschuwde niemand. Op maandag 8 juni om 18:05 mailde Eva aan Kuiper dat ze de originele monsterdozen van cohort B
+  die avond uit B0.14 zou halen en woensdag alles aan de vertrouwenspersoon zou geven. Kuiper schreef om 19:30 een
+  concept-antwoord dat hij nooit verstuurde. Eva had die middag ook ruzie met postdoc Thomas Veldkamp, omdat hij in
+  april een deel van haar analyse in zijn eigen hoofdstuk had overgenomen; Thomas dacht daarom dat zij hém ging
+  aangeven. Thomas bleef tot 21:34 in het gebouw om haar bestanden op de gedeelde schijf door te kijken en vertrok
+  daarna. Om 21:30 zag hij Eva bij de koffieautomaat; ze zei dat ze "nog even naar beneden" ging. Om 21:41 ging Eva
+  met haar badge B0.14 binnen. Om 21:43 appte ze haar zus Lisa: "Ik haal nu de dozen uit de cryo. Als ik die heb kan
+  Arjen het niet meer ontkennen." Haar telefoon liet ze daarna in haar tas in haar kantoor B1.22 liggen. Kuiper kwam
+  om 21:48 het gebouw binnen, haalde om 21:52 met zijn eigen pas de sleutel van de nachtgrendel (NG-B0) uit de
+  elektronische sleutelkast en schoof rond 21:55 de mechanische nachtgrendel van B0.14 van buiten dicht, terwijl hij
+  wist dat Eva binnen was. Hij wilde haar tot de volgende ochtend weghouden van de monsters en ondertussen haar bewijs
+  weghalen. Om 22:00 begon de automatische vulling van de stikstofvaten. Omdat de sensor in bypass stond, sloeg de
+  ventilatie niet aan. Om 22:05 opende Kuiper met zijn badge Eva's kantoor B1.22 en nam haar blauwe labjournaal
+  nummer 7 mee. Tussen 22:11 en 22:14 drukte Eva vier keer op de noodknop binnen, maar de deur bleef geblokkeerd door
+  de grendel. Ze bonsde op de deur en raakte bewusteloos; ze overleed rond 22:30. Kuiper verliet het gebouw om 22:20.
+  Nachtbeveiliger Bart de Wit sloeg zijn ronde van 22:30 door de B-vleugel over, omdat hij in slaap was gevallen. Bij
+  zijn ronde van 02:30 zag hij dat de nachtgrendel van B0.14 dicht zat, maar keek niet naar binnen. Om 05:52 kwam
+  Kuiper terug, schoof om 05:55 de grendel open en legde om 05:58 de sleutel terug in de sleutelkast. Hij zei tegen de
+  politie dat hij om 17:45 naar huis ging en pas om 05:52 terugkwam om aan zijn ERC-presentatie te werken. Om 07:40
+  vond Ruud Kamphuis Eva. Uit paniek vulde Ruud die ochtend in het onderhoudslog in dat hij de sensor op 6 juni had
+  vervangen en getest; het nieuwe onderdeel werd pas op 12 juni geleverd. Kuiper heeft het labjournaal vernietigd. De
+  politie ging uit van een ongeluk: de deur was dicht maar niet vergrendeld, de noodknop werkte bij een test, en men
+  nam aan dat Eva bewusteloos raakte voordat ze de deur bereikte. Het log met de noodknopmeldingen en het log van de
+  sleutelkast heeft de politie nog niet opgevraagd.
+solution:
+  questions:
+    - id: wie
+      question: Wie is verantwoordelijk voor de dood van Eva Brink?
+      options:
+        - id: arjen-kuiper
+          label: Arjen Kuiper, de groepsleider
+        - id: ruud-kamphuis
+          label: Ruud Kamphuis, de technicus
+        - id: thomas-veldkamp
+          label: Thomas Veldkamp, de collega-postdoc
+        - id: bart-de-wit
+          label: Bart de Wit, de nachtbeveiliger
+        - id: niemand
+          label: Niemand, het was een ongeluk
+      answer: arjen-kuiper
+    - id: opgesloten
+      question: Waarom kwam Eva Brink de ruimte niet uit?
+      options:
+        - id: bewusteloos
+          label: Ze raakte bewusteloos voordat ze de noodknop kon bereiken
+        - id: noodknop-defect
+          label: De noodknop aan de binnenkant was defect
+        - id: nachtgrendel
+          label: De nachtgrendel was van buitenaf dichtgeschoven, waardoor de noodknop de deur niet opende
+        - id: badge-geblokkeerd
+          label: Haar badge was die avond geblokkeerd, zodat de deur niet openging
+      answer: nachtgrendel
+    - id: alarm
+      question: Waarom ging het zuurstofalarm niet af?
+      options:
+        - id: bypass
+          label: De sensor stond al sinds 5 juni in bypass; het onderhoudslog is achteraf vervalst
+        - id: uitgezet-door-dader
+          label: De dader heeft de sensor die avond uitgeschakeld
+        - id: stroomstoring
+          label: Door een stroomstoring werkte de ventilatie niet
+        - id: genegeerd
+          label: Het alarm ging wel af, maar de beveiliging reageerde niet
+      answer: bypass
+    - id: motief
+      question: Wat was het motief?
+      options:
+        - id: fraude
+          label: Eva stond op het punt datamanipulatie in het Nature-artikel te melden
+        - id: vaste-aanstelling
+          label: Eva was de concurrent voor een vaste aanstelling
+        - id: plagiaat
+          label: Eva zou een collega aangeven voor plagiaat
+        - id: relatie
+          label: Een uit de hand gelopen persoonlijke relatie
+      answer: fraude
+    - id: opzet
+      question: Wat beschrijft het handelen van de verantwoordelijke het best?
+      options:
+        - id: onwetend
+          label: Hij schoof de grendel dicht zonder te weten dat er iemand binnen was
+        - id: bewust-risico
+          label: >-
+            Hij sloot haar bewust op om haar bewijs weg te nemen, terwijl hij wist dat de sensor in bypass stond en de
+            vulling om 22:00 begon
+        - id: vergiftigd
+          label: Hij liet de stikstof handmatig in de ruimte stromen om haar te doden
+        - id: ruzie
+          label: Hij duwde haar tijdens een ruzie de ruimte in en raakte in paniek
+      answer: bewust-risico
+  epilogue: >-
+    Eva Brink had ontdekt dat 38 van de 112 monsters in het Nature-artikel van Arjen Kuiper nooit hebben bestaan. Op 8
+    juni mailde ze hem dat ze die avond de originele dozen uit de cryo-opslag zou halen. Kuiper kwam om 21:48 terug
+    naar het instituut, haalde de sleutel van de nachtgrendel uit de sleutelkast en sloot haar op. Hij wist van Ruud
+    Kamphuis dat de zuurstofsensor in bypass stond en dat de vulling om 22:00 zou beginnen. Terwijl Eva tevergeefs op de
+    noodknop drukte, haalde hij haar labjournaal uit haar kantoor. 's Ochtends schoof hij de grendel weer open, zodat
+    het op een ongeluk leek. Kuiper is aangehouden op verdenking van doodslag. Ruud Kamphuis wordt vervolgd voor het
+    vervalsen van het onderhoudslog. Het HBI heeft het Nature-artikel laten terugtrekken. Hanneke Smit heeft het
+    integriteitsonderzoek overgenomen, en Eva wordt postuum als eerste auteur genoemd op de rectificatie.

@@ -1,0 +1,48 @@
+ownerName: Atelier Pauw
+ownerType: organisation
+description: De pc in het restauratieatelier van Hendrik Pauw in Amsterdam.
+lock:
+  code: spieraam
+  hint: "Beveiligd. Alleen Hendrik Pauw kent de code."
+apps:
+  - type: files
+    id: werkorders
+    title: Werkorders
+    files:
+      - id: werkorder-restauratie
+        folder: Werkorders 2026
+        name: Werkorder_2026-031.txt
+        content: |
+          Werkorder 2026-031
+          Opdrachtgever: Galerie Lindeboom, V. Lindeboom
+          Binnengekomen: 14 april 2026
+
+          M. Brandt, Duinlandschap bij Bloemendaal, olie op doek, 68 x 92 cm
+          M. Brandt, Vrouw met parasol, olie op doek, 81 x 60 cm
+
+          Werkzaamheden: oppervlaktereiniging, vernis verwijderd en vernieuwd.
+          Toestand: goed, licht craquelé in de lucht van het Duinlandschap.
+      - id: werkorder-kopieen
+        folder: Werkorders 2026
+        name: Werkorder_2026-032.txt
+        content: |
+          Werkorder 2026-032
+          Opdrachtgever: Galerie Lindeboom, V. Lindeboom
+
+          Twee presentatiekopieën naar M. Brandt (zie 2026-031), zelfde formaat,
+          oud doek en spieraam, verouderde vernis. Voor reizende tentoonstelling.
+          Merkteken: potlood op spieraam "HP 2026 kopie".
+
+          Opgeleverd: 19 mei 2026
+          Vergoeding: EUR 18.000,- (contant ontvangen 19 mei)
+      - id: transportbonnen
+        folder: Transport
+        name: Transporten_20-05.txt
+        content: |
+          Ophaling Kunsttransport Ruysdael, 20 mei 2026, 10:00
+
+          R-26-0514   2 kisten   -> Galerie Lindeboom, Haarlem
+          R-26-0515   2 kisten   -> Verstraeten Fine Art, Antwerpen
+
+          Indeling door H. Pauw volgens instructie V. Lindeboom:
+          kisten met merkteken "HP" naar Haarlem, de andere twee naar Antwerpen.

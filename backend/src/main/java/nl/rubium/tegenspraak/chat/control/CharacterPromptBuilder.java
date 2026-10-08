@@ -10,7 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CharacterPromptBuilder {
 
-    public String buildSystemPrompt(CaseDefinition caseDefinition, CharacterProfile character) {
+    /**
+     * @param introducibleContacts hidden characters this character may still introduce to the team; their conditions
+     *     come from the character's introductions
+     */
+    public String buildSystemPrompt(
+            CaseDefinition caseDefinition, CharacterProfile character, List<CharacterProfile> introducibleContacts) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Je speelt het personage ")
                 .append(character.name())
@@ -29,6 +34,7 @@ public class CharacterPromptBuilder {
         appendSection(prompt, "Schrijfstijl", character.speechStyle());
         appendList(prompt, "Wat je weet en vrij mag vertellen", character.knownFacts());
         appendSecrets(prompt, character.secrets());
+        appendIntroductions(prompt, character, introducibleContacts);
         appendRules(prompt);
         return prompt.toString();
     }
@@ -64,6 +70,31 @@ public class CharacterPromptBuilder {
                 .append("\n  Geef dit pas prijs als: ")
                 .append(secret.revealWhen().strip())
                 .append('\n'));
+        prompt.append('\n');
+    }
+
+    private static void appendIntroductions(
+            StringBuilder prompt, CharacterProfile character, List<CharacterProfile> introducibleContacts) {
+        if (introducibleContacts.isEmpty()) {
+            return;
+        }
+        prompt.append("## Mensen die je kunt voorstellen\n")
+                .append("Je kunt de rechercheurs in contact brengen met deze mensen. Doe dat alleen als aan de"
+                        + " voorwaarde is voldaan: roep dan de tool ")
+                .append(IntroduceContactTool.NAME)
+                .append(" aan met het id en vertel in je antwoord dat ze contact kunnen opnemen.\n");
+        for (CharacterProfile contact : introducibleContacts) {
+            character.introduces().stream()
+                    .filter(introduction -> introduction.character().equals(contact.id()))
+                    .findFirst()
+                    .ifPresent(introduction -> prompt.append("- ")
+                            .append(contact.name())
+                            .append(" (id: ")
+                            .append(contact.id())
+                            .append(")\n  Voorwaarde: ")
+                            .append(introduction.when().strip())
+                            .append('\n'));
+        }
         prompt.append('\n');
     }
 

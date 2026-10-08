@@ -1,0 +1,88 @@
+ownerName: Arjen Kuiper
+ownerType: person
+description: Laptop van Arjen Kuiper, in beslag genomen door de politie.
+lock:
+  code: C2072024
+  hint: "Wachtwoordhint: mijn eerste lab (zonder punt) + het jaar van het Nature-artikel"
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: bypass
+        folder: Inbox
+        from: r.kamphuis@hbi.nl
+        to: a.kuiper@hbi.nl
+        subject: sensor B0.14
+        sentAt: 2026-06-05T11:37:00
+        body: |
+          Arjen,
+
+          De zuurstofsensor van B0.14 geeft steeds vals alarm. Ik heb hem in bypass gezet tot het nieuwe
+          onderdeel er is, dat duurt ongeveer een week. Ventilatie slaat dan ook niet automatisch aan.
+          Wil je je mensen waarschuwen dat ze niet in B0.14 moeten zijn tijdens de vulling (22:00)?
+
+          Ruud
+      - id: van-eva
+        folder: Inbox
+        from: e.brink@hbi.nl
+        to: a.kuiper@hbi.nl
+        subject: Cohort B
+        sentAt: 2026-06-08T18:05:00
+        body: |
+          Arjen,
+
+          Ik heb het je vorige week al gevraagd en je ontweek het. Ik heb de biobankregistratie van cohort B
+          naast de dataset van figuur 3 gelegd. Er zijn 74 monsters, geen 112. De rest bestaat niet.
+
+          Vanavond haal ik de originele dozen uit B0.14 en woensdag geef ik alles aan de vertrouwenspersoon.
+          Het spijt me, maar ik kan dit niet laten liggen.
+
+          Eva
+      - id: erc-interview
+        folder: Inbox
+        from: noreply@erc.europa.eu
+        to: a.kuiper@hbi.nl
+        subject: ERC Advanced Grant - invitation to interview
+        sentAt: 2026-05-20T14:00:00
+        body: |
+          Dear Professor Kuiper,
+
+          We are pleased to inform you that your proposal "PANC-MARK" has been selected for the final stage.
+          Your interview is scheduled for 22 June 2026 in Brussels. Please note that the panel will discuss
+          your key publications, in particular Kuiper et al., Nature 2024.
+
+          ERC Executive Agency
+      - id: concept-aan-eva
+        folder: Concepten
+        from: a.kuiper@hbi.nl
+        to: e.brink@hbi.nl
+        subject: "Re: Cohort B"
+        sentAt: 2026-06-08T19:30:00
+        body: |
+          Eva,
+
+          Doe niets overhaasts. Je begrijpt niet wat je aan het doen bent, niet voor mij en niet voor jezelf.
+          Ik kom vanavond naar het instituut, dan
+      - id: ruud-bevestiging
+        folder: Verzonden
+        from: a.kuiper@hbi.nl
+        to: r.kamphuis@hbi.nl
+        subject: "Re: sensor B0.14"
+        sentAt: 2026-06-05T12:02:00
+        body: |
+          Prima, ik regel het.
+
+          A.
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: erc-presentatie
+        folder: ERC
+        name: Interview_notities.txt
+        content: |
+          ERC interview 22-06
+          - opening: Nature 2024, figuur 3 = bewijs van concept
+          - vragen over cohort B? -> "volledig gevalideerd, n=112"
+          - team: Brink (biomarkers), Veldkamp (modellen), Jansen (PhD)

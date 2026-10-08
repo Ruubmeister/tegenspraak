@@ -1,0 +1,89 @@
+ownerName: Ronald Verhoef
+ownerType: person
+description: Clublaptop van de penningmeester. Eigendom van VV Rijnvogels, Ingrid heeft je toegang gegeven.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: luckyduin-limiet
+        folder: Inbox
+        from: support@luckyduin-casino.com
+        to: penningmeester@vvrijnvogels.nl
+        subject: Je account is tijdelijk geblokkeerd
+        sentAt: 2026-06-10T09:14:00
+        body: |
+          Beste Ronald,
+
+          Je openstaande saldo van EUR 11.240,- is niet binnen de termijn voldaan.
+          Je account is daarom geblokkeerd. Na betaling van het volledige bedrag wordt je account
+          direct weer geactiveerd.
+
+          Team LuckyDuin
+      - id: luckyduin-betaling
+        folder: Inbox
+        from: support@luckyduin-casino.com
+        to: penningmeester@vvrijnvogels.nl
+        subject: Storting ontvangen
+        sentAt: 2026-06-14T14:22:00
+        body: |
+          Beste Ronald,
+
+          We hebben je contante storting van EUR 8.400,- via het stortingspunt ontvangen.
+          Openstaand saldo: EUR 2.840,-. Je account is weer actief. Veel speelplezier!
+
+          Team LuckyDuin
+      - id: kluis-leeg
+        folder: Verzonden
+        from: penningmeester@vvrijnvogels.nl
+        to: voorzitter@vvrijnvogels.nl
+        subject: Kluis LEEG
+        sentAt: 2026-06-15T08:44:00
+        body: |
+          Ingrid,
+
+          Zoals ik net al aan de telefoon zei: de kluis was dicht, maar de geldzak is weg. Geen braak.
+          Ik wil niemand beschuldigen, maar alleen wij drieën hebben de code. Kevin was als laatste
+          weg en rijdt sinds kort op een gloednieuwe scooter. Ik zeg het maar even.
+
+          Ronald
+      - id: herinnering-jaarrekening
+        folder: Inbox
+        from: secretaris@vvrijnvogels.nl
+        to: penningmeester@vvrijnvogels.nl
+        subject: Jaarrekening en kascontrole
+        sentAt: 2026-06-02T19:30:00
+        body: |
+          Ronald,
+
+          De kascommissie wil graag voor 1 juli de stukken zien. Kun je de bankafschriften van het
+          afgelopen jaar alvast delen?
+
+          Groet, Gert
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: begroting
+        folder: Penningmeester
+        name: Begroting_2026-2027.txt
+        content: |
+          Begroting VV Rijnvogels 2026-2027 (concept)
+
+          Contributie            EUR 48.000,-
+          Sponsoring             EUR 21.500,-
+          Kantine                EUR 34.000,-
+          Seizoensafsluiting     EUR  8.000,- (verwacht)
+      - id: overzicht
+        folder: Persoonlijk
+        name: overzicht.txt
+        lock:
+          code: "1923"
+          hint: "Wachtwoordhint: oprichtingsjaar van de club"
+        content: |
+          LuckyDuin       11.240  !! geblokkeerd, moet voor 20 juni
+          Creditcard       1.850
+          Zwager Henk      2.000  (zegt niks tegen Marja)
+
+          clubgeld: maandag pas naar bank -> zondag storten bij stortingspunt
+          als het uitkomt: zeggen dat de kluis leeg was, Kevin heeft de code ook

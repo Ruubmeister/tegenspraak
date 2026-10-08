@@ -38,10 +38,16 @@ export interface CharacterSummary {
 
 export type OwnerType = 'person' | 'organisation'
 
+/** Present while something is locked. The code itself never reaches the browser. */
+export interface Lock {
+  hint: string
+}
+
 export interface DesktopSummary {
   id: string
   ownerName: string
   ownerType: OwnerType
+  lock: Lock | null
 }
 
 export interface CaseOverview {
@@ -59,7 +65,9 @@ export interface MailMessage {
   to: string
   subject: string
   sentAt: string
-  body: string
+  /** Null while the mail is locked. */
+  body: string | null
+  lock: Lock | null
 }
 
 export interface MailApp {
@@ -73,7 +81,9 @@ export interface FileEntry {
   id: string
   folder: string
   name: string
-  content: string
+  /** Null while the file is locked. */
+  content: string | null
+  lock: Lock | null
 }
 
 export interface FilesApp {
@@ -86,15 +96,18 @@ export interface FilesApp {
 /** Discriminated on "type". A new desktop app needs a member here and a case in DesktopAppView. */
 export type DesktopApp = MailApp | FilesApp
 
+/** A locked desktop has no apps until the team enters its code. */
 export interface Desktop {
   id: string
   ownerName: string
   ownerType: OwnerType
   description: string
+  lock: Lock | null
   apps: DesktopApp[]
 }
 
-export type MessageSender = 'PLAYER' | 'CHARACTER'
+/** NOTICE messages are game events in the chat, such as a newly introduced contact. */
+export type MessageSender = 'PLAYER' | 'CHARACTER' | 'NOTICE'
 
 /** The conversation is shared by the team; authorName is the member who wrote a PLAYER message. */
 export interface ChatMessage {

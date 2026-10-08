@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import type { MailApp, MailMessage } from '../../api/types'
+import type { DesktopLocation } from '../desktopApi'
+import { LockIcon } from '../UnlockForm'
 import { folderNames } from './groupByFolder'
+import { LockedItem } from './LockedItem'
 
 const dateTimeFormat = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'medium', timeStyle: 'short' })
 
-export function MailAppView({ app }: { app: MailApp }) {
+export function MailAppView({ app, location }: { app: MailApp; location: DesktopLocation }) {
   const folders = folderNames(app.messages)
   const [selectedFolder, setSelectedFolder] = useState(folders[0])
   const [selectedMessageId, setSelectedMessageId] = useState<string>()
@@ -37,7 +40,9 @@ export function MailAppView({ app }: { app: MailApp }) {
               className={message.id === selectedMessageId ? 'active' : undefined}
               onClick={() => setSelectedMessageId(message.id)}
             >
-              <span className="mail-list-subject">{message.subject}</span>
+              <span className="mail-list-subject">
+                {message.subject} {message.lock && <LockIcon />}
+              </span>
               <span className="mail-list-meta">
                 {message.from} · {dateTimeFormat.format(new Date(message.sentAt))}
               </span>
@@ -46,13 +51,23 @@ export function MailAppView({ app }: { app: MailApp }) {
         ))}
       </ul>
       <div className="app-reader">
-        {selectedMessage ? <MailReader message={selectedMessage} /> : <p className="status">Selecteer een bericht.</p>}
+        {selectedMessage ? (
+          <MailReader message={selectedMessage} appId={app.id} location={location} />
+        ) : (
+          <p className="status">Selecteer een bericht.</p>
+        )}
       </div>
     </div>
   )
 }
 
-function MailReader({ message }: { message: MailMessage }) {
+interface MailReaderProps {
+  message: MailMessage
+  appId: string
+  location: DesktopLocation
+}
+
+function MailReader({ message, appId, location }: MailReaderProps) {
   return (
     <article>
       <h3>{message.subject}</h3>
@@ -64,7 +79,18 @@ function MailReader({ message }: { message: MailMessage }) {
         <dt>Datum</dt>
         <dd>{dateTimeFormat.format(new Date(message.sentAt))}</dd>
       </dl>
-      <pre className="document-text">{message.body}</pre>
+      {message.lock ? (
+        <LockedItem
+          key={message.id}
+          location={location}
+          appId={appId}
+          itemId={message.id}
+          lock={message.lock}
+          subject="deze mail"
+        />
+      ) : (
+        <pre className="document-text">{message.body}</pre>
+      )}
     </article>
   )
 }

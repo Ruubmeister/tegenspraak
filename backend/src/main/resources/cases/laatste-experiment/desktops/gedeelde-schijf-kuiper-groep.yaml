@@ -1,0 +1,56 @@
+ownerName: Onderzoeksgroep Kuiper
+ownerType: organisation
+description: De gedeelde schijf van de onderzoeksgroep van Arjen Kuiper.
+apps:
+  - type: files
+    id: schijf
+    title: Gedeelde schijf
+    files:
+      - id: medewerkers
+        folder: Groep
+        name: Medewerkers.txt
+        content: |
+          Onderzoeksgroep Kuiper - Hollands Biotech Instituut
+
+          Prof. dr. Arjen Kuiper - groepsleider. Begon zijn groep in 2009 in lab C2.07 en verhuisde in 2015
+            naar de B-vleugel. Kantoor B2.10.
+          Dr. Eva Brink - postdoc sinds 2023. Promoveerde in 2021 in Groningen. Kantoor B1.22.
+          Dr. Thomas Veldkamp - postdoc sinds 2022. Promoveerde in 2020 in Leiden. Kantoor B1.24.
+          Mila Jansen MSc - promovendus sinds 2024. Kantoor B1.22.
+          Ruud Kamphuis - technicus (facilitaire dienst, gedeeld met groep De Haan).
+      - id: publicaties
+        folder: Groep
+        name: Publicaties.txt
+        content: |
+          Selectie publicaties
+
+          Kuiper A., Brink E., Veldkamp T., et al. (2024). A circulating biomarker for early detection of
+            pancreatic cancer. Nature. Cohort B: n = 112, figuur 3.
+          Kuiper A., De Haan P. (2021). Cryopreservation of serum biobanks. J. Biobanking.
+      - id: biobankregister
+        folder: Biobank
+        name: Register_cohort_B.txt
+        content: |
+          Biobankregister cohort B (export 2 juni 2026)
+
+          Dozen B-01 t/m B-08, vat 3, cryo-opslag B0.14
+          Aantal geregistreerde monsters: 74
+          Laatste ontvangst: 11-12-2023
+          Beheerder: A. Kuiper
+      - id: vaste-aanstelling
+        folder: Groep
+        name: Vacature_tenure_track.txt
+        content: |
+          Tenure track groep Kuiper - interne procedure
+
+          Kandidaten: dr. E. Brink, dr. T. Veldkamp
+          Besluit: 1 juli 2026, door de groepsleider na advies van de commissie.
+      - id: agenda-juni
+        folder: Groep
+        name: Groepsagenda_juni.txt
+        content: |
+          02-06   Groepsoverleg 10:00
+          08-06   T. Veldkamp: avond vrij (verjaardag moeder) - vervalt
+          09-06   A. Kuiper: hele dag ERC-voorbereiding
+          10-06   E. Brink: ochtend afwezig
+          22-06   A. Kuiper: ERC-interview Brussel

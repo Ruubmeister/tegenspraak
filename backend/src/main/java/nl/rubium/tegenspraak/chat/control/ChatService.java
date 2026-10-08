@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
-import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
-import nl.rubium.tegenspraak.team.control.TeamService;
+import nl.rubium.tegenspraak.investigation.control.InvestigationService;
+import nl.rubium.tegenspraak.investigation.control.TeamProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -20,7 +19,10 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
@@ -30,66 +32,84 @@ public class ChatService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ChatService.class);
 
-    private final CaseCatalog caseCatalog;
+    /** Guards against a model that keeps calling tools instead of answering. */
+    private static final int MAX_TOOL_ROUNDS = 3;
+
     private final CharacterPromptBuilder characterPromptBuilder;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatModel chatModel;
-    private final TeamService teamService;
+    private final ToolCallingManager toolCallingManager;
+    private final InvestigationService investigationService;
     private final ConversationLocks conversationLocks;
     private final int maxHistoryMessages;
 
     public ChatService(
-            CaseCatalog caseCatalog,
             CharacterPromptBuilder characterPromptBuilder,
             ChatMessageRepository chatMessageRepository,
             ChatModel chatModel,
-            TeamService teamService,
+            ToolCallingManager toolCallingManager,
+            InvestigationService investigationService,
             ConversationLocks conversationLocks,
             @Value("${tegenspraak.chat.max-history-messages}") int maxHistoryMessages) {
-        this.caseCatalog = caseCatalog;
         this.characterPromptBuilder = characterPromptBuilder;
         this.chatMessageRepository = chatMessageRepository;
         this.chatModel = chatModel;
-        this.teamService = teamService;
+        this.toolCallingManager = toolCallingManager;
+        this.investigationService = investigationService;
         this.conversationLocks = conversationLocks;
         this.maxHistoryMessages = maxHistoryMessages;
     }
 
     public List<ChatMessage> getConversation(UUID playerId, Conversation conversation) {
-        teamService.requireMember(conversation.teamId(), playerId);
-        caseCatalog.getCharacter(conversation.caseId(), conversation.characterId());
+        investigationService.requireAvailableCharacter(
+                conversation.teamId(), playerId, conversation.caseId(), conversation.characterId());
         return chatMessageRepository.findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtAsc(
                 conversation.teamId(), conversation.caseId(), conversation.characterId());
     }
 
     /**
-     * Sends a team member's message to the character and returns the reply. Both messages are only stored once the
-     * character has replied, so a failed LLM call leaves the conversation untouched and the player can retry. Messages
-     * to the same conversation are handled one at a time, see ConversationLocks.
+     * Sends a team member's message to the character and returns the reply. Messages are only stored once the character
+     * has replied, so a failed LLM call leaves the conversation untouched and the player can retry. Messages to the same
+     * conversation are handled one at a time, see ConversationLocks.
      */
     public ChatMessage sendMessage(UUID playerId, String playerName, Conversation conversation, String content) {
-        teamService.requireMember(conversation.teamId(), playerId);
-        CaseDefinition caseDefinition = caseCatalog.getCase(conversation.caseId());
-        CharacterProfile character = caseCatalog.getCharacter(conversation.caseId(), conversation.characterId());
-        String systemPrompt = characterPromptBuilder.buildSystemPrompt(caseDefinition, character);
-
+        CharacterProfile character = investigationService.requireAvailableCharacter(
+                conversation.teamId(), playerId, conversation.caseId(), conversation.characterId());
         return conversationLocks.withLock(
-                conversation, () -> replyAndStore(conversation, systemPrompt, playerName, content));
+                conversation, () -> replyAndStore(playerId, conversation, character, playerName, content));
     }
 
+    /**
+     * Progress is read inside the lock, so the character is only offered introductions that did not happen yet. Contacts
+     * the character introduced are unlocked for the team and announced with a notice in this conversation.
+     */
     private ChatMessage replyAndStore(
-            Conversation conversation, String systemPrompt, String playerName, String content) {
+            UUID playerId, Conversation conversation, CharacterProfile character, String playerName, String content) {
+        TeamProgress progress =
+                investigationService.getProgress(conversation.teamId(), playerId, conversation.caseId());
+        List<CharacterProfile> introducible = progress.introducibleBy(character);
+        IntroduceContactTool introduceContactTool = new IntroduceContactTool(introducible);
+
         ChatMessage playerMessage = ChatMessage.fromPlayer(
                 conversation.teamId(), conversation.caseId(), conversation.characterId(), playerName, content);
         List<Message> prompt = new ArrayList<>();
-        prompt.add(new SystemMessage(systemPrompt));
+        prompt.add(new SystemMessage(
+                characterPromptBuilder.buildSystemPrompt(progress.caseDefinition(), character, introducible)));
         recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message)));
         prompt.add(toPromptMessage(playerMessage));
 
-        String reply = askModel(prompt, conversation.characterId());
+        String reply = askModel(prompt, introducible.isEmpty() ? null : introduceContactTool, character.id());
         ChatMessage characterMessage = ChatMessage.fromCharacter(
                 conversation.teamId(), conversation.caseId(), conversation.characterId(), reply);
-        chatMessageRepository.saveAll(List.of(playerMessage, characterMessage));
+        List<ChatMessage> newMessages = new ArrayList<>(List.of(playerMessage, characterMessage));
+        investigationService
+                .introduceCharacters(conversation.teamId(), conversation.caseId(), introduceContactTool.introduced())
+                .forEach(contact -> newMessages.add(ChatMessage.notice(
+                        conversation.teamId(),
+                        conversation.caseId(),
+                        conversation.characterId(),
+                        character.name() + " heeft je in contact gebracht met " + contact.name() + ".")));
+        chatMessageRepository.saveAll(newMessages);
         return characterMessage;
     }
 
@@ -102,6 +122,7 @@ public class ChatService {
                         conversation.characterId(),
                         Limit.of(maxHistoryMessages)));
         Collections.reverse(history);
+        history.removeIf(message -> message.getSender() == MessageSender.NOTICE);
         while (!history.isEmpty() && history.getFirst().getSender() != MessageSender.PLAYER) {
             history.removeFirst();
         }
@@ -113,13 +134,17 @@ public class ChatService {
         return switch (message.getSender()) {
             case PLAYER -> new UserMessage("[" + message.getAuthorName() + "]: " + message.getContent());
             case CHARACTER -> new AssistantMessage(message.getContent());
+            case NOTICE -> throw new IllegalArgumentException("Notices are not part of the prompt");
         };
     }
 
-    private String askModel(List<Message> prompt, String characterId) {
+    /** The tool is null when the character has nobody left to introduce. */
+    private String askModel(List<Message> prompt, IntroduceContactTool introduceContactTool, String characterId) {
         ChatResponse response;
         try {
-            response = chatModel.call(new Prompt(prompt));
+            response = introduceContactTool == null
+                    ? chatModel.call(new Prompt(prompt))
+                    : callWithTool(new Prompt(prompt, optionsWithTool(introduceContactTool)));
         } catch (RuntimeException e) {
             LOG.warn("LLM call failed for character {}", characterId, e);
             throw new CharacterUnavailableException("LLM call failed for character " + characterId, e);
@@ -135,6 +160,36 @@ public class ChatService {
             throw new CharacterUnavailableException("Empty reply from character " + characterId);
         }
         return reply.strip();
+    }
+
+    /**
+     * The chat model only returns the tool call, it does not execute it. The tool runs here and its result goes back to
+     * the model, until the model answers with text.
+     */
+    private ChatResponse callWithTool(Prompt prompt) {
+        Prompt currentPrompt = prompt;
+        ChatResponse response = chatModel.call(currentPrompt);
+        for (int round = 0; round < MAX_TOOL_ROUNDS && response != null && response.hasToolCalls(); round++) {
+            List<Message> history =
+                    toolCallingManager.executeToolCalls(currentPrompt, response).conversationHistory();
+            currentPrompt = new Prompt(history, prompt.getOptions());
+            response = chatModel.call(currentPrompt);
+        }
+        return response;
+    }
+
+    /**
+     * Runtime options replace the model's configured options instead of being merged with them, so the tool is added to
+     * a copy of the configured options.
+     */
+    private ChatOptions optionsWithTool(IntroduceContactTool introduceContactTool) {
+        if (!(chatModel.getOptions() instanceof ToolCallingChatOptions defaultOptions)) {
+            throw new IllegalStateException("The chat model does not support tool calling");
+        }
+        return defaultOptions
+                .mutate()
+                .toolCallbacks(introduceContactTool.toCallback())
+                .build();
     }
 
     /**

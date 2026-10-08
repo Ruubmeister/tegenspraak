@@ -1,0 +1,77 @@
+ownerName: Hollandia Kunstverzekeringen
+ownerType: organisation
+description: Het schadedossier van Galerie Lindeboom bij Hollandia Kunstverzekeringen.
+apps:
+  - type: files
+    id: dossier
+    title: Schadedossier
+    files:
+      - id: schademelding
+        folder: Claim
+        name: Schademelding_19-09-2026.txt
+        content: |
+          Schademelding Hollandia Kunstverzekeringen
+          Polisnummer: HKV-77120-L
+          Verzekerde: Galerie Lindeboom, V. Lindeboom
+          Datum melding: 19 september 2026, 09:12
+
+          Toedracht volgens verzekerde:
+          "In de nacht van 18 op 19 september is brand uitgebroken in het depot. Vermoedelijk is de oliekachel
+          die daar tegen het vocht stond door iemand op de hoogste stand gezet. Ik verdenk een ontslagen
+          medewerkster die mij eerder heeft bedreigd. Ik lag die nacht thuis te slapen."
+
+          Verloren werken:
+          - Marius Brandt, Duinlandschap bij Bloemendaal (1921)   EUR   480.000,-
+          - Marius Brandt, Vrouw met parasol (1924)               EUR   520.000,-
+          - Vier werken op papier en doek, diverse kunstenaars    EUR   240.000,-
+          Totaal                                                  EUR 1.240.000,-
+      - id: polishistorie
+        folder: Polis
+        name: Polishistorie.txt
+        content: |
+          Polis HKV-77120-L, Galerie Lindeboom
+
+          01-01-2024   Brandt, Duinlandschap      EUR 400.000,-
+          01-01-2024   Brandt, Vrouw met parasol  EUR 450.000,-
+          16-06-2026   Wijziging op verzoek verzekerde, na nieuw taxatierapport:
+                       Brandt, Duinlandschap      EUR 480.000,-
+                       Brandt, Vrouw met parasol  EUR 520.000,-
+                       Premie verhoogd per 1 juli 2026.
+      - id: taxatierapport
+        folder: Polis
+        name: Taxatierapport_juni_2026.txt
+        content: |
+          Taxatiebureau Spaarne - rapport 2026-118
+          Opdrachtgever: V. Lindeboom
+          Datum: 9 juni 2026
+
+          Getaxeerd op basis van foto's en documentatie aangeleverd door de opdrachtgever.
+          De werken zijn niet fysiek bezichtigd.
+          Waarde Duinlandschap bij Bloemendaal: EUR 480.000,-
+          Waarde Vrouw met parasol: EUR 520.000,-
+      - id: brandweerrapport
+        folder: Onderzoek
+        name: Brandweerrapport_samenvatting.txt
+        content: |
+          Veiligheidsregio Kennemerland - samenvatting brandonderzoek
+          Locatie: Kleine Houtstraat, Haarlem (depot achterhuis)
+
+          Melding 03:24, ter plaatse 03:31, brand meester 04:10.
+          Vermoedelijke oorzaak: oliekachel, stand 3 (maximaal), op circa 20 cm van opgestapelde doeken.
+          Opmerking: kachel had geen werkende thermostaat. Het depot is volgens de medewerkster normaal onverwarmd.
+          Geen braaksporen aan ramen of deuren. Achterdeur was op slot bij aankomst.
+          Van de doeken resteren alleen as en verkoolde resten van lijsten en spieramen.
+      - id: alarmexport
+        folder: Onderzoek
+        name: Alarmexport_Beveiliging_Kennemerland.txt
+        content: |
+          Beveiliging Kennemerland - gebeurtenissen object Galerie Lindeboom
+          Gebruikers worden getoond met hun nummer. Bediening via paneel of via app.
+
+          18-09-2026 18:10   INGESCHAKELD              gebruiker 2 (paneel)
+          19-09-2026 02:51   ONDERHOUDSMODUS AAN       gebruiker 1 (app)
+          19-09-2026 02:58   ACHTERDEUR GEOPEND        geen doormelding (onderhoudsmodus)
+          19-09-2026 03:09   ACHTERDEUR GESLOTEN       geen doormelding (onderhoudsmodus)
+          19-09-2026 03:20   ROOKMELDER DEPOT          doorgemeld aan meldkamer
+          19-09-2026 03:24   MELDKAMER                 brandweer gealarmeerd, eigenaar gebeld (geen gehoor)
+          19-09-2026 03:52   ONDERHOUDSMODUS UIT       gebruiker 1 (app)

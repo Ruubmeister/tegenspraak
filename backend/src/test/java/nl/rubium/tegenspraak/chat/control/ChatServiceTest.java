@@ -6,24 +6,27 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
 import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
+import nl.rubium.tegenspraak.investigation.control.InvestigationService;
+import nl.rubium.tegenspraak.investigation.control.TeamProgress;
 import nl.rubium.tegenspraak.team.control.TeamNotFoundException;
-import nl.rubium.tegenspraak.team.control.TeamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -33,7 +36,10 @@ import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.data.domain.Limit;
 
 class ChatServiceTest {
@@ -44,27 +50,48 @@ class ChatServiceTest {
     private static final String CHARACTER_ID = "de-butler";
     private static final Conversation CONVERSATION = new Conversation(TEAM_ID, CASE_ID, CHARACTER_ID);
 
-    private final CaseCatalog caseCatalog = mock(CaseCatalog.class);
+    private static final CharacterProfile GARDENER = new CharacterProfile(
+            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null);
+    private static final CharacterProfile BUTLER = new CharacterProfile(
+            CHARACTER_ID,
+            "De Butler",
+            "Butler",
+            "Altijd aanwezig.",
+            null,
+            null,
+            null,
+            null,
+            false,
+            List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
+    private static final CaseDefinition CASE_DEFINITION = new CaseDefinition(
+            CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of());
+
     private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
     private final ChatModel chatModel = mock(ChatModel.class);
-    private final TeamService teamService = mock(TeamService.class);
+    private final InvestigationService investigationService = mock(InvestigationService.class);
     private final ChatService chatService = new ChatService(
-            caseCatalog,
             new CharacterPromptBuilder(),
             chatMessageRepository,
             chatModel,
-            teamService,
+            ToolCallingManager.builder().build(),
+            investigationService,
             new ConversationLocks(),
             40);
+    private final Set<String> unlockedTargets = new HashSet<>();
 
     @BeforeEach
     void setUp() {
-        CharacterProfile character =
-                new CharacterProfile(CHARACTER_ID, "De Butler", "Butler", "Altijd aanwezig.", null, null, null, null);
-        CaseDefinition caseDefinition =
-                new CaseDefinition(CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(character), List.of());
-        when(caseCatalog.getCase(CASE_ID)).thenReturn(caseDefinition);
-        when(caseCatalog.getCharacter(CASE_ID, CHARACTER_ID)).thenReturn(character);
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(BUTLER);
+        when(investigationService.getProgress(TEAM_ID, PLAYER_ID, CASE_ID))
+                .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
+        when(investigationService.introduceCharacters(eq(TEAM_ID), eq(CASE_ID), anyList()))
+                .thenAnswer(invocation -> invocation.getArgument(2));
+        when(chatModel.getOptions())
+                .thenReturn(ToolCallingChatOptions.builder()
+                        .model("test-model")
+                        .maxTokens(100)
+                        .build());
     }
 
     @Test
@@ -149,7 +176,8 @@ class ChatServiceTest {
 
     @Test
     void sendMessage_givenUnknownCharacter_expectNotFoundAndModelNotCalled() {
-        when(caseCatalog.getCharacter(CASE_ID, "onbekend")).thenThrow(new CaseContentNotFoundException("Unknown"));
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, "onbekend"))
+                .thenThrow(new CaseContentNotFoundException("Unknown"));
 
         assertThatThrownBy(() -> chatService.sendMessage(
                         PLAYER_ID, "anouk", new Conversation(TEAM_ID, CASE_ID, "onbekend"), "Hallo"))
@@ -159,7 +187,8 @@ class ChatServiceTest {
 
     @Test
     void sendMessage_givenPlayerNotInTeam_expectTeamNotFoundAndModelNotCalled() {
-        doThrow(new TeamNotFoundException("Not a member")).when(teamService).requireMember(TEAM_ID, PLAYER_ID);
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
+                .thenThrow(new TeamNotFoundException("Not a member"));
 
         assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo"))
                 .isInstanceOf(TeamNotFoundException.class);
@@ -168,10 +197,149 @@ class ChatServiceTest {
 
     @Test
     void getConversation_givenPlayerNotInTeam_expectTeamNotFound() {
-        doThrow(new TeamNotFoundException("Not a member")).when(teamService).requireMember(TEAM_ID, PLAYER_ID);
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
+                .thenThrow(new TeamNotFoundException("Not a member"));
 
         assertThatThrownBy(() -> chatService.getConversation(PLAYER_ID, CONVERSATION))
                 .isInstanceOf(TeamNotFoundException.class);
+    }
+
+    @Test
+    void sendMessage_givenIntroducibleContact_expectToolOfferedOnConfiguredOptions() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo");
+
+        ChatOptions options = capturePrompt().getOptions();
+        assertThat(options).isInstanceOfSatisfying(ToolCallingChatOptions.class, toolOptions -> {
+            assertThat(toolOptions.getModel()).isEqualTo("test-model");
+            assertThat(toolOptions.getMaxTokens()).isEqualTo(100);
+            assertThat(toolOptions.getToolCallbacks())
+                    .extracting(callback -> callback.getToolDefinition().name())
+                    .containsExactly("introduce_contact");
+        });
+    }
+
+    @Test
+    void sendMessage_givenContactAlreadyIntroduced_expectNoToolOffered() {
+        unlockedTargets.add("character:de-tuinman");
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo");
+
+        ChatOptions options = capturePrompt().getOptions();
+        boolean toolOffered = options instanceof ToolCallingChatOptions toolOptions
+                && !toolOptions.getToolCallbacks().isEmpty();
+        assertThat(toolOffered).isFalse();
+    }
+
+    @Test
+    void sendMessage_givenModelIntroducesContact_expectContactUnlockedAndNoticeStored() {
+        givenStoredHistoryNewestFirst();
+        givenModelCallsToolThenReplies("{\"characterId\": \"de-tuinman\"}", "Vraag het De Tuinman maar.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?");
+
+        verify(investigationService).introduceCharacters(TEAM_ID, CASE_ID, List.of(GARDENER));
+        assertThat(savedMessages())
+                .extracting(ChatMessage::getSender, ChatMessage::getContent)
+                .containsExactly(
+                        tuple(MessageSender.PLAYER, "Wie was er in de tuin?"),
+                        tuple(MessageSender.CHARACTER, "Vraag het De Tuinman maar."),
+                        tuple(MessageSender.NOTICE, "De Butler heeft je in contact gebracht met De Tuinman."));
+    }
+
+    @Test
+    void sendMessage_givenToolCalledWithUnknownId_expectNothingIntroduced() {
+        givenStoredHistoryNewestFirst();
+        givenModelCallsToolThenReplies("{\"characterId\": \"de-kok\"}", "Ik ken geen kok.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Ken je de kok?");
+
+        verify(investigationService).introduceCharacters(TEAM_ID, CASE_ID, List.of());
+        assertThat(savedMessages()).extracting(ChatMessage::getSender).doesNotContain(MessageSender.NOTICE);
+    }
+
+    @Test
+    void sendMessage_givenModelCallsTool_expectToolResultSentBackToModel() {
+        givenStoredHistoryNewestFirst();
+        givenModelCallsToolThenReplies("{\"characterId\": \"de-tuinman\"}", "Vraag het De Tuinman maar.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?");
+
+        ArgumentCaptor<Prompt> prompts = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel, times(2)).call(prompts.capture());
+        assertThat(prompts.getAllValues().getLast().getInstructions())
+                .extracting(Message::getMessageType)
+                .endsWith(MessageType.ASSISTANT, MessageType.TOOL);
+    }
+
+    @Test
+    void sendMessage_givenModelKeepsCallingTool_expectCharacterUnavailableAndNothingStored() {
+        givenStoredHistoryNewestFirst();
+        when(chatModel.call(any(Prompt.class))).thenReturn(toolCallResponse("{\"characterId\": \"de-tuinman\"}"));
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?"))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(chatMessageRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void sendMessage_givenModelFailsAfterToolCall_expectNothingIntroducedOrStored() {
+        givenStoredHistoryNewestFirst();
+        when(chatModel.call(any(Prompt.class)))
+                .thenReturn(toolCallResponse("{\"characterId\": \"de-tuinman\"}"))
+                .thenThrow(new IllegalStateException("API down"));
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?"))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(investigationService, never()).introduceCharacters(any(), any(), anyList());
+        verify(chatMessageRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void sendMessage_givenNoticeInHistory_expectNoticeNotSentToModel() {
+        givenStoredHistoryNewestFirst(
+                ChatMessage.notice(TEAM_ID, CASE_ID, CHARACTER_ID, "De Butler heeft je in contact gebracht."),
+                characterMessage("Goedenavond."),
+                playerMessage("anouk", "Hallo"));
+        givenModelReplies("Ja?");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Nog iets");
+
+        assertThat(capturePromptMessages())
+                .extracting(Message::getText)
+                .noneMatch(text -> text.contains("in contact gebracht"));
+    }
+
+    private void givenModelCallsToolThenReplies(String toolInput, String reply) {
+        when(chatModel.call(any(Prompt.class)))
+                .thenReturn(toolCallResponse(toolInput))
+                .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(reply)))));
+    }
+
+    /** The chat model only reports the tool call, ChatService has to execute it. */
+    private static ChatResponse toolCallResponse(String toolInput) {
+        AssistantMessage toolCall = AssistantMessage.builder()
+                .content("")
+                .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "introduce_contact", toolInput)))
+                .build();
+        return new ChatResponse(List.of(new Generation(toolCall)));
+    }
+
+    private List<ChatMessage> savedMessages() {
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<ChatMessage>> saved = ArgumentCaptor.forClass(List.class);
+        verify(chatMessageRepository).saveAll(saved.capture());
+        return saved.getValue();
+    }
+
+    private Prompt capturePrompt() {
+        ArgumentCaptor<Prompt> prompt = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel).call(prompt.capture());
+        return prompt.getValue();
     }
 
     private void givenStoredHistoryNewestFirst(ChatMessage... messages) {
@@ -186,9 +354,7 @@ class ChatServiceTest {
     }
 
     private List<Message> capturePromptMessages() {
-        ArgumentCaptor<Prompt> prompt = ArgumentCaptor.forClass(Prompt.class);
-        verify(chatModel).call(prompt.capture());
-        return prompt.getValue().getInstructions();
+        return capturePrompt().getInstructions();
     }
 
     private static ChatMessage playerMessage(String authorName, String content) {

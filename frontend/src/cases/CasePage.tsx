@@ -1,12 +1,13 @@
 import { Link, NavLink, Outlet, useParams } from 'react-router'
 import { useTeam, useTeamId } from '../teams/teamsApi'
+import { LockIcon } from '../desktop/UnlockForm'
 import { useCaseOverview } from './casesApi'
 
 /** Shell of a case a team is working on: the navigation on the left, the selected chat or desktop on the right. */
 export function CasePage() {
   const { caseId = '' } = useParams()
   const teamId = useTeamId()
-  const { data: caseOverview, isPending, isError } = useCaseOverview(caseId)
+  const { data: caseOverview, isPending, isError } = useCaseOverview(teamId, caseId)
   // Loading the team also checks membership before the shared conversations are opened
   const team = useTeam(teamId)
 
@@ -40,7 +41,9 @@ export function CasePage() {
         <h2>Computers</h2>
         {caseOverview.desktops.map((desktop) => (
           <NavLink key={desktop.id} to={`computer/${desktop.id}`}>
-            <span className="nav-title">{desktop.ownerName}</span>
+            <span className="nav-title">
+              {desktop.ownerName} {desktop.lock && <LockIcon />}
+            </span>
             <span className="nav-subtitle">{desktop.ownerType === 'person' ? 'Persoon' : 'Organisatie'}</span>
           </NavLink>
         ))}

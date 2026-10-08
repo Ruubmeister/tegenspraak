@@ -1,0 +1,106 @@
+ownerName: Victor Lindeboom
+ownerType: person
+description: Privélaptop van Victor Lindeboom, in beslag genomen op verzoek van Hollandia.
+lock:
+  code: "1994"
+  hint: "Wachtwoordhint: het jaar van mijn eerste Brandt"
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: ultimatum-bank
+        folder: Inbox
+        from: zakelijk@kennemerbank.nl
+        to: v.lindeboom@ziggo.nl
+        subject: Achterstand financiering Galerie Lindeboom
+        sentAt: 2026-03-04T11:20:00
+        body: |
+          Geachte heer Lindeboom,
+
+          Uw zakelijke lening van EUR 900.000,- vertoont een achterstand van zes maanden. Wij verzoeken u
+          uiterlijk 1 juni 2026 een aflossing van EUR 250.000,- te voldoen. Lukt dat niet, dan zien wij ons
+          genoodzaakt de financiering op te zeggen.
+
+          Kennemer Bank, afdeling Bijzonder Beheer
+      - id: discretie
+        folder: Inbox
+        from: luc@verstraetenfineart.be
+        to: v.lindeboom@ziggo.nl
+        subject: "Re: de twee dames"
+        sentAt: 2026-05-08T16:40:00
+        body: |
+          Beste Victor,
+
+          Mijn klant gaat akkoord met 610.000 voor beide werken. Discretie is verzekerd, hij wil zelf ook
+          anoniem blijven. Ruysdael kan ze op 20 mei rechtstreeks bij Pauw ophalen. Betaling volgt binnen
+          een week na ontvangst.
+
+          Allez, tot ziens op Tefaf,
+          Luc
+      - id: transport-antwerpen
+        folder: Inbox
+        from: planning@ruysdael-kunsttransport.nl
+        to: v.lindeboom@ziggo.nl
+        subject: Bevestiging transport 20 mei
+        sentAt: 2026-05-18T10:07:00
+        body: |
+          Geachte heer Lindeboom,
+
+          Hierbij bevestigen wij transport R-26-0515:
+          ophalen Atelier Pauw, Amsterdam, woensdag 20 mei, 10:00 uur
+          afleveren Verstraeten Fine Art, Antwerpen, circa 13:30 uur
+          2 schilderijen, M. Brandt, ingepakt in klimaatkisten.
+
+          Met vriendelijke groet,
+          Kunsttransport Ruysdael
+      - id: bijschrijving
+        folder: Inbox
+        from: noreply@nordbank.lu
+        to: v.lindeboom@ziggo.nl
+        subject: Bijschrijving op uw rekening
+        sentAt: 2026-05-27T07:02:00
+        body: |
+          Op uw rekening LU28 0019 4006 4475 0000 is een bedrag bijgeschreven.
+
+          Bedrag: EUR 610.000,00
+          Van: Verstraeten Fine Art BV, Antwerpen
+          Omschrijving: aankoop 2 werken, fact. 2026-044
+      - id: app-melding
+        folder: Inbox
+        from: app@beveiligingkennemerland.nl
+        to: v.lindeboom@ziggo.nl
+        subject: "Galerie Lindeboom: onderhoudsmodus geactiveerd"
+        sentAt: 2026-09-19T02:51:00
+        body: |
+          De onderhoudsmodus van object Galerie Lindeboom is geactiveerd via de app op toestel
+          "iPhone van Victor". In onderhoudsmodus worden deurcontacten niet doorgemeld.
+          Rookmelders blijven actief.
+      - id: aan-hendrik
+        folder: Verzonden
+        from: v.lindeboom@ziggo.nl
+        to: atelier@pauwrestauratie.nl
+        subject: De Brandts
+        sentAt: 2026-04-10T21:15:00
+        body: |
+          Beste Hendrik,
+
+          Zoals besproken: naast de schoonmaakbeurt graag twee presentatiekopieën, zo dicht mogelijk bij het
+          origineel. Ze zijn voor een reizende tentoonstelling, de originelen blijven veilig. De vergoeding
+          regelen we contant, zoals je gewend bent.
+
+          Met hartelijke groet,
+          Victor
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: aflossing
+        folder: Documenten
+        name: aflossing.txt
+        content: |
+          Bank 250.000 -> voor 1 juni (van L.)
+          Pauw 18.000 contant
+          rest 342.000 laten staan in Lux.
+
+          Hollandia: taxatie omhoog voor de zomer. Daarna winter, kachel.

@@ -65,6 +65,10 @@ public class ChatMessage {
         return new ChatMessage(teamId, caseId, characterId, MessageSender.CHARACTER, null, content);
     }
 
+    public static ChatMessage notice(UUID teamId, String caseId, String characterId, String content) {
+        return new ChatMessage(teamId, caseId, characterId, MessageSender.NOTICE, null, content);
+    }
+
     public UUID getId() {
         return id;
     }
@@ -85,7 +89,7 @@ public class ChatMessage {
         return sender;
     }
 
-    /** Null for character messages. */
+    /** Null for character messages and notices. */
     public String getAuthorName() {
         return authorName;
     }

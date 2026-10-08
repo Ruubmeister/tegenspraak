@@ -1,0 +1,51 @@
+ownerName: VV Rijnvogels
+ownerType: organisation
+description: Gedeelde schijf van het bestuur en de vrijwilligers van VV Rijnvogels.
+apps:
+  - type: files
+    id: schijf
+    title: Gedeelde schijf
+    files:
+      - id: alarmcodes
+        folder: Bestuur/Beveiliging
+        name: Gebruikers_alarmsysteem.txt
+        content: |
+          Gebruikers alarmsysteem clubhuis (codes zelf zijn alleen bekend bij de gebruiker)
+
+          01  Ingrid Mulder        voorzitter
+          02  Kevin Bos            barbeheerder
+          03  Ronald Verhoef       penningmeester
+          04  Kantine algemeen     (alleen tijdens wedstrijddagen)
+          05  Schoonmaakbedrijf Duinrand
+      - id: sleutelbeheer
+        folder: Bestuur/Beveiliging
+        name: Sleutelbeheer.txt
+        content: |
+          Sleutels clubhuis (hoofdingang)
+
+          Ingrid Mulder, Kevin Bos, Ronald Verhoef, Fatima El Amrani, Schoonmaakbedrijf Duinrand
+
+          Fatima heeft een sleutel van de materiaalruimte en de hoofdingang, maar geen alarmcode.
+          Zij kan het clubhuis dus alleen in als het alarm uit staat.
+      - id: notulen-mei
+        folder: Bestuur/Notulen
+        name: Notulen_bestuursvergadering_12-05-2026.txt
+        content: |
+          Notulen bestuursvergadering 12 mei 2026
+          Aanwezig: Ingrid Mulder (vz), Ronald Verhoef (penn.), Gert Zwart (secr.), Kevin Bos (bar)
+
+          4. Seizoensafsluiting 13 juni
+          - Loterij met prijzen van sponsors, Kevin regelt de bar.
+          - Ronald stelt voor het geld niet zondag maar maandagochtend af te storten, omdat de nachtkluis
+            van de bank op zondag vaak vol zit. Geld blijft tot die tijd in de kluis. Akkoord.
+
+          5. Financiën
+          - Ronald meldt dat de jaarrekening nog niet klaar is. Hij heeft het druk, volgt in juli.
+          - Gert vraagt naar de kascontrole van vorig jaar. Ronald: "komt goed".
+      - id: clubgeschiedenis
+        folder: Algemeen
+        name: Clubgeschiedenis.txt
+        content: |
+          VV Rijnvogels werd in 1923 opgericht door vissers uit Katwijk aan Zee.
+          De club speelt sinds 1968 op Sportpark De Zeeweg.
+          Bekendste oud-speler: keeper Arie Ouwehand, die in 1975 twee interlands speelde.

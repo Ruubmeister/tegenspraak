@@ -8,3 +8,6 @@ knownFacts:
 secrets:
   - fact: Hij was in de bibliotheek.
     revealWhen: De speler noemt de bibliotheek.
+introduces:
+  - character: de-tuinman
+    when: De speler vraagt wie er in de tuin was.

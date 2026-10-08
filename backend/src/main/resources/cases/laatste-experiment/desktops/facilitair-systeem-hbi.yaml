@@ -1,0 +1,88 @@
+ownerName: Facilitaire dienst HBI
+ownerType: organisation
+description: Het facilitaire beheersysteem van het Hollands Biotech Instituut.
+apps:
+  - type: files
+    id: beheer
+    title: Beheer
+    files:
+      - id: werkinstructie-cryo
+        folder: Veiligheid
+        name: Werkinstructie_cryo-opslag_B0.14.txt
+        content: |
+          Werkinstructie cryo-opslag B0.14
+
+          - Automatische vulling van de stikstofvaten: dagelijks 22:00 - circa 22:40.
+          - Nooit alleen in B0.14 tijdens de vulling. Na 18:00 alleen met melding aan de beveiliging.
+          - De zuurstofsensor schakelt bij O2 < 19,5% het alarm en de noodventilatie in.
+          - Noodknop binnenzijde opent de deur direct, BEHALVE als de nachtgrendel (buitenzijde) gesloten is.
+          - Nachtgrendel alleen sluiten na controle dat de ruimte leeg is (kijk door het raam).
+          - Sleutel nachtgrendel (NG-B0) in elektronische sleutelkast, alleen groepsleiders en facilitaire dienst.
+      - id: onderhoudslog
+        folder: Onderhoud
+        name: Onderhoudslog_B0.14.txt
+        content: |
+          Onderhoudslog B0.14
+
+          Datum werk   Omschrijving                                  Door          Ingevoerd op
+          12-03-2026   Jaarlijkse keuring stikstofvaten, OK          R. Kamphuis   12-03-2026 14:20
+          02-06-2026   Zuurstofsensor geeft vals alarm, gereset      R. Kamphuis   02-06-2026 10:05
+          05-06-2026   Zuurstofsensor vals alarm, onderdeel besteld  R. Kamphuis   05-06-2026 11:30
+          06-06-2026   Zuurstofsensor vervangen en getest, OK        R. Kamphuis   09-06-2026 08:52
+      - id: pakbon
+        folder: Inkoop
+        name: Pakbon_LabSafe_2026-0612.txt
+        content: |
+          LabSafe Benelux B.V. - pakbon
+          Bestelling: 05-06-2026, HBI facilitaire dienst (R. Kamphuis)
+          Geleverd: 12-06-2026, 09:40
+
+          1x  O2-sensorkop type OX-200 (vervanging B0.14)
+      - id: deurlog-b-vleugel
+        folder: Toegang
+        name: Deurlog_B-vleugel_8-9_juni.txt
+        content: |
+          Deurlog B-vleugel, 8 en 9 juni 2026 (badges en meldingen)
+
+          08-06 08:14   B1.22   badge E. Brink                geopend
+          08-06 09:05   B1.22   badge M. Jansen               geopend
+          08-06 14:31   B0.14   badge R. Kamphuis             geopend
+          08-06 21:41   B0.14   badge E. Brink                geopend
+          08-06 22:05   B1.22   badge A. Kuiper               geopend
+          08-06 22:11   B0.14   noodknop binnenzijde          deur geblokkeerd (mechanisch)
+          08-06 22:12   B0.14   noodknop binnenzijde          deur geblokkeerd (mechanisch)
+          08-06 22:12   B0.14   noodknop binnenzijde          deur geblokkeerd (mechanisch)
+          08-06 22:14   B0.14   noodknop binnenzijde          deur geblokkeerd (mechanisch)
+          09-06 07:40   B0.14   badge R. Kamphuis             geopend
+      - id: rondelog
+        folder: Beveiliging
+        name: Rondelog_nacht_8-9_juni.txt
+        content: |
+          Rondelog beveiliging, dienst B. de Wit, 8-9 juni 2026
+
+          20:30   A-vleugel   afgemeld
+          21:30   C-vleugel   afgemeld
+          22:30   B-vleugel   NIET AFGEMELD
+          23:30   A-vleugel   afgemeld
+          00:30   C-vleugel   afgemeld
+          01:30   A-vleugel   afgemeld
+          02:30   B-vleugel   afgemeld, geen bijzonderheden
+          03:30   C-vleugel   afgemeld
+          04:30   A-vleugel   afgemeld
+          05:30   C-vleugel   afgemeld
+          06:30   B-vleugel   afgemeld, geen bijzonderheden
+      - id: sleutelkast
+        folder: Beveiliging
+        name: Sleutelkast_log_juni.txt
+        lock:
+          code: HBI-7731
+          hint: "Beheeraccount sleutelkast. De beveiliging heeft de code."
+        content: |
+          Elektronische sleutelkast hoofdgebouw - log juni 2026
+
+          02-06 10:01   NG-B0   uitgenomen    R. Kamphuis
+          02-06 10:22   NG-B0   teruggeplaatst R. Kamphuis
+          08-06 21:52   NG-B0   uitgenomen    A. Kuiper
+          09-06 05:58   NG-B0   teruggeplaatst A. Kuiper
+          09-06 08:30   NG-B0   uitgenomen    technische recherche
+          09-06 11:10   NG-B0   teruggeplaatst technische recherche

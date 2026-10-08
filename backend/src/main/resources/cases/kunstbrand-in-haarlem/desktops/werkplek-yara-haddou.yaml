@@ -1,0 +1,117 @@
+ownerName: Yara Haddou
+ownerType: person
+description: Werkplek van galeriemanager Yara Haddou in Galerie Lindeboom.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: restauratie-april
+        folder: Inbox
+        from: victor@galerielindeboom.nl
+        to: yara@galerielindeboom.nl
+        subject: Brandts
+        sentAt: 2026-04-13T17:48:00
+        body: |
+          Yara,
+
+          Morgen worden de twee Brandts opgehaald door Ruysdael. Ze gaan een paar weken naar Hendrik Pauw
+          voor een schoonmaakbeurt. Zet het alsjeblieft niet in de agenda en noem het niet tegenover
+          Hollandia, dan krijgen we weer een hele papierwinkel.
+
+          Victor
+      - id: transport-retour
+        folder: Inbox
+        from: planning@ruysdael-kunsttransport.nl
+        to: yara@galerielindeboom.nl
+        subject: Bevestiging transport 20 mei
+        sentAt: 2026-05-18T10:05:00
+        body: |
+          Geachte mevrouw Haddou,
+
+          Hierbij bevestigen wij transport R-26-0514:
+          ophalen Atelier Pauw, Amsterdam, woensdag 20 mei, 10:00 uur
+          afleveren Galerie Lindeboom, Haarlem, circa 11:30 uur
+          2 schilderijen, M. Brandt, ingepakt in klimaatkisten.
+
+          Met vriendelijke groet,
+          Kunsttransport Ruysdael
+      - id: taxatie-doorsturen
+        folder: Inbox
+        from: victor@galerielindeboom.nl
+        to: yara@galerielindeboom.nl
+        subject: Taxatie naar Hollandia
+        sentAt: 2026-06-10T08:30:00
+        body: |
+          Yara,
+
+          Wil jij het nieuwe taxatierapport naar Hollandia sturen met het verzoek de verzekerde waarde aan te
+          passen? De markt voor Brandt is flink gestegen, we zijn veel te laag verzekerd.
+
+          Victor
+      - id: doorgestuurd-lotte
+        folder: Inbox
+        from: victor@galerielindeboom.nl
+        to: yara@galerielindeboom.nl
+        subject: "FW: je gaat hier spijt van krijgen"
+        sentAt: 2026-08-15T09:02:00
+        body: |
+          Zie je nu wat ik bedoel? Bewaar dit maar.
+
+          ----- Doorgestuurd bericht -----
+          Van: lotte.vermeulen@gmail.com
+          Datum: 14 augustus 2026, 23:41
+          Onderwerp: je gaat hier spijt van krijgen
+
+          Twee jaar heb ik me voor jou kapotgewerkt en dan dit. Reorganisatie? Ik weet heus wel waarom.
+          Je gaat hier spijt van krijgen, Victor.
+      - id: afsluiten-vrijdag
+        folder: Verzonden
+        from: yara@galerielindeboom.nl
+        to: victor@galerielindeboom.nl
+        subject: Afgesloten
+        sentAt: 2026-09-18T18:12:00
+        body: |
+          Hoi Victor, galerie is dicht en het alarm staat aan. Ik heb de kachel uit het depot weer naar de
+          werkplaats gezet, die stond daar in de weg. Fijn weekend!
+
+          Yara
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: alarmgebruikers
+        folder: Beheer
+        name: Alarmgebruikers.txt
+        content: |
+          Alarmsysteem Galerie Lindeboom - gebruikers
+
+          1  Victor Lindeboom   paneel + app
+          2  Yara Haddou        paneel
+          3  Lotte Vermeulen    paneel (verwijderd op 14-08-2026)
+      - id: sleutelregister
+        folder: Beheer
+        name: Sleutelregister.txt
+        content: |
+          Sleutel   Houder              Uitgegeven    Ingeleverd
+          S1        Victor Lindeboom    2003          -
+          S2        Yara Haddou         2020          -
+          S3        Lotte Vermeulen     2024          31-08-2026 (ontvangen door Y. Haddou)
+      - id: galeriegeschiedenis
+        folder: Pers
+        name: Over_de_galerie.txt
+        content: |
+          Galerie Lindeboom werd in 1991 opgericht door Victor Lindeboom in de Kleine Houtstraat in Haarlem.
+          Victor raakte al jong in de ban van de schilder Marius Brandt (1889-1951). In 1994 kocht hij zijn
+          eerste Brandt, het Duinlandschap bij Bloemendaal, dat sindsdien het hart van de collectie vormt.
+          In 2002 volgde Vrouw met parasol.
+      - id: agenda-voorjaar
+        folder: Planning
+        name: Agenda_april-mei_2026.txt
+        content: |
+          06-04   Opbouw voorjaarsexpositie "Kust en duin"
+          14-04   (geen afspraken)
+          18-04   Opening "Kust en duin"
+          02-05   Kunstbeurs Utrecht, Victor
+          20-05   Levering Ruysdael 11:30
+          23-05   Brandts in depot gehangen (op verzoek V.)

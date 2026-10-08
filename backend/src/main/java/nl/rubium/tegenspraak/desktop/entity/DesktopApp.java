@@ -2,10 +2,12 @@ package nl.rubium.tegenspraak.desktop.entity;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * An application on a virtual desktop. The "type" property selects the implementation, both in the case files and in
- * the JSON sent to the frontend. Adding a new kind of app means adding a record here and a matching frontend component.
+ * An application on a virtual desktop. The "type" property selects the implementation in the case files. Adding a new
+ * kind of app means adding a record here, a response in the investigation boundary and a matching frontend component.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
@@ -17,4 +19,14 @@ public sealed interface DesktopApp permits MailApp, FilesApp {
     String id();
 
     String title();
+
+    /** The mails or files of this app. */
+    List<? extends LockableItem> items();
+
+    default Optional<LockableItem> findItem(String itemId) {
+        return items().stream()
+                .filter(item -> item.id().equals(itemId))
+                .map(LockableItem.class::cast)
+                .findFirst();
+    }
 }

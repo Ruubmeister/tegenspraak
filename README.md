@@ -22,6 +22,8 @@ The backend is a single service, split into feature packages that each follow bo
 - `chat`: a team's shared conversation with a character; the persona file becomes the LLM system prompt, and player
   messages reach the LLM as `[name]: ...` so the character can tell the detectives apart
 - `desktop`: virtual desktops made of typed apps (`mail`, `files`)
+- `investigation`: what a team can see and use in a case: introduced contacts and desktops, mails and files opened
+  with their code. Unlocks are shared by the team
 - `verdict`: the team solves a case by answering its multiple choice questions; attempts are stored per team
 
 ## Running locally
@@ -62,20 +64,58 @@ Cases live in `backend/src/main/resources/cases/`. Folder and file names are the
 ```
 cases/{case-id}/case.yaml                   title, summary, introduction, setting (hidden truth), solution
 cases/{case-id}/characters/{id}.yaml        persona: name, role, description, personality, speechStyle,
-                                            knownFacts, secrets (fact + revealWhen)
-cases/{case-id}/desktops/{id}.yaml          ownerName, ownerType (person|organisation), description, apps
+                                            knownFacts, secrets (fact + revealWhen), hidden, introduces
+cases/{case-id}/desktops/{id}.yaml          ownerName, ownerType (person|organisation), description, lock, apps
 ```
 
 The `solution` holds multiple choice `questions` (each with an `id`, `question`, `options` and the `answer` option
 id) and an `epilogue`. The case is solved when every answer is correct; a wrong attempt only tells the player how
 many answers were right. The epilogue is shown after solving, so it may reveal the whole truth.
 
-Unknown properties or invalid ids fail startup, so mistakes are caught immediately. See `het-lek-bij-van-dijk` for an
-example. Only a character's name, role and description are sent to the player; the setting and persona stay on the
-server.
+### Hidden contacts
 
-Adding a new desktop app type: add a record implementing `DesktopApp` (and register it in `@JsonSubTypes`), add the
-matching type to `frontend/src/api/types.ts`, and render it in `DesktopAppView`.
+A character with `hidden: true` is not available until another character introduces it. The introducer lists it under
+`introduces`, with the condition in the conversation:
+
+```yaml
+introduces:
+  - character: dennis-de-vries
+    when: Je hebt verteld dat Dennis bij Kramer Bouw werkt en de rechercheurs willen hem spreken.
+```
+
+The introducer's LLM gets an `introduce_contact` tool and calls it once the condition is met. The contact is then
+available to the whole team, and a notice appears in the chat. Every hidden character needs at least one introducer.
+
+### Locks
+
+A desktop, a mail or a file can be locked with a code that the team has to work out:
+
+```yaml
+lock:
+  code: "1403"
+  hint: "Wachtwoordhint: etentje bij de ouders van D. (ddmm)"
+```
+
+Codes are compared ignoring case and whitespace. Players see the hint and, for mails and files, the subject or name;
+the content is only sent once the team entered the code. A locked desktop shows no apps at all. After 5 wrong codes
+for one item within a minute the team has to wait (`tegenspraak.locks` in `application.yaml`). Mails, files and apps
+need ids that are unique within their parent, because locks are addressed by them.
+
+Unknown properties or invalid ids fail startup, so mistakes are caught immediately. Only a character's name, role and
+description are sent to the player; the setting, persona and lock codes stay on the server.
+
+The case list is sorted by id. The title ends with the difficulty, so players can pick a case that suits them:
+
+| Case                    | Difficulty  | What makes it harder                                                           |
+| ----------------------- | ----------- | ------------------------------------------------------------------------------ |
+| `het-lek-bij-van-dijk`  | oefenzaak   | Walkthrough: two characters, direct clues                                      |
+| `kas-van-vv-rijnvogels` | makkelijk   | One red herring, one hidden witness, one lock with the code on another desktop |
+| `kunstbrand-in-haarlem` | gemiddeld   | A lying suspect, two hidden contacts, a lock code only a character knows       |
+| `laatste-experiment`    | moeilijk    | Several liars, a chain of introductions, a timeline to rebuild from logs       |
+
+Adding a new desktop app type: add a record implementing `DesktopApp` (and register it in `@JsonSubTypes`), add a
+matching response to `DesktopResponse` that leaves out locked content, add the type to `frontend/src/api/types.ts`,
+and render it in `DesktopAppView`.
 
 ## Checks
 

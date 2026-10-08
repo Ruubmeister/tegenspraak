@@ -72,3 +72,17 @@ apps:
           Inschrijvingssom: EUR 4.250.000,- excl. btw
           Opgesteld door: S. Bakker
           Datum: 12 maart 2026
+      - id: dagboek
+        folder: Persoonlijk
+        name: dagboek.txt
+        lock:
+          code: "1403"
+          hint: "Wachtwoordhint: etentje bij de ouders van D. (ddmm)"
+        content: |
+          13 maart
+          Bod is binnen! Gisteravond nog laat bijlage B gecheckt. Mijn mail stond nog open op de laptop
+          toen ik naar bed ging, Dennis zat er nog achter.
+
+          20 maart
+          Kramer Bouw heeft gewonnen. Met precies tienduizend euro minder. Ik moet steeds aan die avond
+          denken. Ik durf het niemand te vertellen.

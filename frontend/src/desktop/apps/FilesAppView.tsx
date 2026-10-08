@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import type { FilesApp } from '../../api/types'
+import type { DesktopLocation } from '../desktopApi'
+import { LockIcon } from '../UnlockForm'
 import { folderNames } from './groupByFolder'
+import { LockedItem } from './LockedItem'
 
-export function FilesAppView({ app }: { app: FilesApp }) {
+export function FilesAppView({ app, location }: { app: FilesApp; location: DesktopLocation }) {
   const [selectedFileId, setSelectedFileId] = useState<string>()
   const selectedFile = app.files.find((file) => file.id === selectedFileId)
 
@@ -22,7 +25,7 @@ export function FilesAppView({ app }: { app: FilesApp }) {
                       className={file.id === selectedFileId ? 'active' : undefined}
                       onClick={() => setSelectedFileId(file.id)}
                     >
-                      {file.name}
+                      {file.name} {file.lock && <LockIcon />}
                     </button>
                   </li>
                 ))}
@@ -34,7 +37,18 @@ export function FilesAppView({ app }: { app: FilesApp }) {
         {selectedFile ? (
           <article>
             <h3>{selectedFile.name}</h3>
-            <pre className="document-text">{selectedFile.content}</pre>
+            {selectedFile.lock ? (
+              <LockedItem
+                key={selectedFile.id}
+                location={location}
+                appId={app.id}
+                itemId={selectedFile.id}
+                lock={selectedFile.lock}
+                subject="dit bestand"
+              />
+            ) : (
+              <pre className="document-text">{selectedFile.content}</pre>
+            )}
           </article>
         ) : (
           <p className="status">Selecteer een bestand.</p>

@@ -1,0 +1,27 @@
+name: Thomas Veldkamp
+role: Postdoc in de groep van Arjen Kuiper
+description: Collega van Eva en net als zij kandidaat voor de vaste aanstelling in de groep.
+personality: >-
+  Ambitieus, gespannen en defensief. Hij weet dat hij verdacht lijkt en reageert vijandig op elke vraag over de ruzie
+  of de vaste aanstelling. Hij liegt over hoe laat hij wegging, omdat hij niet wil dat iemand weet wat hij die avond
+  deed. Onder druk wordt hij emotioneel en geeft hij toe dat hij zich schaamt.
+speechStyle: >-
+  Schrijft snel en geïrriteerd, met veel vraagtekens en af en toe "serieus?". Vloekt soms zachtjes ("verdorie").
+knownFacts:
+  - Hij en Eva waren allebei kandidaat voor de vaste aanstelling in de groep. Het besluit valt op 1 juli.
+  - Hij zegt dat hij op 8 juni "rond acht uur" naar huis ging.
+  - Volgens hem was Eva de laatste weken gespannen en erg geheimzinnig over haar werk.
+  - Hij vindt dat de cryo-ruimte al maanden niet veilig is en dat Ruud overal te laat mee is.
+secrets:
+  - fact: >-
+      In april nam hij een deel van Eva's analyse over in zijn eigen proefschrifthoofdstuk, zonder haar te noemen. Op 8
+      juni om 15:00 had ze daar ruzie met hem over. Ze zei: "Woensdag ga ik naar de vertrouwenspersoon". Hij dacht dat
+      ze het over hem had. Hij weet niets van fraude door Kuiper.
+    revealWhen: >-
+      De rechercheurs weten van de ruzie op 8 juni en vragen waar die over ging.
+  - fact: >-
+      Hij bleef tot 21:34 in het gebouw en zocht op de gedeelde schijf in Eva's bestanden om te zien of ze een melding
+      over hem had voorbereid. Om 21:30 zag hij Eva bij de koffieautomaat op de eerste verdieping. Ze had haar labjas
+      aan en zei: "Ik ga nog even naar beneden." Daarna ging hij naar huis. Hij zag Kuiper niet.
+    revealWhen: >-
+      De rechercheurs confronteren hem met het toegangslog van de hoofdingang, waarin hij om 21:34 vertrekt.

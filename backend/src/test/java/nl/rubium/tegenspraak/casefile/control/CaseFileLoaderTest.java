@@ -29,7 +29,7 @@ class CaseFileLoaderTest {
             assertThat(caseDefinition.manifest().setting()).isEqualTo("De butler deed het.");
             assertThat(caseDefinition.characters())
                     .extracting(CharacterProfile::id)
-                    .containsExactly("de-butler");
+                    .containsExactly("de-butler", "de-tuinman");
             assertThat(caseDefinition.desktops()).extracting(Desktop::id).containsExactly("landhuis");
         });
     }
@@ -104,6 +104,41 @@ class CaseFileLoaderTest {
         assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-id"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("De_Butler");
+    }
+
+    @Test
+    void loadAll_givenHiddenCharacterWithIntroducer_expectIntroductionLoaded() {
+        CaseDefinition caseDefinition =
+                loader.loadAll("classpath:test-cases/valid").getFirst();
+
+        assertThat(caseDefinition.findCharacter("de-tuinman"))
+                .hasValueSatisfying(gardener -> assertThat(gardener.hidden()).isTrue());
+        assertThat(caseDefinition.findCharacter("de-butler"))
+                .hasValueSatisfying(butler -> assertThat(butler.introduces())
+                        .singleElement()
+                        .satisfies(introduction ->
+                                assertThat(introduction.character()).isEqualTo("de-tuinman")));
+    }
+
+    @Test
+    void loadAll_givenLockedFile_expectLockLoaded() {
+        Desktop desktop = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .desktops()
+                .getFirst();
+
+        assertThat(desktop.findApp("bestanden").flatMap(app -> app.findItem("kluis")))
+                .hasValueSatisfying(file -> {
+                    assertThat(file.lock().hint()).isEqualTo("Waarmee en welke kamer?");
+                    assertThat(file.lock().opensWith("kandelaar7")).isTrue();
+                });
+    }
+
+    @Test
+    void loadAll_givenHiddenCharacterWithoutIntroducer_expectStartupFailure() {
+        assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-introduction"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("de-tuinman");
     }
 
     @Test

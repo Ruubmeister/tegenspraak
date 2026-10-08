@@ -1,0 +1,91 @@
+title: Brand in Galerie Lindeboom (gemiddeld)
+summary: >-
+  Een nachtelijke brand verwoest zes schilderijen in het depot van een Haarlemse galerie, verzekerd voor ruim een
+  miljoen euro. Een ongeluk met een kachel, zegt de eigenaar. De verzekeraar twijfelt.
+introduction: >-
+  Je bent ingehuurd door Hollandia Kunstverzekeringen. In de nacht van vrijdag 18 op zaterdag 19 september brak brand
+  uit in het depot van Galerie Lindeboom in de Kleine Houtstraat in Haarlem. Zes schilderijen gingen verloren,
+  waaronder twee werken van de schilder Marius Brandt. Eigenaar Victor Lindeboom heeft een schadeclaim ingediend van
+  1.240.000 euro. Volgens de brandweer begon de brand bij een oliekachel. Schade-expert Marloes de Graaf vertrouwt het
+  niet en wil weten wat er echt is gebeurd. Je hebt het schadedossier van Hollandia, de werkplek van galeriemanager
+  Yara Haddou en een atelier-pc tot je beschikking, en de in beslag genomen laptop van Victor ligt klaar, maar die is
+  beveiligd.
+setting: >-
+  Galerie Lindeboom in Haarlem is van Victor Lindeboom (58). De galerie staat er financieel slecht voor: Victor heeft
+  een zakelijke lening van 900.000 euro bij de Kennemer Bank en kreeg in maart een ultimatum. Op 14 april liet Victor
+  zijn twee schilderijen van Marius Brandt ("Duinlandschap bij Bloemendaal" en "Vrouw met parasol") naar Atelier Pauw
+  in Amsterdam brengen, officieel voor restauratie. Hij vroeg restaurator Hendrik Pauw er twee nauwkeurige kopieën van
+  te maken, "presentatiekopieën voor een reizende tentoonstelling", en betaalde hem daarvoor 18.000 euro contant.
+  Hendrik merkte de kopieën in potlood op het spieraam met "HP 2026 kopie". Op 20 mei gingen de kopieën terug naar de
+  galerie en de originelen naar kunsthandel Verstraeten Fine Art in Antwerpen. Kunsthandelaar Luc Verstraeten
+  verkocht ze door aan een anonieme privéverzamelaar. Op 27 mei ontving Victor 610.000 euro van Verstraeten Fine Art
+  op een privérekening. In juni liet Victor de verzekerde waarde van de twee Brandts verhogen van 850.000 naar
+  1.000.000 euro, op basis van een nieuw taxatierapport. In juli zag zijn assistente Lotte Vermeulen een transportorder
+  naar Antwerpen op de printer liggen en vroeg ernaar. Victor ontsloeg haar in augustus. Lotte stuurde hem een boze
+  mail, maar leverde haar sleutel op 31 augustus in en was in de brandnacht met vriendinnen in café De Zwaan. In de
+  nacht van de brand zette Victor om 02:51 het alarm van de galerie via de app op zijn telefoon in onderhoudsmodus,
+  opende om 02:58 met zijn eigen sleutel de achterdeur, haalde de oliekachel uit de werkplaats (Yara had hem die
+  middag uit het depot teruggezet en dat aan Victor gemaild), zette hem op de hoogste stand tegen de kopieën en de
+  vier kleinere werken in het depot en vertrok. Om 03:20 ging de rookmelder af en om 03:31 was de brandweer ter plaatse.
+  Victor beweert dat hij thuis in Heemstede sliep. Galeriemanager Yara Haddou weet van de restauratie bij Hendrik, maar
+  niet van de kopieën of de verkoop. Victor vroeg haar de restauratie niet in de agenda te zetten.
+solution:
+  questions:
+    - id: wie
+      question: Wie heeft de brand gesticht?
+      options:
+        - id: victor-lindeboom
+          label: Victor Lindeboom, de eigenaar
+        - id: lotte-vermeulen
+          label: Lotte Vermeulen, de ontslagen assistente
+        - id: yara-haddou
+          label: Yara Haddou, de galeriemanager
+        - id: hendrik-pauw
+          label: Hendrik Pauw, de restaurator
+        - id: ongeluk
+          label: Niemand, het was een ongeluk met de kachel
+      answer: victor-lindeboom
+    - id: wat-verbrandde
+      question: Wat is er bij de brand werkelijk verloren gegaan?
+      options:
+        - id: originelen
+          label: De twee originele Brandts en vier kleinere werken
+        - id: kopieen
+          label: Twee kopieën van de Brandts en vier kleinere werken
+        - id: niets
+          label: Niets van waarde, het depot was al leeggehaald
+        - id: alleen-kleine-werken
+          label: Alleen de vier kleinere werken, de Brandts hingen in de galerie
+      answer: kopieen
+    - id: originelen
+      question: Waar zijn de originele schilderijen van Marius Brandt gebleven?
+      options:
+        - id: kluis-victor
+          label: In een kluis van Victor Lindeboom, om na de uitkering terug te halen
+        - id: verkocht-antwerpen
+          label: Verkocht via een kunsthandel in Antwerpen aan een privéverzamelaar
+        - id: atelier-pauw
+          label: Nog in het atelier van Hendrik Pauw in Amsterdam
+        - id: gestolen-lotte
+          label: Gestolen door Lotte Vermeulen voor haar ontslag
+      answer: verkocht-antwerpen
+    - id: binnenkomst
+      question: Hoe kwam de dader binnen zonder dat het alarm afging?
+      options:
+        - id: raam
+          label: Via een open raam aan de achterkant
+        - id: sleutel-lotte
+          label: Met een sleutel die Lotte Vermeulen nooit had ingeleverd
+        - id: app-onderhoudsmodus
+          label: Het alarm ging via de app in onderhoudsmodus, daarna de achterdeur met een eigen sleutel
+        - id: deur-open
+          label: Yara Haddou had de achterdeur die avond niet afgesloten
+      answer: app-onderhoudsmodus
+  epilogue: >-
+    Victor Lindeboom zat diep in de schulden. In april liet hij zijn twee schilderijen van Marius Brandt naar
+    restaurator Hendrik Pauw brengen en liet er kopieën van maken. De originelen verkocht hij via Luc Verstraeten in
+    Antwerpen voor 610.000 euro aan een privéverzamelaar, terwijl de kopieën in zijn depot hingen. Daarna verhoogde
+    hij de verzekerde waarde. In de nacht van 18 op 19 september zette hij het alarm via zijn telefoon in
+    onderhoudsmodus, ging met zijn eigen sleutel naar binnen en zette een oliekachel tegen de doeken. Hollandia weigert
+    de uitkering en doet aangifte van verzekeringsfraude en brandstichting. De politie probeert via Verstraeten Fine
+    Art de originele schilderijen terug te vinden.

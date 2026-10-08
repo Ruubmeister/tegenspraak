@@ -96,4 +96,26 @@ describe('ChatPanel', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Sanne Bakker reageert niet.')
     expect(screen.getByLabelText('Bericht aan Sanne Bakker')).toHaveValue('Hallo?')
   })
+
+  it('ChatPanel_givenNoticeInConversation_expectNoticeShownAsEvent', async () => {
+    mockFetch({
+      [`GET ${MESSAGES_PATH}`]: () =>
+        jsonResponse([
+          characterMessage('1', 'Hier is zijn nummer.'),
+          {
+            id: '2',
+            sender: 'NOTICE',
+            authorName: null,
+            content: 'Sanne Bakker heeft je in contact gebracht met Dennis de Vries.',
+            sentAt: '2026-10-05T10:02:00Z',
+          },
+        ]),
+    })
+
+    renderChatPanel()
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Sanne Bakker heeft je in contact gebracht met Dennis de Vries.',
+    )
+  })
 })

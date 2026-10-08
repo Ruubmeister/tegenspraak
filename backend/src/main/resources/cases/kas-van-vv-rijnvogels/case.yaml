@@ -1,0 +1,73 @@
+title: De kas van VV Rijnvogels (makkelijk)
+summary: >-
+  Na de seizoensafsluiting van voetbalvereniging VV Rijnvogels is de complete opbrengst uit de kluis verdwenen.
+  Geen braaksporen, en maar drie mensen kennen de code.
+introduction: >-
+  Ingrid Mulder, voorzitter van VV Rijnvogels in Katwijk, heeft je om hulp gevraagd. Op zaterdag 13 juni vierde de
+  club de seizoensafsluiting. De opbrengst van de bar en de loterij, 8.460 euro contant, ging na afloop in de kluis
+  in de bestuurskamer. Maandagochtend was de kluis leeg. Er zijn geen braaksporen en Ingrid wil de politie er
+  voorlopig buiten houden, omdat ze vreest dat het iemand van de club is. Je hebt toegang tot de pc in het clubhuis,
+  de gedeelde schijf van de club en de clublaptop van de penningmeester. Ingrid, barbeheerder Kevin Bos en
+  penningmeester Ronald Verhoef willen met je chatten.
+setting: >-
+  VV Rijnvogels is een amateurvoetbalclub in Katwijk. Op zaterdag 13 juni 2026 was de seizoensafsluiting. De bar
+  sloot om 00:30. Barbeheerder Kevin Bos en penningmeester Ronald Verhoef telden om 00:45 samen de kas: 8.460 euro.
+  Ronald deed het geld in een verzegelde geldzak en sloot om 00:50 de kluis in de bestuurskamer af, terwijl Kevin
+  erbij stond. Alleen Ronald, Kevin en voorzitter Ingrid Mulder kennen de kluiscode. Kevin zette om 00:58 het alarm
+  aan en vertrok als laatste. Ronald heeft gokschulden van ruim 11.000 euro bij online casino LuckyDuin en zijn
+  rekening werd geblokkeerd tot hij betaalde. Hij reed die nacht terug naar het clubhuis, zette om 01:12 het alarm
+  uit met zijn eigen gebruikerscode (03), haalde de geldzak uit de kluis en zette om 01:31 het alarm weer aan.
+  Jeugdtrainer Fatima El Amrani reed om 01:15 langs het clubhuis, nadat ze een speler naar huis had gebracht, en
+  zag de blauwe Volvo van Ronald op het parkeerterrein staan. Ze heeft daar niets van gezegd, omdat ze dacht dat
+  Ronald iets was vergeten. Op maandag 15 juni om 08:31 kwam Ronald naar het clubhuis om het geld naar de bank te
+  brengen, en meldde om 08:40 aan Ingrid dat de kluis leeg was. Hij heeft de verdenking voorzichtig op Kevin
+  gericht, die onlangs een nieuwe scooter kocht. Kevin heeft niets gestolen; hij financierde de scooter met een
+  lening. Ronald heeft het geld zondag gestort op zijn casinorekening.
+solution:
+  questions:
+    - id: wie
+      question: Wie heeft het geld uit de kluis gehaald?
+      options:
+        - id: kevin-bos
+          label: Kevin Bos, de barbeheerder
+        - id: ronald-verhoef
+          label: Ronald Verhoef, de penningmeester
+        - id: ingrid-mulder
+          label: Ingrid Mulder, de voorzitter
+        - id: fatima-el-amrani
+          label: Fatima El Amrani, de jeugdtrainer
+        - id: inbreker
+          label: Een inbreker van buiten de club
+      answer: ronald-verhoef
+    - id: wanneer
+      question: Wanneer is het geld uit de kluis verdwenen?
+      options:
+        - id: tijdens-feest
+          label: Zaterdagavond, tijdens het feest
+        - id: nacht
+          label: In de nacht van zaterdag op zondag, rond 01:15, toen iedereen weg was
+        - id: zondagmiddag
+          label: Zondagmiddag, tijdens de schoonmaak
+        - id: maandagochtend
+          label: Maandagochtend, vlak voordat het geld naar de bank zou gaan
+      answer: nacht
+    - id: waarom
+      question: Waarom heeft de dader het geld meegenomen?
+      options:
+        - id: scooter
+          label: Om een nieuwe scooter te betalen
+        - id: gokschulden
+          label: Om gokschulden bij een online casino af te lossen
+        - id: wraak
+          label: Uit wraak op het bestuur
+        - id: verzekering
+          label: Om de club een verzekeringsuitkering te bezorgen
+      answer: gokschulden
+  epilogue: >-
+    In de nacht na de seizoensafsluiting reed penningmeester Ronald Verhoef terug naar het clubhuis. Om 01:12
+    schakelde hij het alarm uit met zijn eigen code, haalde de geldzak met 8.460 euro uit de kluis en zette om 01:31
+    het alarm weer aan. Jeugdtrainer Fatima El Amrani zag zijn auto staan. Ronald had ruim 11.000 euro schuld bij een
+    online casino en stortte het geld zondag op zijn casinorekening. Maandag deed hij alsof hij de kluis leeg aantrof
+    en liet hij de verdenking op Kevin Bos vallen. Ronald treedt af als penningmeester en heeft met de club een
+    afbetalingsregeling getroffen. Ingrid Mulder verwijst hem naar de gokverslavingszorg en heeft Kevin haar excuses
+    aangeboden.

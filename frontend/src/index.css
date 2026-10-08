@@ -474,6 +474,58 @@ textarea {
   resize: none;
 }
 
+/* Locks */
+
+.lock-icon {
+  vertical-align: -0.1em;
+  color: var(--color-text-muted);
+}
+
+.unlock-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: 24rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-muted);
+}
+
+.unlock-form p {
+  margin: 0;
+}
+
+.unlock-title {
+  font-weight: 600;
+}
+
+.unlock-hint {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.unlock-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.desktop-locked {
+  padding: 2rem 1.25rem;
+}
+
+.chat-notice {
+  align-self: center;
+  margin: 0.25rem 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+}
+
 /* Desktop */
 
 .desktop {

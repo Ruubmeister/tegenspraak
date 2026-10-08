@@ -1,0 +1,15 @@
+title: Demo
+summary: Korte zaak
+introduction: Intro
+setting: De butler deed het.
+solution:
+  questions:
+    - id: dader
+      question: Wie deed het?
+      options:
+        - id: de-butler
+          label: De butler
+        - id: de-tuinman
+          label: De tuinman
+      answer: de-butler
+  epilogue: De butler bekende alles.

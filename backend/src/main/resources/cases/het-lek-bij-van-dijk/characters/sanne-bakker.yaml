@@ -19,3 +19,8 @@ secrets:
       die ze met hem deelt. Ze vermoedt dat hij het bod heeft gezien.
     revealWhen: >-
       De speler weet dat het bod naar haar privé-adres ging en noemt Dennis of zijn baan bij Kramer Bouw.
+introduces:
+  - character: dennis-de-vries
+    when: >-
+      Je hebt verteld dat je vriend Dennis bij Kramer Bouw werkt, en de rechercheurs willen hem spreken of vragen hoe
+      ze hem kunnen bereiken. Je geeft met tegenzin zijn nummer.

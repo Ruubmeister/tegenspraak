@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak.chat.boundary;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -21,6 +22,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.http.MediaType;
 
 class ChatControllerIT extends IntegrationTest {
@@ -128,6 +130,32 @@ class ChatControllerIT extends IntegrationTest {
     void getConversation_givenUnknownCharacter_expectNotFound() throws Exception {
         mockMvc.perform(get(messagesPath(teamId, "onbekend")).with(user(player)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void sendMessage_givenSanneIntroducesDennis_expectDennisAvailableForTeamWithNotice() throws Exception {
+        mockMvc.perform(get(messagesPath(teamId, "dennis-de-vries")).with(user(player)))
+                .andExpect(status().isNotFound());
+        when(chatModel.call(any(Prompt.class))).thenAnswer(invocation -> {
+            Prompt prompt = invocation.getArgument(0);
+            ((ToolCallingChatOptions) prompt.getOptions())
+                    .getToolCallbacks()
+                    .getFirst()
+                    .call("{\"characterId\": \"dennis-de-vries\"}");
+            return new ChatResponse(List.of(new Generation(new AssistantMessage("Hier is zijn nummer."))));
+        });
+
+        sendHallo(player, messages);
+
+        mockMvc.perform(get("/api/teams/" + teamId + "/cases/het-lek-bij-van-dijk")
+                        .with(user(player)))
+                .andExpect(jsonPath("$.characters[*].id").value(containsInAnyOrder("sanne-bakker", "dennis-de-vries")));
+        mockMvc.perform(get(messages).with(user(player)))
+                .andExpect(jsonPath("$[2].sender").value("NOTICE"))
+                .andExpect(jsonPath("$[2].content")
+                        .value("Sanne Bakker heeft je in contact gebracht met Dennis de Vries."));
+        mockMvc.perform(get(messagesPath(teamId, "dennis-de-vries")).with(user(player)))
+                .andExpect(status().isOk());
     }
 
     private void givenCharacterReplies(String reply) {

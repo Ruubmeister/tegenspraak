@@ -1,0 +1,74 @@
+ownerName: Politie Midden-Nederland
+ownerType: organisation
+description: Het politiedossier over het overlijden van Eva Brink.
+apps:
+  - type: files
+    id: dossier
+    title: Dossier
+    files:
+      - id: melding
+        folder: Proces-verbaal
+        name: PV_aantreffen_09-06.txt
+        content: |
+          Proces-verbaal van bevindingen
+          Datum: 9 juni 2026, 08:05
+
+          Om 07:44 melding van het HBI: medewerker levenloos aangetroffen in cryo-opslag B0.14.
+          Slachtoffer: dr. E. Brink (34), aangetroffen op de vloer, circa een meter van de deur.
+          Aangetroffen door: R. Kamphuis, technicus, die om 07:40 de ruimte met zijn badge betrad.
+
+          Deur B0.14: gesloten, nachtgrendel (mechanisch, buitenzijde) geopend.
+          Noodknop binnenzijde: bij test door technische recherche om 10:15 functioneel, deur opent direct.
+          Zuurstofsensor: geen alarm gegeven. Onderhoudslog vermeldt vervanging op 6 juni.
+          Persoonlijke bezittingen: telefoon en tas in kantoor B1.22. Geen labjournaal aangetroffen.
+          Volgens collega's werkte slachtoffer altijd met een blauw labjournaal.
+      - id: sectie
+        folder: Forensisch
+        name: Sectierapport_samenvatting.txt
+        content: |
+          NFI - samenvatting sectierapport E. Brink
+
+          Doodsoorzaak: verstikking door zuurstoftekort (hypoxie).
+          Tijdstip van overlijden: tussen 22:00 en 23:30 op 8 juni 2026.
+          Uitwendig: kneuzingen en schaafwonden aan de knokkels van de rechterhand, recent ontstaan.
+          Opmerking politie: vermoedelijk bij het vallen opgelopen.
+          Geen aanwijzingen voor geweld door derden. Geen alcohol of medicatie.
+      - id: toegang-hoofdingang
+        folder: Onderzoek
+        name: Toegangslog_hoofdingang_8-9_juni.txt
+        content: |
+          HBI - toegangslog hoofdingang (badge), 8 en 9 juni 2026
+
+          08-06 08:12   IN    E. Brink
+          08-06 08:30   IN    T. Veldkamp
+          08-06 08:45   IN    A. Kuiper
+          08-06 08:51   IN    R. Kamphuis
+          08-06 09:02   IN    M. Jansen
+          08-06 17:10   UIT   M. Jansen
+          08-06 17:45   UIT   A. Kuiper
+          08-06 18:20   UIT   R. Kamphuis
+          08-06 21:34   UIT   T. Veldkamp
+          08-06 21:48   IN    A. Kuiper
+          08-06 22:20   UIT   A. Kuiper
+          09-06 05:52   IN    A. Kuiper
+          09-06 07:31   IN    R. Kamphuis
+      - id: verklaringen
+        folder: Onderzoek
+        name: Verklaringen_samenvatting.txt
+        content: |
+          Samenvatting verklaringen (afgenomen op 9 en 10 juni)
+
+          A. Kuiper (groepsleider): op 8 juni om 17:45 naar huis. Op 9 juni om 05:52 terug om te werken aan
+          ERC-presentatie, in eigen kantoor (2e verdieping). Niet in de kelder geweest. Slachtoffer was
+          "zijn beste postdoc". Wijst op ruzie tussen slachtoffer en T. Veldkamp.
+
+          T. Veldkamp (postdoc): "rond acht uur" naar huis. Had die middag een "meningsverschil" met het
+          slachtoffer over de verdeling van werk.
+
+          R. Kamphuis (technicus): sensor op 6 juni vervangen en getest, "alles was in orde".
+
+          L. Brink (zus): toont appbericht van 21:43. Gelooft niet in een ongeluk. Bericht niet relevant
+          geacht voor de toedracht.
+
+          Voorlopige conclusie: ongeval. Slachtoffer was alleen in B0.14 tijdens de automatische vulling,
+          sensor vermoedelijk defect, slachtoffer raakte bewusteloos voordat ze de deur bereikte.

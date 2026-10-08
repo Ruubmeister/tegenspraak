@@ -1,0 +1,96 @@
+ownerName: Eva Brink
+ownerType: person
+description: Werkplek van Eva Brink in kantoor B1.22, veiliggesteld door de politie.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: afspraak-vertrouwenspersoon
+        folder: Inbox
+        from: integriteit@hbi.nl
+        to: e.brink@hbi.nl
+        subject: Bevestiging afspraak
+        sentAt: 2026-06-05T16:20:00
+        body: |
+          Beste Eva,
+
+          Hierbij bevestig ik onze afspraak op woensdag 10 juni om 09:00, kamer A0.03.
+          Neem gerust mee wat je wilt laten zien. Alles wat je vertelt blijft vertrouwelijk.
+
+          Hartelijke groet,
+          Hanneke Smit
+          Vertrouwenspersoon wetenschappelijke integriteit
+      - id: thomas-boos
+        folder: Inbox
+        from: t.veldkamp@hbi.nl
+        to: e.brink@hbi.nl
+        subject: vanmiddag
+        sentAt: 2026-06-08T16:02:00
+        body: |
+          Eva,
+
+          Ik snap niet waarom je er zo'n drama van maakt. Het was één paragraaf en ik had je heus wel bedankt
+          in de definitieve versie. Als je echt naar de vertrouwenspersoon stapt, maak je mijn carrière kapot
+          voor niks. Denk daar nog even over na.
+
+          T.
+      - id: aan-kuiper
+        folder: Verzonden
+        from: e.brink@hbi.nl
+        to: a.kuiper@hbi.nl
+        subject: Cohort B
+        sentAt: 2026-06-08T18:05:00
+        body: |
+          Arjen,
+
+          Ik heb het je vorige week al gevraagd en je ontweek het. Ik heb de biobankregistratie van cohort B
+          naast de dataset van figuur 3 gelegd. Er zijn 74 monsters, geen 112. De rest bestaat niet.
+
+          Vanavond haal ik de originele dozen uit B0.14 en woensdag geef ik alles aan de vertrouwenspersoon.
+          Het spijt me, maar ik kan dit niet laten liggen.
+
+          Eva
+      - id: nature-concern
+        folder: Inbox
+        from: a.kuiper@hbi.nl
+        to: e.brink@hbi.nl
+        subject: "Re: vraag over figuur 3"
+        sentAt: 2026-06-01T08:12:00
+        body: |
+          Eva,
+
+          De dataset van figuur 3 is in orde, die heb ik zelf samengesteld. Stop alsjeblieft met graven in oude
+          data, we hebben een ERC-interview voor te bereiden. Je weet hoe belangrijk dit is voor de hele groep,
+          ook voor jouw contract.
+
+          Arjen
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: todo
+        folder: Documenten
+        name: todo.txt
+        content: |
+          - ma: dozen cohort B uit B0.14 (NIET tijdens vulling, vulling 22:00!)
+          - di: foto's van de labels, alles in journaal 7
+          - wo 09:00 Hanneke Smit (A0.03)
+          - Pluis naar dierenarts do
+      - id: vergelijking
+        folder: Documenten/Cohort B
+        name: Vergelijking_biobank_figuur3.txt
+        lock:
+          code: pluis2021
+          hint: "Wachtwoordhint: naam van mijn kat + het jaar van mijn promotie"
+        content: |
+          Vergelijking cohort B - E. Brink, mei 2026
+
+          Nature 2024, figuur 3: n = 112 patiëntmonsters (cohort B)
+          Biobankregister cohort B: 74 monsters geregistreerd, alle met ontvangstdatum en label
+
+          38 monsters in de dataset hebben geen registratie in de biobank. De waarden van deze 38 liggen
+          allemaal opvallend dicht bij de trendlijn. Zonder deze 38 is het effect niet significant (p = 0,21).
+
+          De dataset is samengesteld door A. Kuiper (zie metadata, 14-02-2024).
+          Bewijs: originele dozen B-01 t/m B-08 in vat 3 van B0.14. Daar zitten er maar 74 in.

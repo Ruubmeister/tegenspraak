@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import jakarta.servlet.http.Cookie;
@@ -10,7 +11,9 @@ import nl.rubium.tegenspraak.auth.entity.PlayerAccountRepository;
 import nl.rubium.tegenspraak.auth.entity.PlayerRole;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import nl.rubium.tegenspraak.team.entity.Team;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -48,6 +51,12 @@ public abstract class IntegrationTest {
 
     @MockitoBean
     protected ChatModel chatModel;
+
+    /** The real model has configured options; the character tools are added to a copy of them. */
+    @BeforeEach
+    void stubChatModelOptions() {
+        when(chatModel.getOptions()).thenReturn(ToolCallingChatOptions.builder().build());
+    }
 
     /** Mirrors the SPA: the XSRF-TOKEN cookie value is echoed back in the X-XSRF-TOKEN header. */
     protected static RequestPostProcessor spaCsrf() {

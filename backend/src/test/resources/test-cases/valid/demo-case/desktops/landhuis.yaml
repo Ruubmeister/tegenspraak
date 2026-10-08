@@ -21,3 +21,10 @@ apps:
         folder: Documenten
         name: menu.txt
         content: Soep
+      - id: kluis
+        folder: Prive
+        name: kluis.txt
+        lock:
+          code: Kandelaar 7
+          hint: Waarmee en welke kamer?
+        content: Het testament.

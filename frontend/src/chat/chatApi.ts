@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest } from '../api/http'
 import type { ChatMessage } from '../api/types'
+import { caseOverviewQueryKey } from '../cases/casesApi'
 import { teamPath } from '../teams/teamsApi'
 
 /** Teammates write to the same conversation, so it is refreshed regularly while open. */
@@ -22,12 +23,19 @@ export function useConversation(teamId: string, caseId: string, characterId: str
   })
 }
 
-/** Sends a message and refreshes the conversation, which then contains both the message and the reply. */
+/**
+ * Sends a message and refreshes the conversation, which then contains the message, the reply and any notices. The case
+ * is refreshed too, because the character may have introduced a new contact.
+ */
 export function useSendMessage(teamId: string, caseId: string, characterId: string) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (content: string) =>
       apiRequest<ChatMessage>('POST', messagesPath(teamId, caseId, characterId), { content }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: conversationQueryKey(teamId, caseId, characterId) }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: conversationQueryKey(teamId, caseId, characterId) }),
+        queryClient.invalidateQueries({ queryKey: caseOverviewQueryKey(teamId, caseId) }),
+      ]),
   })
 }
