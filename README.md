@@ -41,6 +41,35 @@ npm install
 npm run dev
 ```
 
+## Running in production (Debian)
+
+Production uses an existing Postgres server and no Docker; the packaged jar leaves out the Docker Compose support.
+Example configs are in `deploy/`: a systemd unit for the backend and an nginx site that serves the frontend build and
+proxies `/api` to the backend, so both share one origin.
+
+```bash
+# Build
+(cd backend && ./mvnw -DskipTests package)
+(cd frontend && npm ci && npm run build)
+
+# Backend
+sudo apt install openjdk-21-jre-headless nginx
+sudo useradd --system --home /opt/tegenspraak --shell /usr/sbin/nologin tegenspraak
+sudo install -D -m 644 backend/target/tegenspraak-0.0.1-SNAPSHOT.jar /opt/tegenspraak/tegenspraak.jar
+sudo install -D -m 600 deploy/systemd/tegenspraak.env.example /etc/tegenspraak/tegenspraak.env  # then edit it
+sudo cp deploy/systemd/tegenspraak-backend.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now tegenspraak-backend
+
+# Frontend
+sudo mkdir -p /var/www/tegenspraak && sudo cp -r frontend/dist/. /var/www/tegenspraak/
+sudo cp deploy/nginx/tegenspraak.conf /etc/nginx/sites-available/  # then set server_name
+sudo ln -s /etc/nginx/sites-available/tegenspraak.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Create the database and its owner on the Postgres server first; Flyway creates the tables on the first startup. Logs
+are in `journalctl -u tegenspraak-backend`.
+
 ## Accounts
 
 There is no self registration. On the first startup the backend creates a single admin account (`admin`, see

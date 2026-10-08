@@ -1,0 +1,32 @@
+[Unit]
+Description=Tegenspraak backend (Spring Boot)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tegenspraak
+Group=tegenspraak
+WorkingDirectory=/opt/tegenspraak
+EnvironmentFile=/etc/tegenspraak/tegenspraak.env
+ExecStart=/usr/bin/java -Xms256m -Xmx512m -jar /opt/tegenspraak/tegenspraak.jar
+# The JVM exits with 143 on SIGTERM, which is a normal shutdown
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5
+
+# Hardening: the backend only needs to read its jar and talk to Postgres and the Anthropic API
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
