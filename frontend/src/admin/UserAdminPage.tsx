@@ -128,8 +128,8 @@ function UserRow({ user }: { user: UserAccount }) {
   return (
     <tr>
       <td>{user.username}</td>
-      <td>{ROLE_LABELS[user.role]}</td>
-      <td>{new Date(user.createdAt).toLocaleDateString('nl-NL')}</td>
+      <td data-label="Rol">{ROLE_LABELS[user.role]}</td>
+      <td data-label="Aangemaakt">{new Date(user.createdAt).toLocaleDateString('nl-NL')}</td>
       <td className="user-actions">
         {user.role === 'PLAYER' && (
           <>

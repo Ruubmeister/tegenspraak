@@ -4,6 +4,7 @@ import { AttachToChat } from '../../chat/AttachToChat'
 import type { DesktopLocation } from '../desktopApi'
 import type { AppViewProps } from './appViewProps'
 import { LockIcon } from '../UnlockForm'
+import { BackToListButton } from './BackToListButton'
 import { folderNames } from './groupByFolder'
 import { LockedItem } from './LockedItem'
 
@@ -18,7 +19,7 @@ export function MailAppView({ app, location, ownerName, contacts, initialItemId 
   const selectedMessage = app.messages.find((message) => message.id === selectedMessageId)
 
   return (
-    <div className="mail-app">
+    <div className={selectedMessage ? 'mail-app showing-item' : 'mail-app'}>
       <ul className="app-sidebar" aria-label="Mappen">
         {folders.map((folder) => (
           <li key={folder}>
@@ -55,13 +56,16 @@ export function MailAppView({ app, location, ownerName, contacts, initialItemId 
       </ul>
       <div className="app-reader">
         {selectedMessage ? (
-          <MailReader
-            message={selectedMessage}
-            appId={app.id}
-            location={location}
-            ownerName={ownerName}
-            contacts={contacts}
-          />
+          <>
+            <BackToListButton label={selectedFolder} onClick={() => setSelectedMessageId(undefined)} />
+            <MailReader
+              message={selectedMessage}
+              appId={app.id}
+              location={location}
+              ownerName={ownerName}
+              contacts={contacts}
+            />
+          </>
         ) : (
           <p className="status">Selecteer een bericht.</p>
         )}

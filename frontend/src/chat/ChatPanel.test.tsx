@@ -122,6 +122,19 @@ describe('ChatPanel', () => {
     expect(screen.getByLabelText('Bericht aan Sanne Bakker')).toHaveValue('Hallo?')
   })
 
+  it('ChatPanel_givenEnterOnTouchScreen_expectNewLineInsteadOfSend', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(pointer: coarse)' }))
+    const fetchMock = mockFetch({ [`GET ${MESSAGES_PATH}`]: () => jsonResponse([]) })
+    const user = userEvent.setup()
+    renderChatPanel()
+    await screen.findByText('Stuur Sanne Bakker een bericht.')
+
+    await user.type(screen.getByLabelText('Bericht aan Sanne Bakker'), 'Eerste regel{Enter}Tweede regel')
+
+    expect(screen.getByLabelText('Bericht aan Sanne Bakker')).toHaveValue('Eerste regel\nTweede regel')
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false)
+  })
+
   it('ChatPanel_givenNoticeInConversation_expectNoticeShownAsEvent', async () => {
     mockFetch({
       [`GET ${MESSAGES_PATH}`]: () =>

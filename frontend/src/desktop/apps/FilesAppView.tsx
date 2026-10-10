@@ -3,6 +3,7 @@ import type { FilesApp } from '../../api/types'
 import { AttachToChat } from '../../chat/AttachToChat'
 import type { AppViewProps } from './appViewProps'
 import { LockIcon } from '../UnlockForm'
+import { BackToListButton } from './BackToListButton'
 import { folderNames } from './groupByFolder'
 import { LockedItem } from './LockedItem'
 
@@ -11,7 +12,7 @@ export function FilesAppView({ app, location, ownerName, contacts, initialItemId
   const selectedFile = app.files.find((file) => file.id === selectedFileId)
 
   return (
-    <div className="files-app">
+    <div className={selectedFile ? 'files-app showing-item' : 'files-app'}>
       <div className="app-sidebar file-tree">
         {folderNames(app.files).map((folder) => (
           <section key={folder}>
@@ -37,6 +38,7 @@ export function FilesAppView({ app, location, ownerName, contacts, initialItemId
       <div className="app-reader">
         {selectedFile ? (
           <article>
+            <BackToListButton label={app.title} onClick={() => setSelectedFileId(undefined)} />
             <h3>{selectedFile.name}</h3>
             {selectedFile.lock ? (
               <LockedItem

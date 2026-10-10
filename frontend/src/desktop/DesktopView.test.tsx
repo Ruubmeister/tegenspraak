@@ -217,6 +217,27 @@ describe('DesktopView', () => {
     ])
   })
 
+  it('DesktopView_givenOpenedMailAndBackClicked_expectMessageListShownAgain', async () => {
+    const user = userEvent.setup()
+    renderDesktop(desktop)
+    await user.click(screen.getByRole('button', { name: /^Bod/ }))
+
+    await user.click(screen.getByRole('button', { name: /Terug naar Inbox/ }))
+
+    expect(screen.getByText('Selecteer een bericht.')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'Berichten' })).toBeInTheDocument()
+  })
+
+  it('DesktopView_givenOpenedFileAndBackClicked_expectNoFileSelected', async () => {
+    const user = userEvent.setup()
+    renderDesktop(desktop, { appId: 'bestanden', itemId: 'notities' })
+
+    await user.click(screen.getByRole('button', { name: /Terug naar Bestanden/ }))
+
+    expect(screen.getByText('Selecteer een bestand.')).toBeInTheDocument()
+    expect(screen.queryByText('bod definitief maken')).not.toBeInTheDocument()
+  })
+
   it('DesktopView_givenLockedFile_expectNoAttachButton', async () => {
     renderDesktop(desktop)
 

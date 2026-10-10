@@ -17,6 +17,11 @@ import { MessageLengthCounter } from './MessageLengthCounter'
 /** How close to the bottom the player must be for new messages to keep the conversation scrolled down. */
 const FOLLOW_LATEST_THRESHOLD_PX = 48
 
+/** On touch keyboards Enter is the only way to start a new line, so there only the send button sends. */
+function sendsOnEnter() {
+  return !window.matchMedia?.('(pointer: coarse)').matches
+}
+
 interface ChatPanelProps {
   teamId: string
   caseId: string
@@ -166,7 +171,7 @@ export function ChatPanel({ teamId, caseId, character, currentUsername }: ChatPa
             value={draft.text}
             onChange={(event) => updateDraft({ ...draft, text: event.target.value })}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
+              if (event.key === 'Enter' && !event.shiftKey && sendsOnEnter()) {
                 handleSubmit(event)
               }
             }}
