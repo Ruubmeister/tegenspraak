@@ -45,7 +45,7 @@ public class ChatController {
             @Valid @RequestBody SendMessageRequest request,
             @AuthenticationPrincipal PlayerPrincipal player) {
         Conversation conversation = new Conversation(teamId, caseId, characterId);
-        return ChatMessageResponse.from(
-                chatService.sendMessage(player.getId(), player.getUsername(), conversation, request.content()));
+        return ChatMessageResponse.from(chatService.sendMessage(
+                player.getId(), player.getUsername(), conversation, request.content(), request.attachmentRefs()));
     }
 }

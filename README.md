@@ -20,7 +20,8 @@ The backend is a single service, split into feature packages that each follow bo
 - `team`: players investigate in teams; others join with the team's code (`ABCD-EFGH`). Playing alone is a team of
   one, and the last member to leave deletes the team with its progress
 - `chat`: a team's shared conversation with a character; the persona file becomes the LLM system prompt, and player
-  messages reach the LLM as `[name]: ...` so the character can tell the detectives apart
+  messages reach the LLM as `[name]: ...` so the character can tell the detectives apart. A message can carry up to
+  three opened mails or files as attachments; only references are stored, and the character reads them in full
 - `desktop`: virtual desktops made of typed apps (`mail`, `files`)
 - `investigation`: what a team can see and use in a case: introduced contacts and desktops, mails and files opened
   with their code. Unlocks are shared by the team
@@ -53,18 +54,18 @@ proxies `/api` to the backend, so both share one origin.
 (cd frontend && npm ci && npm run build)
 
 # Backend
-sudo apt install openjdk-21-jre-headless nginx
-sudo useradd --system --home /opt/tegenspraak --shell /usr/sbin/nologin tegenspraak
-sudo install -D -m 644 backend/target/tegenspraak-0.0.1-SNAPSHOT.jar /opt/tegenspraak/tegenspraak.jar
-sudo install -D -m 600 deploy/systemd/tegenspraak.env.example /etc/tegenspraak/tegenspraak.env  # then edit it
-sudo cp deploy/systemd/tegenspraak-backend.service /etc/systemd/system/
-sudo systemctl daemon-reload && sudo systemctl enable --now tegenspraak-backend
+apt install openjdk-21-jre-headless nginx
+useradd --system --home /opt/tegenspraak --shell /usr/sbin/nologin tegenspraak
+install -D -m 644 backend/target/tegenspraak-0.0.1-SNAPSHOT.jar /opt/tegenspraak/tegenspraak.jar
+install -D -m 600 deploy/systemd/tegenspraak.env.example /etc/tegenspraak/tegenspraak.env  # then edit it
+cp deploy/systemd/tegenspraak-backend.service /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now tegenspraak-backend
 
 # Frontend
-sudo mkdir -p /var/www/tegenspraak && sudo cp -r frontend/dist/. /var/www/tegenspraak/
-sudo cp deploy/nginx/tegenspraak.conf /etc/nginx/sites-available/  # then set server_name
-sudo ln -s /etc/nginx/sites-available/tegenspraak.conf /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
+mkdir -p /var/www/tegenspraak && cp -r frontend/dist/. /var/www/tegenspraak/
+cp deploy/nginx/tegenspraak.conf /etc/nginx/sites-available/  # then set server_name
+ln -s /etc/nginx/sites-available/tegenspraak.conf /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
 ```
 
 Create the database and its owner on the Postgres server first; Flyway creates the tables on the first startup. Logs

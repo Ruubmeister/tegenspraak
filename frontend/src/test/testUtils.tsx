@@ -4,7 +4,7 @@ import type { ReactElement } from 'react'
 import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
 
-type RouteHandler = (init: RequestInit) => Response
+type RouteHandler = (init: RequestInit) => Response | Promise<Response>
 
 /** Stubs fetch with handlers keyed by "METHOD /path". Unknown routes fail the test loudly. */
 export function mockFetch(handlers: Record<string, RouteHandler>) {

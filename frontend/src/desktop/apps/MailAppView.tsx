@@ -1,16 +1,19 @@
 import { useState } from 'react'
-import type { MailApp, MailMessage } from '../../api/types'
+import type { CharacterSummary, MailApp, MailMessage } from '../../api/types'
+import { AttachToChat } from '../../chat/AttachToChat'
 import type { DesktopLocation } from '../desktopApi'
+import type { AppViewProps } from './appViewProps'
 import { LockIcon } from '../UnlockForm'
 import { folderNames } from './groupByFolder'
 import { LockedItem } from './LockedItem'
 
 const dateTimeFormat = new Intl.DateTimeFormat('nl-NL', { dateStyle: 'medium', timeStyle: 'short' })
 
-export function MailAppView({ app, location }: { app: MailApp; location: DesktopLocation }) {
+export function MailAppView({ app, location, ownerName, contacts, initialItemId }: AppViewProps & { app: MailApp }) {
   const folders = folderNames(app.messages)
-  const [selectedFolder, setSelectedFolder] = useState(folders[0])
-  const [selectedMessageId, setSelectedMessageId] = useState<string>()
+  const initialMessage = app.messages.find((message) => message.id === initialItemId)
+  const [selectedFolder, setSelectedFolder] = useState(initialMessage?.folder ?? folders[0])
+  const [selectedMessageId, setSelectedMessageId] = useState(initialMessage?.id)
   const messagesInFolder = app.messages.filter((message) => message.folder === selectedFolder)
   const selectedMessage = app.messages.find((message) => message.id === selectedMessageId)
 
@@ -52,7 +55,13 @@ export function MailAppView({ app, location }: { app: MailApp; location: Desktop
       </ul>
       <div className="app-reader">
         {selectedMessage ? (
-          <MailReader message={selectedMessage} appId={app.id} location={location} />
+          <MailReader
+            message={selectedMessage}
+            appId={app.id}
+            location={location}
+            ownerName={ownerName}
+            contacts={contacts}
+          />
         ) : (
           <p className="status">Selecteer een bericht.</p>
         )}
@@ -65,9 +74,11 @@ interface MailReaderProps {
   message: MailMessage
   appId: string
   location: DesktopLocation
+  ownerName: string
+  contacts: CharacterSummary[]
 }
 
-function MailReader({ message, appId, location }: MailReaderProps) {
+function MailReader({ message, appId, location, ownerName, contacts }: MailReaderProps) {
   return (
     <article>
       <h3>{message.subject}</h3>
@@ -89,7 +100,23 @@ function MailReader({ message, appId, location }: MailReaderProps) {
           subject="deze mail"
         />
       ) : (
-        <pre className="document-text">{message.body}</pre>
+        <>
+          <AttachToChat
+            key={message.id}
+            teamId={location.teamId}
+            caseId={location.caseId}
+            evidence={{
+              desktopId: location.desktopId,
+              appId,
+              itemId: message.id,
+              kind: 'mail',
+              title: message.subject,
+              ownerName,
+            }}
+            contacts={contacts}
+          />
+          <pre className="document-text">{message.body}</pre>
+        </>
       )}
     </article>
   )

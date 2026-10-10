@@ -1,14 +1,18 @@
 package nl.rubium.tegenspraak.chat.boundary;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,8 +28,16 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 
 class ChatControllerIT extends IntegrationTest {
+
+    private static final String BID_MAIL =
+            "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"mail\", \"itemId\": \"deadline-herinnering\"}";
+    private static final String NOTES_FILE =
+            "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"bestanden\", \"itemId\": \"notities\"}";
+    private static final String LOCKED_DIARY =
+            "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"bestanden\", \"itemId\": \"dagboek\"}";
 
     private PlayerPrincipal player;
     private UUID teamId;
@@ -156,6 +168,53 @@ class ChatControllerIT extends IntegrationTest {
                         .value("Sanne Bakker heeft je in contact gebracht met Dennis de Vries."));
         mockMvc.perform(get(messagesPath(teamId, "dennis-de-vries")).with(user(player)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void sendMessage_givenOpenMailAttached_expectMailShownToCharacterAndListedInConversation() throws Exception {
+        givenCharacterReplies("Dat is het bod.");
+
+        sendWithAttachments(BID_MAIL).andExpect(status().isOk());
+
+        verify(chatModel)
+                .call(argThat(
+                        (Prompt prompt) -> prompt.getUserMessage().getText().contains("4.250.000")));
+        mockMvc.perform(get(messages).with(user(player)))
+                .andExpect(jsonPath("$[0].attachments.length()").value(1))
+                .andExpect(jsonPath("$[0].attachments[0].kind").value("mail"))
+                .andExpect(jsonPath("$[0].attachments[0].title").value("Bod Oude Suikerfabriek"))
+                .andExpect(jsonPath("$[0].attachments[0].ownerName").value("Sanne Bakker"))
+                .andExpect(jsonPath("$[1].attachments.length()").value(0));
+    }
+
+    @Test
+    void sendMessage_givenLockedDiaryAttached_expectNotFoundAndModelNotCalled() throws Exception {
+        sendWithAttachments(LOCKED_DIARY).andExpect(status().isNotFound());
+
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
+    void sendMessage_givenFourAttachments_expectBadRequest() throws Exception {
+        sendWithAttachments(BID_MAIL, NOTES_FILE, LOCKED_DIARY, BID_MAIL).andExpect(status().isBadRequest());
+
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
+    void getConversation_givenCharacterReply_expectNoAttachmentContentInResponse() throws Exception {
+        givenCharacterReplies("Dat is het bod.");
+        sendWithAttachments(BID_MAIL).andExpect(status().isOk());
+
+        mockMvc.perform(get(messages).with(user(player))).andExpect(content().string(not(containsString("4.250.000"))));
+    }
+
+    private ResultActions sendWithAttachments(String... attachments) throws Exception {
+        return mockMvc.perform(post(messages)
+                .with(user(player))
+                .with(spaCsrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"content\": \"Wat is dit?\", \"attachments\": [" + String.join(",", attachments) + "]}"));
     }
 
     private void givenCharacterReplies(String reply) {

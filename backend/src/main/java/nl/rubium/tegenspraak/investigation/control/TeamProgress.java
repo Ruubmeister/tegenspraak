@@ -41,6 +41,28 @@ public record TeamProgress(CaseDefinition caseDefinition, Set<String> unlockedTa
         return item.lock() == null || isUnlocked(UnlockTarget.item(desktop.id(), app.id(), item.id()));
     }
 
+    /** Mails and files the team can read, on desktops it has opened, in the order of the case files. */
+    public List<EvidenceItem> openEvidence() {
+        return caseDefinition.desktops().stream()
+                .filter(this::isOpen)
+                .flatMap(desktop -> desktop.apps().stream()
+                        .flatMap(app -> app.items().stream()
+                                .filter(item -> isOpen(desktop, app, item))
+                                .map(item -> new EvidenceItem(desktop, app, item))))
+                .toList();
+    }
+
+    /** Empty when the mail or file does not exist, or when the team cannot read it yet. */
+    public Optional<EvidenceItem> findOpenEvidence(EvidenceRef ref) {
+        return caseDefinition
+                .findDesktop(ref.desktopId())
+                .filter(this::isOpen)
+                .flatMap(desktop -> desktop.findApp(ref.appId())
+                        .flatMap(app -> app.findItem(ref.itemId())
+                                .filter(item -> isOpen(desktop, app, item))
+                                .map(item -> new EvidenceItem(desktop, app, item))));
+    }
+
     private boolean isUnlocked(UnlockTarget target) {
         return unlockedTargets.contains(target.key());
     }

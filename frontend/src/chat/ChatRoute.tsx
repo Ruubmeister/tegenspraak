@@ -14,7 +14,7 @@ export function ChatRoute() {
   if (!character) {
     return <p className="status error">Dit contact bestaat niet.</p>
   }
-  // The key resets the draft and scroll state when switching between contacts
+  // The key gives every contact its own draft and scroll state
   return (
     <ChatPanel
       key={character.id}

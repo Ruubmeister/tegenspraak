@@ -58,6 +58,37 @@ class InvestigationControllerIT extends IntegrationTest {
     }
 
     @Test
+    void getEvidence_givenNewTeam_expectOpenMailsAndFilesWithoutLockedDiary() throws Exception {
+        String body = mockMvc.perform(get(casePath() + "/evidence").with(user(player)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.itemId == 'deadline-herinnering')].kind")
+                        .value(contains("mail")))
+                .andExpect(jsonPath("$[?(@.itemId == 'deadline-herinnering')].title")
+                        .value(contains("Bod Oude Suikerfabriek")))
+                .andExpect(jsonPath("$[?(@.itemId == 'notities')].kind").value(contains("file")))
+                .andExpect(jsonPath("$[?(@.itemId == 'dagboek')]").isEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(body).doesNotContain("4.250.000");
+    }
+
+    @Test
+    void getEvidence_givenDiaryUnlocked_expectDiaryListed() throws Exception {
+        unlockDiary(player, "1403").andExpect(status().isOk());
+
+        mockMvc.perform(get(casePath() + "/evidence").with(user(player)))
+                .andExpect(jsonPath("$[?(@.itemId == 'dagboek')].title").value(contains("dagboek.txt")));
+    }
+
+    @Test
+    void getEvidence_givenNonMember_expectNotFound() throws Exception {
+        mockMvc.perform(get(casePath() + "/evidence").with(user(createPlayer())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getDesktop_givenPersonDesktop_expectAppsWithTypeDiscriminator() throws Exception {
         mockMvc.perform(get(sanneDesktopPath()).with(user(player)))
                 .andExpect(status().isOk())

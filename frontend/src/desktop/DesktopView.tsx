@@ -1,17 +1,27 @@
 import { useState } from 'react'
-import type { Desktop, DesktopApp, Lock } from '../api/types'
+import type { CharacterSummary, Desktop, DesktopApp, Lock } from '../api/types'
 import { FilesAppView } from './apps/FilesAppView'
 import { MailAppView } from './apps/MailAppView'
+import type { AppViewProps } from './apps/appViewProps'
 import { useUnlockDesktop, type DesktopLocation } from './desktopApi'
 import { UnlockForm } from './UnlockForm'
+
+/** A mail or file to show right away, for example when following a chat attachment. */
+export interface ItemSelection {
+  appId: string
+  itemId: string
+}
 
 interface DesktopViewProps {
   desktop: Desktop
   location: DesktopLocation
+  /** The contacts an opened mail or file can be attached for. */
+  contacts: CharacterSummary[]
+  initialSelection?: ItemSelection
 }
 
 /** A virtual computer: a dock with the installed apps and a window showing the selected one. */
-export function DesktopView({ desktop, location }: DesktopViewProps) {
+export function DesktopView({ desktop, location, contacts, initialSelection }: DesktopViewProps) {
   return (
     <div className="desktop">
       <header className="desktop-header">
@@ -21,7 +31,7 @@ export function DesktopView({ desktop, location }: DesktopViewProps) {
       {desktop.lock ? (
         <LockedDesktop lock={desktop.lock} location={location} />
       ) : (
-        <OpenDesktop desktop={desktop} location={location} />
+        <OpenDesktop desktop={desktop} location={location} contacts={contacts} initialSelection={initialSelection} />
       )}
     </div>
   )
@@ -42,8 +52,9 @@ function LockedDesktop({ lock, location }: { lock: Lock; location: DesktopLocati
   )
 }
 
-function OpenDesktop({ desktop, location }: DesktopViewProps) {
-  const [openAppId, setOpenAppId] = useState(desktop.apps[0]?.id)
+function OpenDesktop({ desktop, location, contacts, initialSelection }: DesktopViewProps) {
+  const selectedApp = desktop.apps.find((app) => app.id === initialSelection?.appId)
+  const [openAppId, setOpenAppId] = useState((selectedApp ?? desktop.apps[0])?.id)
   const openApp = desktop.apps.find((app) => app.id === openAppId)
 
   return (
@@ -62,17 +73,27 @@ function OpenDesktop({ desktop, location }: DesktopViewProps) {
         ))}
       </nav>
       <div className="desktop-window">
-        {openApp ? <DesktopAppView app={openApp} location={location} /> : <p className="status">Geen programma's.</p>}
+        {openApp ? (
+          <DesktopAppView
+            app={openApp}
+            location={location}
+            ownerName={desktop.ownerName}
+            contacts={contacts}
+            initialItemId={openApp.id === initialSelection?.appId ? initialSelection.itemId : undefined}
+          />
+        ) : (
+          <p className="status">Geen programma's.</p>
+        )}
       </div>
     </div>
   )
 }
 
-function DesktopAppView({ app, location }: { app: DesktopApp; location: DesktopLocation }) {
+function DesktopAppView({ app, ...props }: AppViewProps & { app: DesktopApp }) {
   switch (app.type) {
     case 'mail':
-      return <MailAppView key={app.id} app={app} location={location} />
+      return <MailAppView key={app.id} app={app} {...props} />
     case 'files':
-      return <FilesAppView key={app.id} app={app} location={location} />
+      return <FilesAppView key={app.id} app={app} {...props} />
   }
 }

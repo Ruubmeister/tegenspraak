@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import type { FilesApp } from '../../api/types'
-import type { DesktopLocation } from '../desktopApi'
+import { AttachToChat } from '../../chat/AttachToChat'
+import type { AppViewProps } from './appViewProps'
 import { LockIcon } from '../UnlockForm'
 import { folderNames } from './groupByFolder'
 import { LockedItem } from './LockedItem'
 
-export function FilesAppView({ app, location }: { app: FilesApp; location: DesktopLocation }) {
-  const [selectedFileId, setSelectedFileId] = useState<string>()
+export function FilesAppView({ app, location, ownerName, contacts, initialItemId }: AppViewProps & { app: FilesApp }) {
+  const [selectedFileId, setSelectedFileId] = useState(app.files.find((file) => file.id === initialItemId)?.id)
   const selectedFile = app.files.find((file) => file.id === selectedFileId)
 
   return (
@@ -47,7 +48,23 @@ export function FilesAppView({ app, location }: { app: FilesApp; location: Deskt
                 subject="dit bestand"
               />
             ) : (
-              <pre className="document-text">{selectedFile.content}</pre>
+              <>
+                <AttachToChat
+                  key={selectedFile.id}
+                  teamId={location.teamId}
+                  caseId={location.caseId}
+                  evidence={{
+                    desktopId: location.desktopId,
+                    appId: app.id,
+                    itemId: selectedFile.id,
+                    kind: 'file',
+                    title: selectedFile.name,
+                    ownerName,
+                  }}
+                  contacts={contacts}
+                />
+                <pre className="document-text">{selectedFile.content}</pre>
+              </>
             )}
           </article>
         ) : (

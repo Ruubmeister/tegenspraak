@@ -1,10 +1,11 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { Desktop, FileEntry } from '../api/types'
+import type { CharacterSummary, Desktop, FileEntry } from '../api/types'
+import { readChatDraft } from '../chat/chatDrafts'
 import { jsonResponse, mockFetch, renderWithProviders, statusResponse } from '../test/testUtils'
 import type { DesktopLocation } from './desktopApi'
-import { DesktopView } from './DesktopView'
+import { DesktopView, type ItemSelection } from './DesktopView'
 
 const location: DesktopLocation = { teamId: 'team-1', caseId: 'het-lek', desktopId: 'werkplek' }
 const DESKTOP_PATH = '/api/teams/team-1/cases/het-lek/desktops/werkplek'
@@ -63,8 +64,17 @@ const desktop: Desktop = {
   ],
 }
 
-function renderDesktop(shownDesktop: Desktop) {
-  return renderWithProviders(<DesktopView desktop={shownDesktop} location={location} />)
+const sanne: CharacterSummary = {
+  id: 'sanne-bakker',
+  name: 'Sanne Bakker',
+  role: 'Officemanager',
+  description: 'Werkt er al acht jaar.',
+}
+
+function renderDesktop(shownDesktop: Desktop, initialSelection?: ItemSelection) {
+  return renderWithProviders(
+    <DesktopView desktop={shownDesktop} location={location} contacts={[sanne]} initialSelection={initialSelection} />,
+  )
 }
 
 function withDiary(diary: FileEntry): Desktop {
@@ -168,5 +178,50 @@ describe('DesktopView', () => {
 
     expect(screen.getByText('Deze computer is vergrendeld.')).toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: "Programma's" })).not.toBeInTheDocument()
+  })
+
+  it('DesktopView_givenInitialSelectionInOtherFolder_expectMailOpened', () => {
+    renderDesktop(desktop, { appId: 'mail', itemId: 'sent-1' })
+
+    expect(screen.getByText('even thuis afmaken')).toBeInTheDocument()
+  })
+
+  it('DesktopView_givenInitialSelectionInFilesApp_expectFileOpened', () => {
+    renderDesktop(desktop, { appId: 'bestanden', itemId: 'notities' })
+
+    expect(screen.getByText('bod definitief maken')).toBeInTheDocument()
+  })
+
+  it('DesktopView_givenMailAttachedForContact_expectMailInDraftOfThatChat', async () => {
+    const user = userEvent.setup()
+    renderDesktop(desktop)
+    await user.click(screen.getByRole('button', { name: /^Bod/ }))
+
+    await user.click(screen.getByRole('button', { name: 'Voeg toe aan bericht' }))
+    await user.click(screen.getByRole('button', { name: 'Sanne Bakker' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Toegevoegd aan je bericht aan Sanne Bakker.')
+    expect(screen.getByRole('link', { name: 'Naar gesprek met Sanne Bakker' })).toHaveAttribute(
+      'href',
+      '/teams/team-1/zaken/het-lek/chat/sanne-bakker',
+    )
+    expect(readChatDraft({ teamId: 'team-1', caseId: 'het-lek', characterId: 'sanne-bakker' }).attachments).toEqual([
+      {
+        desktopId: 'werkplek',
+        appId: 'mail',
+        itemId: 'inbox-1',
+        kind: 'mail',
+        title: 'Bod',
+        ownerName: 'Sanne Bakker',
+      },
+    ])
+  })
+
+  it('DesktopView_givenLockedFile_expectNoAttachButton', async () => {
+    renderDesktop(desktop)
+
+    await openDiary()
+
+    expect(screen.queryByRole('button', { name: 'Voeg toe aan bericht' })).not.toBeInTheDocument()
   })
 })

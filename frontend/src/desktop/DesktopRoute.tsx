@@ -1,4 +1,4 @@
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
 import { useCaseContext } from '../cases/caseContext'
 import { useTeamId } from '../teams/teamsApi'
 import { useDesktop } from './desktopApi'
@@ -6,6 +6,7 @@ import { DesktopView } from './DesktopView'
 
 export function DesktopRoute() {
   const { desktopId = '' } = useParams()
+  const [searchParams] = useSearchParams()
   const teamId = useTeamId()
   const caseOverview = useCaseContext()
   const location = { teamId, caseId: caseOverview.id, desktopId }
@@ -17,5 +18,16 @@ export function DesktopRoute() {
   if (isError) {
     return <p className="status error">Deze computer kon niet worden geopend.</p>
   }
-  return <DesktopView key={desktop.id} desktop={desktop} location={location} />
+  // A link to an attachment selects its mail or file; the key reopens the computer when that selection changes
+  const appId = searchParams.get('app') ?? undefined
+  const itemId = searchParams.get('item') ?? undefined
+  return (
+    <DesktopView
+      key={`${desktop.id}/${appId}/${itemId}`}
+      desktop={desktop}
+      location={location}
+      contacts={caseOverview.characters}
+      initialSelection={appId && itemId ? { appId, itemId } : undefined}
+    />
+  )
 }

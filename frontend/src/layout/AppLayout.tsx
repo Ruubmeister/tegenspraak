@@ -30,7 +30,9 @@ export function AppLayout() {
           </button>
         </div>
       </header>
-      <Outlet />
+      <div className="app-main">
+        <Outlet />
+      </div>
     </div>
   )
 }

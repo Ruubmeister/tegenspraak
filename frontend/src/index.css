@@ -127,10 +127,20 @@ textarea {
 
 /* Application shell */
 
+/* The header stays in place; the content below scrolls in its own box, and the case page splits it further */
 .app {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .app-header {
@@ -138,6 +148,7 @@ textarea {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.25rem;
+  gap: 1rem;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
@@ -150,7 +161,9 @@ textarea {
 
 .app-header-player {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem 1rem;
   color: var(--color-text-muted);
 }
 
@@ -319,7 +332,8 @@ textarea {
 .case-page {
   flex: 1;
   display: grid;
-  grid-template-columns: 16rem 1fr;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
 }
 
@@ -328,6 +342,7 @@ textarea {
   flex-direction: column;
   gap: 0.25rem;
   padding: 1rem;
+  overflow-y: auto;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
 }
@@ -367,7 +382,7 @@ textarea {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  height: calc(100vh - 3.25rem);
+  overflow-y: auto;
 }
 
 .briefing {
@@ -381,6 +396,7 @@ textarea {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .chat-header {
@@ -395,7 +411,9 @@ textarea {
 
 .chat-messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -464,14 +482,184 @@ textarea {
 
 .chat-input {
   display: flex;
+  align-items: flex-start;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
   border-top: 1px solid var(--color-border);
 }
 
-.chat-input textarea {
+.chat-input-field {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.chat-input textarea {
   resize: none;
+}
+
+.chat-input textarea[aria-invalid='true'] {
+  border-color: var(--color-error);
+  outline-color: var(--color-error);
+}
+
+.message-length {
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.message-length.near {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.message-length.over {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.chat > .chat-too-long {
+  padding-top: 0.5rem;
+}
+
+.chat-attach-button {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: calc(0.6rem - 1px) 0.75rem;
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.chat-attach-button[aria-expanded='true'] {
+  border-color: var(--color-accent);
+}
+
+/* Attachments */
+
+.attachment-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: inherit;
+  text-decoration: none;
+  background: rgb(0 0 0 / 0.08);
+  overflow-wrap: anywhere;
+}
+
+.chat-bubble.player .attachment-chip {
+  background: rgb(255 255 255 / 0.2);
+}
+
+a.attachment-chip:hover {
+  text-decoration: underline;
+}
+
+.attachment-kind {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.draft-attachments {
+  margin: 0;
+  padding: 0.5rem 1.25rem 0;
+}
+
+.draft-attachments .attachment-chip {
+  background: var(--color-surface-muted);
+}
+
+.attachment-remove {
+  border: none;
+  background: none;
+  color: inherit;
+  padding: 0 0.1rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.attachment-picker {
+  max-height: 40%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.attachment-picker-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.attachment-picker fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: none;
+}
+
+.attachment-picker legend {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.attachment-picker label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  cursor: pointer;
+}
+
+.attach-to-chat {
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.attach-to-chat ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.attach-to-chat ul button {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.attach-to-chat p {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
 }
 
 /* Locks */
@@ -532,6 +720,7 @@ textarea {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .desktop-header {
@@ -554,6 +743,7 @@ textarea {
 .desktop-dock {
   display: flex;
   gap: 0.5rem;
+  overflow-x: auto;
   padding: 0.5rem 1.25rem;
   background: var(--color-surface-muted);
 }
@@ -590,15 +780,16 @@ textarea {
 .mail-app,
 .files-app {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
 }
 
 .mail-app {
-  grid-template-columns: 10rem 20rem 1fr;
+  grid-template-columns: 10rem 20rem minmax(0, 1fr);
 }
 
 .files-app {
-  grid-template-columns: 16rem 1fr;
+  grid-template-columns: 16rem minmax(0, 1fr);
 }
 
 .app-sidebar,
@@ -607,6 +798,7 @@ textarea {
   margin: 0;
   padding: 0.5rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   border-right: 1px solid var(--color-border);
 }
 
@@ -634,6 +826,7 @@ textarea {
 
 .app-reader {
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.25rem;
 }
 
@@ -684,7 +877,6 @@ textarea {
 .verdict {
   max-width: 42rem;
   padding: 2rem;
-  overflow-y: auto;
 }
 
 .verdict h3 {
@@ -732,4 +924,82 @@ textarea {
   gap: 0.5rem;
   align-items: baseline;
   cursor: pointer;
+}
+
+/* Small screens: every pane is stacked and keeps its own scroll box */
+
+@media (max-width: 48rem) {
+  .app-header {
+    padding: 0.5rem 1rem;
+  }
+
+  .case-page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .case-nav {
+    max-height: 30dvh;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .case-nav .case-nav-verdict {
+    margin-top: 1rem;
+  }
+
+  .briefing,
+  .verdict {
+    padding: 1.25rem 1rem;
+  }
+
+  .chat-header,
+  .desktop-header {
+    padding: 0.5rem 1rem;
+  }
+
+  .chat-messages,
+  .chat-input {
+    padding: 0.75rem 1rem;
+  }
+
+  .draft-attachments {
+    padding: 0.5rem 1rem 0;
+  }
+
+  .attachment-picker {
+    margin: 0 1rem;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+  }
+
+  .mail-app,
+  .files-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mail-app {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .files-app {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .app-sidebar,
+  .mail-list {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mail-app .app-sidebar {
+    max-height: 6rem;
+  }
+
+  .mail-list,
+  .files-app .app-sidebar {
+    max-height: 12rem;
+  }
 }

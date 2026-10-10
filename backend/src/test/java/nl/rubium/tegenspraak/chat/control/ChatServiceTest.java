@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +22,19 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
+import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
+import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.FileEntry;
+import nl.rubium.tegenspraak.desktop.entity.FilesApp;
+import nl.rubium.tegenspraak.desktop.entity.Lock;
+import nl.rubium.tegenspraak.desktop.entity.MailApp;
+import nl.rubium.tegenspraak.desktop.entity.MailMessage;
+import nl.rubium.tegenspraak.desktop.entity.OwnerType;
+import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
+import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
 import nl.rubium.tegenspraak.team.control.TeamNotFoundException;
@@ -63,8 +74,41 @@ class ChatServiceTest {
             null,
             false,
             List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
+    private static final Desktop BUTLER_LAPTOP = new Desktop(
+            "laptop-butler",
+            "De Butler",
+            OwnerType.PERSON,
+            "Laptop",
+            null,
+            List.of(
+                    new MailApp(
+                            "mail",
+                            "Mail",
+                            List.of(new MailMessage(
+                                    "afspraak",
+                                    "Inbox",
+                                    "kok@landhuis.nl",
+                                    "butler@landhuis.nl",
+                                    "Diner",
+                                    LocalDateTime.of(2026, 3, 11, 16, 2),
+                                    "Het diner is om acht uur.",
+                                    null))),
+                    new FilesApp(
+                            "bestanden",
+                            "Bestanden",
+                            List.of(
+                                    new FileEntry("menu", "Documenten", "menu.txt", "Soep en wild.", null),
+                                    new FileEntry(
+                                            "dagboek",
+                                            "Persoonlijk",
+                                            "dagboek.txt",
+                                            "Ik zag de tuinman.",
+                                            new Lock("1234", "Verjaardag"))))));
+    private static final EvidenceRef DINNER_MAIL = new EvidenceRef("laptop-butler", "mail", "afspraak");
+    private static final EvidenceRef MENU_FILE = new EvidenceRef("laptop-butler", "bestanden", "menu");
+    private static final EvidenceRef LOCKED_DIARY = new EvidenceRef("laptop-butler", "bestanden", "dagboek");
     private static final CaseDefinition CASE_DEFINITION = new CaseDefinition(
-            CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of());
+            CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of(BUTLER_LAPTOP));
 
     private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
     private final ChatModel chatModel = mock(ChatModel.class);
@@ -99,7 +143,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst(characterMessage("Goedenavond."), playerMessage("bram", "Hallo"));
         givenModelReplies("Ik was in de keuken.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?", List.of());
 
         List<Message> sent = capturePromptMessages();
         assertThat(sent)
@@ -113,7 +157,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelReplies("  Ik was in de keuken.  ");
 
-        ChatMessage reply = chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?");
+        ChatMessage reply = chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?", List.of());
 
         assertThat(reply.getSender()).isEqualTo(MessageSender.CHARACTER);
         assertThat(reply.getContent()).isEqualTo("Ik was in de keuken.");
@@ -133,7 +177,7 @@ class ChatServiceTest {
         Generation text = new Generation(new AssistantMessage("Ik was in de keuken."));
         when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(List.of(omittedThinking, text)));
 
-        ChatMessage reply = chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?");
+        ChatMessage reply = chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Waar was u?", List.of());
 
         assertThat(reply.getContent()).isEqualTo("Ik was in de keuken.");
     }
@@ -146,7 +190,7 @@ class ChatServiceTest {
                 characterMessage("Eerste antwoord"));
         givenModelReplies("Ja.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Derde vraag");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Derde vraag", List.of());
 
         assertThat(capturePromptMessages())
                 .extracting(Message::getText)
@@ -159,7 +203,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
 
-        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo"))
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of()))
                 .isInstanceOf(CharacterUnavailableException.class);
         verify(chatMessageRepository, never()).saveAll(anyList());
     }
@@ -169,7 +213,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelReplies(" ");
 
-        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo"))
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of()))
                 .isInstanceOf(CharacterUnavailableException.class);
         verify(chatMessageRepository, never()).saveAll(anyList());
     }
@@ -180,7 +224,7 @@ class ChatServiceTest {
                 .thenThrow(new CaseContentNotFoundException("Unknown"));
 
         assertThatThrownBy(() -> chatService.sendMessage(
-                        PLAYER_ID, "anouk", new Conversation(TEAM_ID, CASE_ID, "onbekend"), "Hallo"))
+                        PLAYER_ID, "anouk", new Conversation(TEAM_ID, CASE_ID, "onbekend"), "Hallo", List.of()))
                 .isInstanceOf(CaseContentNotFoundException.class);
         verify(chatModel, never()).call(any(Prompt.class));
     }
@@ -190,7 +234,7 @@ class ChatServiceTest {
         when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
                 .thenThrow(new TeamNotFoundException("Not a member"));
 
-        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo"))
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of()))
                 .isInstanceOf(TeamNotFoundException.class);
         verify(chatModel, never()).call(any(Prompt.class));
     }
@@ -209,7 +253,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelReplies("Goedenavond.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
 
         ChatOptions options = capturePrompt().getOptions();
         assertThat(options).isInstanceOfSatisfying(ToolCallingChatOptions.class, toolOptions -> {
@@ -227,7 +271,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelReplies("Goedenavond.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
 
         ChatOptions options = capturePrompt().getOptions();
         boolean toolOffered = options instanceof ToolCallingChatOptions toolOptions
@@ -240,7 +284,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelCallsToolThenReplies("{\"characterId\": \"de-tuinman\"}", "Vraag het De Tuinman maar.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?", List.of());
 
         verify(investigationService).introduceCharacters(TEAM_ID, CASE_ID, List.of(GARDENER));
         assertThat(savedMessages())
@@ -256,7 +300,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelCallsToolThenReplies("{\"characterId\": \"de-kok\"}", "Ik ken geen kok.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Ken je de kok?");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Ken je de kok?", List.of());
 
         verify(investigationService).introduceCharacters(TEAM_ID, CASE_ID, List.of());
         assertThat(savedMessages()).extracting(ChatMessage::getSender).doesNotContain(MessageSender.NOTICE);
@@ -267,7 +311,7 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         givenModelCallsToolThenReplies("{\"characterId\": \"de-tuinman\"}", "Vraag het De Tuinman maar.");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?", List.of());
 
         ArgumentCaptor<Prompt> prompts = ArgumentCaptor.forClass(Prompt.class);
         verify(chatModel, times(2)).call(prompts.capture());
@@ -281,7 +325,8 @@ class ChatServiceTest {
         givenStoredHistoryNewestFirst();
         when(chatModel.call(any(Prompt.class))).thenReturn(toolCallResponse("{\"characterId\": \"de-tuinman\"}"));
 
-        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?"))
+        assertThatThrownBy(() ->
+                        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?", List.of()))
                 .isInstanceOf(CharacterUnavailableException.class);
         verify(chatMessageRepository, never()).saveAll(anyList());
     }
@@ -293,7 +338,8 @@ class ChatServiceTest {
                 .thenReturn(toolCallResponse("{\"characterId\": \"de-tuinman\"}"))
                 .thenThrow(new IllegalStateException("API down"));
 
-        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?"))
+        assertThatThrownBy(() ->
+                        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?", List.of()))
                 .isInstanceOf(CharacterUnavailableException.class);
         verify(investigationService, never()).introduceCharacters(any(), any(), anyList());
         verify(chatMessageRepository, never()).saveAll(anyList());
@@ -307,7 +353,7 @@ class ChatServiceTest {
                 playerMessage("anouk", "Hallo"));
         givenModelReplies("Ja?");
 
-        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Nog iets");
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Nog iets", List.of());
 
         assertThat(capturePromptMessages())
                 .extracting(Message::getText)
@@ -358,10 +404,118 @@ class ChatServiceTest {
     }
 
     private static ChatMessage playerMessage(String authorName, String content) {
-        return ChatMessage.fromPlayer(TEAM_ID, CASE_ID, CHARACTER_ID, authorName, content);
+        return ChatMessage.fromPlayer(TEAM_ID, CASE_ID, CHARACTER_ID, authorName, content, List.of());
     }
 
     private static ChatMessage characterMessage(String content) {
         return ChatMessage.fromCharacter(TEAM_ID, CASE_ID, CHARACTER_ID, content);
+    }
+
+    @Test
+    void sendMessage_givenOpenAttachments_expectContentInPromptAfterMessage() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Dat klopt.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Klopt dit?", List.of(DINNER_MAIL, MENU_FILE));
+
+        assertThat(capturePromptMessages().getLast().getText())
+                .startsWith("[anouk]: Klopt dit?")
+                .contains("--- Bijlage 1: mail van de computer van De Butler ---")
+                .contains("Van: kok@landhuis.nl", "Onderwerp: Diner", "Het diner is om acht uur.")
+                .contains("--- Bijlage 2: bestand van de computer van De Butler ---")
+                .contains("Naam: Documenten/menu.txt", "Soep en wild.");
+    }
+
+    @Test
+    void sendMessage_givenDuplicateAttachments_expectReferencesStoredOnceWithPlayerMessage() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Dat klopt.");
+
+        chatService.sendMessage(
+                PLAYER_ID, "anouk", CONVERSATION, "Klopt dit?", List.of(DINNER_MAIL, MENU_FILE, DINNER_MAIL));
+
+        assertThat(savedMessages().getFirst().getAttachments())
+                .containsExactly(
+                        new ChatAttachment("laptop-butler", "mail", "afspraak"),
+                        new ChatAttachment("laptop-butler", "bestanden", "menu"));
+    }
+
+    @Test
+    void sendMessage_givenLockedAttachment_expectNotFoundAndModelNotCalled() {
+        givenStoredHistoryNewestFirst();
+
+        assertThatThrownBy(() ->
+                        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Lees dit", List.of(LOCKED_DIARY)))
+                .isInstanceOf(CaseContentNotFoundException.class);
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
+    void sendMessage_givenUnlockedAttachment_expectContentInPrompt() {
+        unlockedTargets.add("item:laptop-butler/bestanden/dagboek");
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Dat is privé.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Lees dit", List.of(LOCKED_DIARY));
+
+        assertThat(capturePromptMessages().getLast().getText()).contains("Ik zag de tuinman.");
+    }
+
+    @Test
+    void sendMessage_givenUnknownAttachment_expectNotFoundAndModelNotCalled() {
+        givenStoredHistoryNewestFirst();
+        EvidenceRef unknown = new EvidenceRef("laptop-butler", "mail", "bestaat-niet");
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of(unknown)))
+                .isInstanceOf(CaseContentNotFoundException.class);
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
+    void sendMessage_givenFourAttachments_expectTooManyAttachmentsAndModelNotCalled() {
+        EvidenceRef fourth = new EvidenceRef("laptop-butler", "mail", "nog-een");
+
+        assertThatThrownBy(() -> chatService.sendMessage(
+                        PLAYER_ID,
+                        "anouk",
+                        CONVERSATION,
+                        "Hallo",
+                        List.of(DINNER_MAIL, MENU_FILE, LOCKED_DIARY, fourth)))
+                .isInstanceOf(TooManyAttachmentsException.class);
+        verify(chatModel, never()).call(any(Prompt.class));
+    }
+
+    @Test
+    void sendMessage_givenAttachmentInHistory_expectContentRepeatedInPrompt() {
+        givenStoredHistoryNewestFirst(characterMessage("Ja."), playerMessageWithDinnerMail("bram", "Ken je deze?"));
+        givenModelReplies("Zoals ik zei.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "En verder?", List.of());
+
+        assertThat(capturePromptMessages().get(1).getText())
+                .startsWith("[bram]: Ken je deze?")
+                .contains("Het diner is om acht uur.");
+    }
+
+    @Test
+    void getConversation_givenMessageWithAttachment_expectAttachmentResolved() {
+        when(chatMessageRepository.findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtAsc(TEAM_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(List.of(playerMessageWithDinnerMail("bram", "Ken je deze?")));
+
+        List<ConversationMessage> conversation = chatService.getConversation(PLAYER_ID, CONVERSATION);
+
+        assertThat(conversation.getFirst().attachments())
+                .extracting(EvidenceItem::title)
+                .containsExactly("Diner");
+    }
+
+    private static ChatMessage playerMessageWithDinnerMail(String authorName, String content) {
+        return ChatMessage.fromPlayer(
+                TEAM_ID,
+                CASE_ID,
+                CHARACTER_ID,
+                authorName,
+                content,
+                List.of(new ChatAttachment("laptop-butler", "mail", "afspraak")));
     }
 }

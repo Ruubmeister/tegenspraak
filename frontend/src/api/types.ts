@@ -109,6 +109,18 @@ export interface Desktop {
 /** NOTICE messages are game events in the chat, such as a newly introduced contact. */
 export type MessageSender = 'PLAYER' | 'CHARACTER' | 'NOTICE'
 
+export type EvidenceKind = 'mail' | 'file'
+
+/** An opened mail or file that can be attached to a chat message. Carries the title only, never the content. */
+export interface EvidenceItem {
+  desktopId: string
+  appId: string
+  itemId: string
+  kind: EvidenceKind
+  title: string
+  ownerName: string
+}
+
 /** The conversation is shared by the team; authorName is the member who wrote a PLAYER message. */
 export interface ChatMessage {
   id: string
@@ -116,6 +128,8 @@ export interface ChatMessage {
   authorName: string | null
   content: string
   sentAt: string
+  /** Mails and files the author attached; empty for character messages and notices. */
+  attachments: EvidenceItem[]
 }
 
 export interface VerdictOption {

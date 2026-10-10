@@ -1,6 +1,7 @@
 package nl.rubium.tegenspraak.investigation.boundary;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
@@ -37,6 +38,15 @@ public class InvestigationController {
     public CaseOverviewResponse getCase(
             @PathVariable UUID teamId, @PathVariable String caseId, @AuthenticationPrincipal PlayerPrincipal player) {
         return CaseOverviewResponse.from(investigationService.getProgress(teamId, player.getId(), caseId));
+    }
+
+    /** Everything the team can attach to a chat message. */
+    @GetMapping("/evidence")
+    public List<EvidenceResponse> getEvidence(
+            @PathVariable UUID teamId, @PathVariable String caseId, @AuthenticationPrincipal PlayerPrincipal player) {
+        return investigationService.getProgress(teamId, player.getId(), caseId).openEvidence().stream()
+                .map(EvidenceResponse::from)
+                .toList();
     }
 
     @GetMapping("/desktops/{desktopId}")

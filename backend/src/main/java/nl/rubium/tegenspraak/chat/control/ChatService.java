@@ -3,11 +3,16 @@ package nl.rubium.tegenspraak.chat.control;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
+import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
+import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
 import org.slf4j.Logger;
@@ -29,6 +34,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ChatService {
+
+    public static final int MAX_ATTACHMENTS = 3;
 
     private static final Logger LOG = LoggerFactory.getLogger(ChatService.class);
 
@@ -60,23 +67,41 @@ public class ChatService {
         this.maxHistoryMessages = maxHistoryMessages;
     }
 
-    public List<ChatMessage> getConversation(UUID playerId, Conversation conversation) {
+    public List<ConversationMessage> getConversation(UUID playerId, Conversation conversation) {
         investigationService.requireAvailableCharacter(
                 conversation.teamId(), playerId, conversation.caseId(), conversation.characterId());
-        return chatMessageRepository.findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtAsc(
-                conversation.teamId(), conversation.caseId(), conversation.characterId());
+        TeamProgress progress =
+                investigationService.getProgress(conversation.teamId(), playerId, conversation.caseId());
+        return chatMessageRepository
+                .findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtAsc(
+                        conversation.teamId(), conversation.caseId(), conversation.characterId())
+                .stream()
+                .map(message -> new ConversationMessage(message, resolveAttachments(message, progress)))
+                .toList();
     }
 
     /**
      * Sends a team member's message to the character and returns the reply. Messages are only stored once the character
      * has replied, so a failed LLM call leaves the conversation untouched and the player can retry. Messages to the same
      * conversation are handled one at a time, see ConversationLocks.
+     *
+     * @param attachments mails and files the team has opened, shown to the character with the message
      */
-    public ChatMessage sendMessage(UUID playerId, String playerName, Conversation conversation, String content) {
+    public ChatMessage sendMessage(
+            UUID playerId,
+            String playerName,
+            Conversation conversation,
+            String content,
+            List<EvidenceRef> attachments) {
+        List<EvidenceRef> distinctAttachments = attachments.stream().distinct().toList();
+        if (distinctAttachments.size() > MAX_ATTACHMENTS) {
+            throw new TooManyAttachmentsException(distinctAttachments.size());
+        }
         CharacterProfile character = investigationService.requireAvailableCharacter(
                 conversation.teamId(), playerId, conversation.caseId(), conversation.characterId());
         return conversationLocks.withLock(
-                conversation, () -> replyAndStore(playerId, conversation, character, playerName, content));
+                conversation,
+                () -> replyAndStore(playerId, conversation, character, playerName, content, distinctAttachments));
     }
 
     /**
@@ -84,19 +109,30 @@ public class ChatService {
      * the character introduced are unlocked for the team and announced with a notice in this conversation.
      */
     private ChatMessage replyAndStore(
-            UUID playerId, Conversation conversation, CharacterProfile character, String playerName, String content) {
+            UUID playerId,
+            Conversation conversation,
+            CharacterProfile character,
+            String playerName,
+            String content,
+            List<EvidenceRef> attachments) {
         TeamProgress progress =
                 investigationService.getProgress(conversation.teamId(), playerId, conversation.caseId());
+        List<ChatAttachment> openAttachments = requireOpenAttachments(attachments, progress);
         List<CharacterProfile> introducible = progress.introducibleBy(character);
         IntroduceContactTool introduceContactTool = new IntroduceContactTool(introducible);
 
         ChatMessage playerMessage = ChatMessage.fromPlayer(
-                conversation.teamId(), conversation.caseId(), conversation.characterId(), playerName, content);
+                conversation.teamId(),
+                conversation.caseId(),
+                conversation.characterId(),
+                playerName,
+                content,
+                openAttachments);
         List<Message> prompt = new ArrayList<>();
         prompt.add(new SystemMessage(
                 characterPromptBuilder.buildSystemPrompt(progress.caseDefinition(), character, introducible)));
-        recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message)));
-        prompt.add(toPromptMessage(playerMessage));
+        recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message, progress)));
+        prompt.add(toPromptMessage(playerMessage, progress));
 
         String reply = askModel(prompt, introducible.isEmpty() ? null : introduceContactTool, character.id());
         ChatMessage characterMessage = ChatMessage.fromCharacter(
@@ -129,10 +165,33 @@ public class ChatService {
         return history;
     }
 
+    /** Locked content must never reach the character, so every attachment has to be readable for the team. */
+    private static List<ChatAttachment> requireOpenAttachments(List<EvidenceRef> attachments, TeamProgress progress) {
+        return attachments.stream()
+                .map(ref -> progress.findOpenEvidence(ref)
+                        .orElseThrow(() -> new CaseContentNotFoundException("Attachment not available: " + ref)))
+                .map(evidence -> new ChatAttachment(
+                        evidence.desktop().id(),
+                        evidence.app().id(),
+                        evidence.item().id()))
+                .toList();
+    }
+
+    /** Unlocks are never undone, so stored attachments stay readable; anything else is left out. */
+    private static List<EvidenceItem> resolveAttachments(ChatMessage message, TeamProgress progress) {
+        return message.getAttachments().stream()
+                .map(attachment -> progress.findOpenEvidence(
+                        new EvidenceRef(attachment.desktopId(), attachment.appId(), attachment.itemId())))
+                .flatMap(Optional::stream)
+                .toList();
+    }
+
     /** Player messages carry the author's name, so the character can tell the team members apart. */
-    private static Message toPromptMessage(ChatMessage message) {
+    private Message toPromptMessage(ChatMessage message, TeamProgress progress) {
         return switch (message.getSender()) {
-            case PLAYER -> new UserMessage("[" + message.getAuthorName() + "]: " + message.getContent());
+            case PLAYER ->
+                new UserMessage(characterPromptBuilder.formatPlayerMessage(
+                        message.getAuthorName(), message.getContent(), resolveAttachments(message, progress)));
             case CHARACTER -> new AssistantMessage(message.getContent());
             case NOTICE -> throw new IllegalArgumentException("Notices are not part of the prompt");
         };
