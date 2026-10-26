@@ -12,13 +12,12 @@ public record EvidenceResponse(
         String desktopId, String appId, String itemId, String kind, String title, String ownerName) {
 
     public static EvidenceResponse from(EvidenceItem evidence) {
-        String kind =
-                switch (evidence.item()) {
-                    case MailMessage mail -> "mail";
-                    case FileEntry file -> "file";
-                    case CalendarEvent event -> "event";
-                    case Photo photo -> "photo";
-                    case BrowserPage page -> "webpage";
+        String kind = switch (evidence.item()) {
+            case MailMessage mail -> "mail";
+            case FileEntry file -> "file";
+            case CalendarEvent event -> "event";
+            case Photo photo -> "photo";
+            case BrowserPage page -> "webpage";
         };
 
         return new EvidenceResponse(
