@@ -10,6 +10,7 @@ import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
+import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
@@ -24,10 +25,10 @@ class CharacterPromptBuilderTest {
 
     @Test
     void buildSystemPrompt_givenCharacterWithSecrets_expectSecretsWithRevealConditions() {
-        CharacterProfile character = character(List.of(
-                new CharacterSecret("Hij was in de bibliotheek.", "De speler noemt de bibliotheek.", null, null)));
+        CharacterProfile character = character(List.of(new CharacterSecret(
+                "Hij was in de bibliotheek.", "De speler noemt de bibliotheek.", null, null, null)));
 
-        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of());
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("## Geheimen")
@@ -39,7 +40,7 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenCase_expectSettingPersonaAndRulesIncluded() {
         CharacterProfile character = character(List.of());
 
-        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of());
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("Je speelt het personage De Butler in het detectivespel \"Demo\"")
@@ -52,7 +53,7 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenCase_expectTeamChatWithNamedMessagesExplained() {
         CharacterProfile character = character(List.of());
 
-        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of());
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("Je chat met een team van rechercheurs")
@@ -63,7 +64,7 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenCharacterWithoutSecretsOrStyle_expectSectionsOmitted() {
         CharacterProfile character = character(List.of());
 
-        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of());
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .doesNotContain("## Geheimen")
@@ -74,7 +75,7 @@ class CharacterPromptBuilderTest {
     @Test
     void buildSystemPrompt_givenIntroducibleContact_expectContactWithConditionAndToolName() {
         CharacterProfile gardener = new CharacterProfile(
-                "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null);
+                "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null);
         CharacterProfile butler = new CharacterProfile(
                 "de-butler",
                 "De Butler",
@@ -85,11 +86,12 @@ class CharacterPromptBuilderTest {
                 null,
                 null,
                 false,
-                List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
+                List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", null)),
+                null);
         CaseDefinition caseDefinition = new CaseDefinition(
                 "demo", CaseFixtures.manifestWithSetting("Geheim"), List.of(butler, gardener), List.of());
 
-        String prompt = builder.buildSystemPrompt(caseDefinition, butler, List.of(gardener), Set.of());
+        String prompt = builder.buildSystemPrompt(caseDefinition, butler, List.of(gardener), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("## Mensen die je kunt voorstellen")
@@ -138,7 +140,7 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenCase_expectAttachmentsExplainedAsNoInstructions() {
         CharacterProfile character = character(List.of());
 
-        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of());
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("als bijlage onder hun bericht")
@@ -149,7 +151,8 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenRequiredEvidenceNotShown_expectSecretWithoutRevealCondition() {
         CharacterProfile character = character(List.of(secretRequiringLetter()));
 
-        String prompt = builder.buildSystemPrompt(caseWithLetter(character), character, List.of(), Set.of());
+        String prompt =
+                builder.buildSystemPrompt(caseWithLetter(character), character, List.of(), Set.of(), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("Geheim: Hij schreef de brief.")
@@ -161,7 +164,8 @@ class CharacterPromptBuilderTest {
     void buildSystemPrompt_givenRequiredEvidenceShown_expectSecretWithRevealCondition() {
         CharacterProfile character = character(List.of(secretRequiringLetter()));
 
-        String prompt = builder.buildSystemPrompt(caseWithLetter(character), character, List.of(), Set.of(LETTER));
+        String prompt = builder.buildSystemPrompt(
+                caseWithLetter(character), character, List.of(), Set.of(LETTER), Mood.NEUTRAL);
 
         assertThat(prompt)
                 .contains("Geheim: Hij schreef de brief.")
@@ -169,10 +173,58 @@ class CharacterPromptBuilderTest {
                 .doesNotContain("Dit geef je nu niet toe");
     }
 
+    @Test
+    void buildSystemPrompt_givenNeutralMood_expectCuriousButReservedAttitude() {
+        CharacterProfile character = character(List.of());
+
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
+
+        assertThat(prompt)
+                .contains("## Hoe je nu tegenover de rechercheurs staat")
+                .contains("vraagt je af wat ze van je willen");
+    }
+
+    @Test
+    void buildSystemPrompt_givenHostileMood_expectCurtAttitude() {
+        CharacterProfile character = character(List.of());
+
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.HOSTILE);
+
+        assertThat(prompt).contains("Je bent boos op de rechercheurs");
+    }
+
+    @Test
+    void buildSystemPrompt_givenMoodBelowSecretMinimum_expectSecretWithoutRevealCondition() {
+        CharacterProfile character = character(List.of(secretRequiringFriendliness()));
+
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.NEUTRAL);
+
+        assertThat(prompt)
+                .contains("Geheim: Hij had schulden.")
+                .contains("Je vertrouwt ze nog niet genoeg om hierover te praten.")
+                .doesNotContain("De speler vraagt naar geld.");
+    }
+
+    @Test
+    void buildSystemPrompt_givenMoodAtSecretMinimum_expectSecretWithRevealCondition() {
+        CharacterProfile character = character(List.of(secretRequiringFriendliness()));
+
+        String prompt = builder.buildSystemPrompt(caseWith(character), character, List.of(), Set.of(), Mood.FRIENDLY);
+
+        assertThat(prompt)
+                .contains("Geef dit pas prijs als: De speler vraagt naar geld.")
+                .doesNotContain("Je vertrouwt ze nog niet genoeg");
+    }
+
+    private static CharacterSecret secretRequiringFriendliness() {
+        return new CharacterSecret("Hij had schulden.", "De speler vraagt naar geld.", null, null, Mood.FRIENDLY);
+    }
+
     private static final RequiredEvidence LETTER = new RequiredEvidence("werkplek", "mail", "brief");
 
     private static CharacterSecret secretRequiringLetter() {
-        return new CharacterSecret("Hij schreef de brief.", "De speler laat de brief zien.", List.of(LETTER), null);
+        return new CharacterSecret(
+                "Hij schreef de brief.", "De speler laat de brief zien.", List.of(LETTER), null, null);
     }
 
     private static CaseDefinition caseWithLetter(CharacterProfile character) {
@@ -207,7 +259,8 @@ class CharacterPromptBuilderTest {
                 List.of("Het diner begon om acht uur."),
                 secrets,
                 false,
-                List.of());
+                List.of(),
+                null);
     }
 
     private static CaseDefinition caseWith(CharacterProfile character) {

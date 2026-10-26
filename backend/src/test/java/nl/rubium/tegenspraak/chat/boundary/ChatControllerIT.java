@@ -1,10 +1,12 @@
 package nl.rubium.tegenspraak.chat.boundary;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,6 +23,10 @@ import java.util.List;
 import java.util.UUID;
 import nl.rubium.tegenspraak.IntegrationTest;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
+import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.Mood;
+import nl.rubium.tegenspraak.chat.control.MessageTone;
+import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -28,6 +34,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -42,6 +49,9 @@ class ChatControllerIT extends IntegrationTest {
     private static final String FORWARDED_BID_REVEAL_CONDITION = "De speler noemt de doorgestuurde mail";
     private static final String LOCKED_DIARY =
             "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"bestanden\", \"itemId\": \"dagboek\"}";
+
+    @Autowired
+    private CharacterMoodRepository characterMoodRepository;
 
     private PlayerPrincipal player;
     private UUID teamId;
@@ -242,6 +252,26 @@ class ChatControllerIT extends IntegrationTest {
                 .with(spaCsrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"content\": \"Wat is dit?\", \"attachments\": [" + String.join(",", attachments) + "]}"));
+    }
+
+    @Test
+    void sendMessage_givenTwoHelpfulMessages_expectFriendlierMoodStoredAndUsedInPrompt() throws Exception {
+        givenCharacterReplies("Fijn dat u het vraagt.");
+        when(messageToneClassifier.classify(any(CharacterProfile.class), any(), any(String.class), anyInt()))
+                .thenReturn(MessageTone.HELPFUL);
+
+        sendHallo(player, messages);
+        sendHallo(player, messages);
+
+        assertThat(characterMoodRepository.findByTeamIdAndCaseIdAndCharacterId(
+                        teamId, "het-lek-bij-van-dijk", "sanne-bakker"))
+                .hasValueSatisfying(mood -> {
+                    assertThat(mood.getScore()).isEqualTo(2 * MessageTone.HELPFUL.scoreChange());
+                    assertThat(mood.getMood()).isEqualTo(Mood.FRIENDLY);
+                });
+        verify(chatModel)
+                .call(argThat((Prompt prompt) ->
+                        prompt.getSystemMessage().getText().contains("Je hebt een goed gevoel bij de rechercheurs.")));
     }
 
     private void givenCharacterReplies(String reply) {

@@ -95,8 +95,8 @@ Cases live in `backend/src/main/resources/cases/`. Folder and file names are the
 ```
 cases/{case-id}/case.yaml                   title, summary, introduction, setting (hidden truth), solution
 cases/{case-id}/characters/{id}.yaml        persona: name, role, description, personality, speechStyle,
-                                            knownFacts, secrets (fact, revealWhen, requiresEvidence), hidden,
-                                            introduces
+                                            knownFacts, secrets (fact, revealWhen, requiresEvidence, minimumMood),
+                                            hidden, introduces, startingMood
 cases/{case-id}/desktops/{id}.yaml          ownerName, ownerType (person|organisation), description, lock, apps
 ```
 
@@ -148,6 +148,32 @@ introduces:
 
 The introducer's LLM gets an `introduce_contact` tool and calls it once the condition is met. The contact is then
 available to the whole team, and a notice appears in the chat. Every hidden character needs at least one introducer.
+
+### Character mood
+
+Every character keeps a hidden mood towards each team: `hostile`, `suspicious`, `neutral`, `friendly` or `trusting`.
+It starts at `startingMood` (default `neutral`: polite but reserved, wondering what the team wants) and shifts with
+the tone of every message, as judged by a small LLM (`tegenspraak.chat.tone-classifier-model`). Helping or convincing
+the character makes it friendlier; accusing or aggressive messages make it like the team less. The character's prompt
+describes its current mood, so it answers warmer or colder. Players never see the mood, only how the character
+reacts.
+
+A secret or introduction can also require a minimum mood. Until the character feels at least that good about the
+team, its prompt only tells it to evade, and an introduction is not offered at all:
+
+```yaml
+startingMood: suspicious
+secrets:
+  - fact: Ze had schulden bij Kuiper.
+    revealWhen: De rechercheurs vragen naar geld.
+    minimumMood: friendly
+introduces:
+  - character: lisa-brink
+    when: De rechercheurs vragen naar Eva's familie.
+    minimumMood: trusting
+```
+
+A failed tone judgement counts as neutral, so it never blocks the chat.
 
 ### Locks
 
