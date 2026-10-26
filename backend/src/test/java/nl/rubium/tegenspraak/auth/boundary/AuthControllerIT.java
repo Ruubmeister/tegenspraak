@@ -14,6 +14,7 @@ import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 class AuthControllerIT extends IntegrationTest {
 
@@ -34,6 +35,7 @@ class AuthControllerIT extends IntegrationTest {
 
         MockHttpSession session = (MockHttpSession) mockMvc.perform(post("/api/auth/login")
                         .session(anonymousSession)
+                        .with(sessionCookie(anonymousSessionId))
                         .with(spaCsrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentials(username, PLAYER_PASSWORD)))
@@ -156,6 +158,18 @@ class AuthControllerIT extends IntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertThat(session.isInvalid()).isTrue();
+    }
+
+    /**
+     * Mirrors a browser sending its JSESSIONID cookie. Spring Security only changes the session id on login when the
+     * requested session id is valid, and MockHttpServletRequest no longer treats a missing one as valid.
+     */
+    private static RequestPostProcessor sessionCookie(String sessionId) {
+        return request -> {
+            request.setRequestedSessionId(sessionId);
+            request.setRequestedSessionIdFromCookie(true);
+            return request;
+        };
     }
 
     private static String passwordChange(String currentPassword, String newPassword) {
