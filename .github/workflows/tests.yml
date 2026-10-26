@@ -1,0 +1,79 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request makes the running checks obsolete
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Verify runs spotless:check, the unit tests and the integration tests. The integration tests start Postgres
+      # with Testcontainers, which uses the Docker daemon of the runner.
+      - name: Format check, unit and integration tests
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/target/surefire-reports
+            backend/target/failsafe-reports
+          retention-days: 7
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      # Also type-checks with tsc -b
+      - name: Build
+        run: npm run build
