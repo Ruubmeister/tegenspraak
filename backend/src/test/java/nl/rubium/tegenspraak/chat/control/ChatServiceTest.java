@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
@@ -23,7 +25,10 @@ import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
+import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
+import nl.rubium.tegenspraak.chat.entity.CharacterMood;
+import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
@@ -64,7 +69,7 @@ class ChatServiceTest {
     private static final Conversation CONVERSATION = new Conversation(TEAM_ID, CASE_ID, CHARACTER_ID);
 
     private static final CharacterProfile GARDENER = new CharacterProfile(
-            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null);
+            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null);
     private static final CharacterProfile BUTLER = new CharacterProfile(
             CHARACTER_ID,
             "De Butler",
@@ -77,9 +82,11 @@ class ChatServiceTest {
                     "Hij koos het menu.",
                     "De speler laat het menu zien.",
                     List.of(new RequiredEvidence("laptop-butler", "bestanden", "menu")),
+                    null,
                     null)),
             false,
-            List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
+            List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", null)),
+            null);
     private static final Desktop BUTLER_LAPTOP = new Desktop(
             "laptop-butler",
             "De Butler",
@@ -117,11 +124,15 @@ class ChatServiceTest {
             CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of(BUTLER_LAPTOP));
 
     private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
+    private final CharacterMoodRepository characterMoodRepository = mock(CharacterMoodRepository.class);
+    private final MessageToneClassifier messageToneClassifier = mock(MessageToneClassifier.class);
     private final ChatModel chatModel = mock(ChatModel.class);
     private final InvestigationService investigationService = mock(InvestigationService.class);
     private final ChatService chatService = new ChatService(
             new CharacterPromptBuilder(),
             chatMessageRepository,
+            characterMoodRepository,
+            messageToneClassifier,
             chatModel,
             ToolCallingManager.builder().build(),
             investigationService,
@@ -135,6 +146,9 @@ class ChatServiceTest {
                 .thenReturn(BUTLER);
         when(investigationService.getProgress(TEAM_ID, PLAYER_ID, CASE_ID))
                 .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
+        when(characterMoodRepository.findByTeamIdAndCaseIdAndCharacterId(TEAM_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(Optional.empty());
+        givenMessageTone(MessageTone.NEUTRAL);
         when(investigationService.introduceCharacters(eq(TEAM_ID), eq(CASE_ID), anyList()))
                 .thenAnswer(invocation -> invocation.getArgument(2));
         when(chatModel.getOptions())
@@ -400,6 +414,22 @@ class ChatServiceTest {
                 .thenReturn(List.of(messages));
     }
 
+    private void givenMessageTone(MessageTone tone) {
+        when(messageToneClassifier.classify(any(CharacterProfile.class), any(), any(String.class), anyInt()))
+                .thenReturn(tone);
+    }
+
+    private void givenStoredMood(Mood mood) {
+        when(characterMoodRepository.findByTeamIdAndCaseIdAndCharacterId(TEAM_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(Optional.of(CharacterMood.start(TEAM_ID, CASE_ID, CHARACTER_ID, mood)));
+    }
+
+    private CharacterMood savedMood() {
+        ArgumentCaptor<CharacterMood> saved = ArgumentCaptor.forClass(CharacterMood.class);
+        verify(characterMoodRepository).save(saved.capture());
+        return saved.getValue();
+    }
+
     private void givenModelReplies(String text) {
         when(chatModel.call(any(Prompt.class)))
                 .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(text)))));
@@ -415,6 +445,115 @@ class ChatServiceTest {
 
     private static ChatMessage characterMessage(String content) {
         return ChatMessage.fromCharacter(TEAM_ID, CASE_ID, CHARACTER_ID, content);
+    }
+
+    @Test
+    void sendMessage_givenFirstHelpfulMessage_expectMoodStartedAtNeutralAndRaised() {
+        givenStoredHistoryNewestFirst();
+        givenMessageTone(MessageTone.HELPFUL);
+        givenModelReplies("Dank u.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wat vervelend voor u.", List.of());
+
+        CharacterMood mood = savedMood();
+        assertThat(mood.getScore()).isEqualTo(MessageTone.HELPFUL.scoreChange());
+        assertThat(mood.getTeamId()).isEqualTo(TEAM_ID);
+        assertThat(mood.getCharacterId()).isEqualTo(CHARACTER_ID);
+    }
+
+    @Test
+    void sendMessage_givenAggressiveMessageToFriendlyCharacter_expectScoreLoweredFromStoredMood() {
+        givenStoredMood(Mood.FRIENDLY);
+        givenStoredHistoryNewestFirst();
+        givenMessageTone(MessageTone.AGGRESSIVE);
+        givenModelReplies("Zo praat u niet tegen mij.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Lieg niet!", List.of());
+
+        assertThat(savedMood().getScore())
+                .isEqualTo(Mood.FRIENDLY.startingScore() + MessageTone.AGGRESSIVE.scoreChange());
+    }
+
+    @Test
+    void sendMessage_givenToneChangesMood_expectReplyPromptUsesNewMood() {
+        givenStoredMood(Mood.NEUTRAL);
+        givenStoredHistoryNewestFirst();
+        givenMessageTone(MessageTone.AGGRESSIVE);
+        givenModelReplies("Wat?");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Lieg niet!", List.of());
+
+        assertThat(capturePromptMessages().getFirst().getText()).contains("Je wantrouwt de rechercheurs.");
+    }
+
+    @Test
+    void sendMessage_givenPreviousReplyAndAttachment_expectClassifierGetsContext() {
+        givenStoredHistoryNewestFirst(characterMessage("Goedenavond."), playerMessage("bram", "Hallo"));
+        givenModelReplies("Ach.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Kijk eens.", List.of(MENU_FILE));
+
+        verify(messageToneClassifier).classify(BUTLER, "Goedenavond.", "Kijk eens.", 1);
+    }
+
+    @Test
+    void sendMessage_givenModelFails_expectMoodNotStored() {
+        givenStoredHistoryNewestFirst();
+        givenMessageTone(MessageTone.HELPFUL);
+        when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of()))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(characterMoodRepository, never()).save(any(CharacterMood.class));
+    }
+
+    @Test
+    void sendMessage_givenIntroductionNeedsBetterMood_expectNoToolOffered() {
+        givenCharacterIntroducingGardenerWhen(Mood.TRUSTING);
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
+
+        ChatOptions options = capturePrompt().getOptions();
+        boolean toolOffered = options instanceof ToolCallingChatOptions toolOptions
+                && !toolOptions.getToolCallbacks().isEmpty();
+        assertThat(toolOffered).isFalse();
+    }
+
+    @Test
+    void sendMessage_givenMoodReachesIntroductionMinimum_expectToolOffered() {
+        givenCharacterIntroducingGardenerWhen(Mood.FRIENDLY);
+        givenStoredMood(Mood.FRIENDLY);
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
+
+        assertThat(capturePrompt().getOptions())
+                .isInstanceOfSatisfying(
+                        ToolCallingChatOptions.class,
+                        toolOptions -> assertThat(toolOptions.getToolCallbacks())
+                                .extracting(
+                                        callback -> callback.getToolDefinition().name())
+                                .containsExactly("introduce_contact"));
+    }
+
+    private void givenCharacterIntroducingGardenerWhen(Mood minimumMood) {
+        CharacterProfile butler = new CharacterProfile(
+                CHARACTER_ID,
+                "De Butler",
+                "Butler",
+                "Altijd aanwezig.",
+                null,
+                null,
+                null,
+                null,
+                false,
+                List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", minimumMood)),
+                null);
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(butler);
     }
 
     @Test

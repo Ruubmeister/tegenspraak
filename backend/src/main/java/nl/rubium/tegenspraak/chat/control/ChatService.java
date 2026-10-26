@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
+import nl.rubium.tegenspraak.chat.entity.CharacterMood;
+import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
@@ -48,6 +50,8 @@ public class ChatService {
 
     private final CharacterPromptBuilder characterPromptBuilder;
     private final ChatMessageRepository chatMessageRepository;
+    private final CharacterMoodRepository characterMoodRepository;
+    private final MessageToneClassifier messageToneClassifier;
     private final ChatModel chatModel;
     private final ToolCallingManager toolCallingManager;
     private final InvestigationService investigationService;
@@ -57,6 +61,8 @@ public class ChatService {
     public ChatService(
             CharacterPromptBuilder characterPromptBuilder,
             ChatMessageRepository chatMessageRepository,
+            CharacterMoodRepository characterMoodRepository,
+            MessageToneClassifier messageToneClassifier,
             ChatModel chatModel,
             ToolCallingManager toolCallingManager,
             InvestigationService investigationService,
@@ -64,6 +70,8 @@ public class ChatService {
             @Value("${tegenspraak.chat.max-history-messages}") int maxHistoryMessages) {
         this.characterPromptBuilder = characterPromptBuilder;
         this.chatMessageRepository = chatMessageRepository;
+        this.characterMoodRepository = characterMoodRepository;
+        this.messageToneClassifier = messageToneClassifier;
         this.chatModel = chatModel;
         this.toolCallingManager = toolCallingManager;
         this.investigationService = investigationService;
@@ -111,7 +119,8 @@ public class ChatService {
     /**
      * Progress is read inside the lock, so the character is only offered introductions that did not happen yet. Contacts
      * the character introduced are unlocked for the team and announced with a notice in this conversation. Evidence
-     * shown with this message counts towards the character's secrets right away.
+     * shown with this message counts towards the character's secrets right away. The tone of the message changes the
+     * character's mood before it replies, so the reply already reacts to it; the new mood is only stored with the reply.
      */
     private ChatMessage replyAndStore(
             UUID playerId,
@@ -123,7 +132,14 @@ public class ChatService {
         TeamProgress progress =
                 investigationService.getProgress(conversation.teamId(), playerId, conversation.caseId());
         List<ChatAttachment> openAttachments = requireOpenAttachments(attachments, progress);
-        List<CharacterProfile> introducible = progress.introducibleBy(character);
+        List<ChatMessage> history = recentHistory(conversation);
+        CharacterMood mood = currentMood(conversation, character);
+        MessageTone tone =
+                messageToneClassifier.classify(character, lastCharacterReply(history), content, openAttachments.size());
+        mood.changeScore(tone.scoreChange());
+        List<CharacterProfile> introducible = progress.introducibleBy(character).stream()
+                .filter(contact -> character.mayIntroduce(contact.id(), mood.getMood()))
+                .toList();
         IntroduceContactTool introduceContactTool = new IntroduceContactTool(introducible);
 
         ChatMessage playerMessage = ChatMessage.fromPlayer(
@@ -136,8 +152,8 @@ public class ChatService {
         List<Message> prompt = new ArrayList<>();
         Set<RequiredEvidence> shownEvidence = shownEvidence(conversation, openAttachments);
         prompt.add(new SystemMessage(characterPromptBuilder.buildSystemPrompt(
-                progress.caseDefinition(), character, introducible, shownEvidence)));
-        recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message, progress)));
+                progress.caseDefinition(), character, introducible, shownEvidence, mood.getMood())));
+        history.forEach(message -> prompt.add(toPromptMessage(message, progress)));
         prompt.add(toPromptMessage(playerMessage, progress));
 
         String reply = askModel(prompt, introducible.isEmpty() ? null : introduceContactTool, character.id());
@@ -152,7 +168,28 @@ public class ChatService {
                         conversation.characterId(),
                         character.name() + " heeft je in contact gebracht met " + contact.name() + ".")));
         chatMessageRepository.saveAll(newMessages);
+        characterMoodRepository.save(mood);
         return characterMessage;
+    }
+
+    private CharacterMood currentMood(Conversation conversation, CharacterProfile character) {
+        return characterMoodRepository
+                .findByTeamIdAndCaseIdAndCharacterId(
+                        conversation.teamId(), conversation.caseId(), conversation.characterId())
+                .orElseGet(() -> CharacterMood.start(
+                        conversation.teamId(),
+                        conversation.caseId(),
+                        conversation.characterId(),
+                        character.startingMood()));
+    }
+
+    /** Null at the start of the conversation. */
+    private static String lastCharacterReply(List<ChatMessage> history) {
+        return history.reversed().stream()
+                .filter(message -> message.getSender() == MessageSender.CHARACTER)
+                .map(ChatMessage::getContent)
+                .findFirst()
+                .orElse(null);
     }
 
     /** Mails and files shown to the character earlier in this conversation or with the new message. */

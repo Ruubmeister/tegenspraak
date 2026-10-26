@@ -90,9 +90,9 @@ class CaseDefinitionTest {
     }
 
     private static CharacterProfile characterWithSecretRequiring(RequiredEvidence evidence) {
-        CharacterSecret secret = new CharacterSecret("Feit", "Als ze het tonen.", List.of(evidence), null);
+        CharacterSecret secret = new CharacterSecret("Feit", "Als ze het tonen.", List.of(evidence), null, null);
         return new CharacterProfile(
-                "de-butler", "De Butler", "Rol", "Beschrijving", null, null, null, List.of(secret), false, null);
+                "de-butler", "De Butler", "Rol", "Beschrijving", null, null, null, List.of(secret), false, null, null);
     }
 
     private static CaseDefinition caseWith(CharacterProfile... characters) {
@@ -101,8 +101,8 @@ class CaseDefinitionTest {
 
     private static CharacterProfile character(String id, boolean hidden, String... introduces) {
         List<ContactIntroduction> introductions = Arrays.stream(introduces)
-                .map(introduced -> new ContactIntroduction(introduced, "Als de speler ernaar vraagt."))
+                .map(introduced -> new ContactIntroduction(introduced, "Als de speler ernaar vraagt.", null))
                 .toList();
-        return new CharacterProfile(id, id, "Rol", "Beschrijving", null, null, null, null, hidden, introductions);
+        return new CharacterProfile(id, id, "Rol", "Beschrijving", null, null, null, null, hidden, introductions, null);
     }
 }

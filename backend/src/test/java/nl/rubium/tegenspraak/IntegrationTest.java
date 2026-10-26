@@ -1,5 +1,7 @@
 package nl.rubium.tegenspraak;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -9,6 +11,9 @@ import nl.rubium.tegenspraak.auth.control.PlayerAccountService;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import nl.rubium.tegenspraak.auth.entity.PlayerAccountRepository;
 import nl.rubium.tegenspraak.auth.entity.PlayerRole;
+import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.chat.control.MessageTone;
+import nl.rubium.tegenspraak.chat.control.MessageToneClassifier;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import nl.rubium.tegenspraak.team.entity.Team;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +57,16 @@ public abstract class IntegrationTest {
     @MockitoBean
     protected ChatModel chatModel;
 
+    /** Mocked separately, so tests of the character's replies only see calls for those replies. */
+    @MockitoBean
+    protected MessageToneClassifier messageToneClassifier;
+
     /** The real model has configured options; the character tools are added to a copy of them. */
     @BeforeEach
     void stubChatModelOptions() {
         when(chatModel.getOptions()).thenReturn(ToolCallingChatOptions.builder().build());
+        when(messageToneClassifier.classify(any(CharacterProfile.class), any(), any(String.class), anyInt()))
+                .thenReturn(MessageTone.NEUTRAL);
     }
 
     /** Mirrors the SPA: the XSRF-TOKEN cookie value is echoed back in the X-XSRF-TOKEN header. */

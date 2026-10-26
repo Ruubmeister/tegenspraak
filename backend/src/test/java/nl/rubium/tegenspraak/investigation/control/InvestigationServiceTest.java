@@ -45,7 +45,7 @@ class InvestigationServiceTest {
     private static final String SAFE_TARGET = "item:computer/bestanden/kluis";
 
     private static final CharacterProfile GARDENER = new CharacterProfile(
-            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null);
+            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null);
     private static final CharacterProfile BUTLER = new CharacterProfile(
             "de-butler",
             "De Butler",
@@ -56,7 +56,8 @@ class InvestigationServiceTest {
             null,
             null,
             false,
-            List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
+            List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", null)),
+            null);
     private static final Desktop COMPUTER = new Desktop(
             "computer",
             "Landhuis",

@@ -6,10 +6,15 @@ import java.util.Set;
 /**
  * Something a character hides until {@code revealWhen} is met. When {@code requiresEvidence} is set, the team must also
  * have shown the character at least {@code requiredCount} of those mails or files as attachments; until then the
- * character denies it, whatever the team claims. Without a count, all of them are required.
+ * character denies it, whatever the team claims. Without a count, all of them are required. With a {@code minimumMood},
+ * the character also keeps the secret until it feels at least that good about the team.
  */
 public record CharacterSecret(
-        String fact, String revealWhen, List<RequiredEvidence> requiresEvidence, Integer requiredCount) {
+        String fact,
+        String revealWhen,
+        List<RequiredEvidence> requiresEvidence,
+        Integer requiredCount,
+        Mood minimumMood) {
 
     public CharacterSecret {
         if (fact == null || fact.isBlank() || revealWhen == null || revealWhen.isBlank()) {
@@ -34,5 +39,9 @@ public record CharacterSecret(
         long shownCount =
                 requiresEvidence.stream().filter(shownEvidence::contains).count();
         return shownCount >= requiredCount;
+    }
+
+    public boolean allows(Mood mood) {
+        return minimumMood == null || mood.isAtLeast(minimumMood);
     }
 }

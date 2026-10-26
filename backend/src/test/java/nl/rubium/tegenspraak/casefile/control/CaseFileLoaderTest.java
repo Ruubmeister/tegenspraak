@@ -8,6 +8,7 @@ import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
@@ -47,6 +48,19 @@ class CaseFileLoaderTest {
             assertThat(secret.revealWhen()).isEqualTo("De speler noemt de bibliotheek.");
             assertThat(secret.requiresEvidence()).isEmpty();
         });
+    }
+
+    @Test
+    void loadAll_givenMoodSettings_expectStartingAndMinimumMoodsLoaded() {
+        CaseDefinition caseDefinition =
+                loader.loadAll("classpath:test-cases/valid").getFirst();
+        CharacterProfile butler = caseDefinition.findCharacter("de-butler").orElseThrow();
+
+        assertThat(butler.startingMood()).isEqualTo(Mood.SUSPICIOUS);
+        assertThat(butler.secrets()).extracting(secret -> secret.minimumMood()).containsExactly(null, Mood.FRIENDLY);
+        assertThat(butler.introduces().getFirst().minimumMood()).isEqualTo(Mood.TRUSTING);
+        assertThat(caseDefinition.findCharacter("de-tuinman").orElseThrow().startingMood())
+                .isEqualTo(Mood.NEUTRAL);
     }
 
     @Test
