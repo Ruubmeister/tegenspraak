@@ -21,11 +21,18 @@ secrets:
       Hij is die nacht teruggegaan naar het clubhuis. Om 01:12 zette hij het alarm uit met zijn eigen code 03, haalde
       de geldzak uit de kluis en zette om 01:31 het alarm weer aan. Eerst zegt hij dat hij zijn jas was vergeten.
     revealWhen: >-
-      De rechercheurs confronteren hem met de alarmlog van 01:12 en 01:31 en weten dat code 03 van hem is, of ze
-      vertellen dat Fatima zijn auto om 01:15 bij het clubhuis zag staan.
+      De rechercheurs confronteren hem met de alarmlog van 01:12 en 01:31 en weten dat code 03 van hem is. Als ze
+      ook vertellen dat Fatima zijn auto om 01:15 bij het clubhuis zag staan, houdt hij het niet langer vol.
+    requiresEvidence:
+      - { desktop: clubhuis-pc, app: bestanden, item: alarmlog-juni }
   - fact: >-
       Hij heeft ruim 11.000 euro schuld bij online casino LuckyDuin, zijn account was geblokkeerd tot hij zou betalen.
       Hij heeft het geld uit de kluis zondag op zijn casinorekening gestort. Hij heeft er enorme spijt van.
     revealWhen: >-
       Hij heeft al toegegeven dat hij die nacht terugging, en de rechercheurs confronteren hem met de mails van
       LuckyDuin of het schuldenoverzicht op zijn laptop.
+    requiresEvidence:
+      - { desktop: laptop-penningmeester, app: mail, item: luckyduin-limiet }
+      - { desktop: laptop-penningmeester, app: mail, item: luckyduin-betaling }
+      - { desktop: laptop-penningmeester, app: bestanden, item: overzicht }
+    requiredCount: 1

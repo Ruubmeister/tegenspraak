@@ -39,6 +39,9 @@ tegenspraak:
     location: classpath:cases
   chat:
     max-history-messages: 40
+  verdict:
+    # A team that has not solved a case after this many attempts has failed it and gets to read the epilogue
+    max-attempts: 5
   admin:
     username: admin
     initial-password: ${TEGENSPRAAK_ADMIN_PASSWORD:}

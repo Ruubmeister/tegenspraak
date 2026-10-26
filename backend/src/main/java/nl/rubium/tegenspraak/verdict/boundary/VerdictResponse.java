@@ -1,52 +1,65 @@
 package nl.rubium.tegenspraak.verdict.boundary;
 
+import java.time.Instant;
 import java.util.List;
-import nl.rubium.tegenspraak.casefile.entity.SolutionOption;
+import java.util.Map;
+import java.util.stream.Collectors;
 import nl.rubium.tegenspraak.casefile.entity.SolutionQuestion;
 import nl.rubium.tegenspraak.verdict.control.VerdictProgress;
+import nl.rubium.tegenspraak.verdict.entity.VerdictAnswer;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttempt;
 
 /**
- * The questions without their answers, plus the team's progress. The epilogue reveals the truth, so it is only
- * included once the case is solved.
+ * The questions without their answers, plus the team's attempts. An attempt only tells how many answers were correct,
+ * not which ones. The epilogue reveals the truth, so it is only included once the case is solved or failed.
  */
 public record VerdictResponse(
-        List<QuestionResponse> questions, int attempts, boolean solved, ScoreResponse lastScore, String epilogue) {
+        List<QuestionResponse> questions,
+        int maxAttempts,
+        int attemptsLeft,
+        boolean solved,
+        boolean failed,
+        List<AttemptResponse> attempts,
+        String epilogue) {
 
-    public record QuestionResponse(String id, String question, List<OptionResponse> options) {
+    public record QuestionResponse(String id, String question) {
 
         static QuestionResponse from(SolutionQuestion question) {
-            return new QuestionResponse(
-                    question.id(),
-                    question.question(),
-                    question.options().stream().map(OptionResponse::from).toList());
+            return new QuestionResponse(question.id(), question.question());
         }
     }
 
-    public record OptionResponse(String id, String label) {
+    /** {@code answers} holds the typed answer per question id. */
+    public record AttemptResponse(
+            int number,
+            String submittedBy,
+            Instant submittedAt,
+            int correctAnswers,
+            int totalQuestions,
+            Map<String, String> answers) {
 
-        static OptionResponse from(SolutionOption option) {
-            return new OptionResponse(option.id(), option.label());
-        }
-    }
-
-    public record ScoreResponse(int correctAnswers, int totalQuestions, String submittedBy) {
-
-        static ScoreResponse from(VerdictAttempt attempt) {
-            return new ScoreResponse(
-                    attempt.getCorrectAnswers(), attempt.getTotalQuestions(), attempt.getSubmittedBy());
+        static AttemptResponse from(VerdictAttempt attempt) {
+            return new AttemptResponse(
+                    attempt.getAttemptNumber(),
+                    attempt.getSubmittedBy(),
+                    attempt.getSubmittedAt(),
+                    attempt.getCorrectAnswers(),
+                    attempt.getTotalQuestions(),
+                    attempt.getAnswers().stream()
+                            .collect(Collectors.toMap(VerdictAnswer::questionId, VerdictAnswer::answer)));
         }
     }
 
     static VerdictResponse from(VerdictProgress progress) {
-        boolean solved = progress.solved();
         return new VerdictResponse(
                 progress.solution().questions().stream()
                         .map(QuestionResponse::from)
                         .toList(),
-                progress.attempts().size(),
-                solved,
-                progress.latestAttempt().map(ScoreResponse::from).orElse(null),
-                solved ? progress.solution().epilogue() : null);
+                progress.maxAttempts(),
+                progress.attemptsLeft(),
+                progress.solved(),
+                progress.failed(),
+                progress.attempts().stream().map(AttemptResponse::from).toList(),
+                progress.finished() ? progress.solution().epilogue() : null);
     }
 }

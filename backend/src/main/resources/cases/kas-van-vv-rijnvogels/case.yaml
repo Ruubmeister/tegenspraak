@@ -27,42 +27,16 @@ solution:
   questions:
     - id: wie
       question: Wie heeft het geld uit de kluis gehaald?
-      options:
-        - id: kevin-bos
-          label: Kevin Bos, de barbeheerder
-        - id: ronald-verhoef
-          label: Ronald Verhoef, de penningmeester
-        - id: ingrid-mulder
-          label: Ingrid Mulder, de voorzitter
-        - id: fatima-el-amrani
-          label: Fatima El Amrani, de jeugdtrainer
-        - id: inbreker
-          label: Een inbreker van buiten de club
-      answer: ronald-verhoef
+      answer: Ronald Verhoef, de penningmeester.
     - id: wanneer
-      question: Wanneer is het geld uit de kluis verdwenen?
-      options:
-        - id: tijdens-feest
-          label: Zaterdagavond, tijdens het feest
-        - id: nacht
-          label: In de nacht van zaterdag op zondag, rond 01:15, toen iedereen weg was
-        - id: zondagmiddag
-          label: Zondagmiddag, tijdens de schoonmaak
-        - id: maandagochtend
-          label: Maandagochtend, vlak voordat het geld naar de bank zou gaan
-      answer: nacht
+      question: Wanneer en hoe is het geld uit de kluis gehaald?
+      answer: >-
+        Kernpunten: in de nacht van zaterdag op zondag, rond 01:15, nadat iedereen weg was; de dader zette het alarm
+        uit met zijn eigen alarmcode en daarna weer aan.
     - id: waarom
       question: Waarom heeft de dader het geld meegenomen?
-      options:
-        - id: scooter
-          label: Om een nieuwe scooter te betalen
-        - id: gokschulden
-          label: Om gokschulden bij een online casino af te lossen
-        - id: wraak
-          label: Uit wraak op het bestuur
-        - id: verzekering
-          label: Om de club een verzekeringsuitkering te bezorgen
-      answer: gokschulden
+      answer: >-
+        Kernpunt: om gokschulden bij een online casino (LuckyDuin) af te lossen.
   epilogue: >-
     In de nacht na de seizoensafsluiting reed penningmeester Ronald Verhoef terug naar het clubhuis. Om 01:12
     schakelde hij het alarm uit met zijn eigen code, haalde de geldzak met 8.460 euro uit de kluis en zette om 01:31

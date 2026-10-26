@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
@@ -106,7 +110,8 @@ public class ChatService {
 
     /**
      * Progress is read inside the lock, so the character is only offered introductions that did not happen yet. Contacts
-     * the character introduced are unlocked for the team and announced with a notice in this conversation.
+     * the character introduced are unlocked for the team and announced with a notice in this conversation. Evidence
+     * shown with this message counts towards the character's secrets right away.
      */
     private ChatMessage replyAndStore(
             UUID playerId,
@@ -129,8 +134,9 @@ public class ChatService {
                 content,
                 openAttachments);
         List<Message> prompt = new ArrayList<>();
-        prompt.add(new SystemMessage(
-                characterPromptBuilder.buildSystemPrompt(progress.caseDefinition(), character, introducible)));
+        Set<RequiredEvidence> shownEvidence = shownEvidence(conversation, openAttachments);
+        prompt.add(new SystemMessage(characterPromptBuilder.buildSystemPrompt(
+                progress.caseDefinition(), character, introducible, shownEvidence)));
         recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message, progress)));
         prompt.add(toPromptMessage(playerMessage, progress));
 
@@ -147,6 +153,16 @@ public class ChatService {
                         character.name() + " heeft je in contact gebracht met " + contact.name() + ".")));
         chatMessageRepository.saveAll(newMessages);
         return characterMessage;
+    }
+
+    /** Mails and files shown to the character earlier in this conversation or with the new message. */
+    private Set<RequiredEvidence> shownEvidence(Conversation conversation, List<ChatAttachment> newAttachments) {
+        List<ChatAttachment> earlierAttachments = chatMessageRepository.findAttachmentsInConversation(
+                conversation.teamId(), conversation.caseId(), conversation.characterId());
+        return Stream.concat(earlierAttachments.stream(), newAttachments.stream())
+                .map(attachment ->
+                        new RequiredEvidence(attachment.desktopId(), attachment.appId(), attachment.itemId()))
+                .collect(Collectors.toSet());
     }
 
     /** Latest messages in chronological order, starting with a player message as the LLM expects. */

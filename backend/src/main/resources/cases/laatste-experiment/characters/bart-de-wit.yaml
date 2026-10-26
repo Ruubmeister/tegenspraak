@@ -21,7 +21,9 @@ secrets:
       Hij heeft de ronde van 22:30 door de B-vleugel overgeslagen, omdat hij in de meldkamer in slaap was gevallen. In
       het rondelog staat die ronde als "niet afgemeld".
     revealWhen: >-
-      De rechercheurs vragen naar zijn ronde van 22:30, of confronteren hem met het rondelog.
+      De rechercheurs confronteren hem met het rondelog, waarin de ronde van 22:30 als "niet afgemeld" staat.
+    requiresEvidence:
+      - { desktop: facilitair-systeem-hbi, app: beheer, item: rondelog }
   - fact: >-
       Bij zijn ronde van 02:30 zag hij dat de nachtgrendel van B0.14 dicht zat. Hij dacht dat iemand de ruimte voor de
       nacht had afgesloten en keek niet door het raampje. Bij zijn ronde van 06:30 zat de grendel weer open; hij nam

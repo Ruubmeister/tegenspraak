@@ -21,3 +21,7 @@ secrets:
     revealWhen: >-
       De rechercheurs noemen de transportorder van Atelier Pauw naar zijn zaak, en maken duidelijk dat de schilderijen
       verzekerd waren en als verbrand zijn opgegeven, zodat hij zelf verdacht kan worden van heling.
+    requiresEvidence:
+      - { desktop: atelier-pauw, app: werkorders, item: transportbonnen }
+      - { desktop: laptop-victor-lindeboom, app: mail, item: transport-antwerpen }
+    requiredCount: 1

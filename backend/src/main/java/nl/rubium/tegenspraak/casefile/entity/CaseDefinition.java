@@ -13,6 +13,7 @@ public record CaseDefinition(
         characters = List.copyOf(characters);
         desktops = List.copyOf(desktops);
         requireValidIntroductions(characters);
+        requireExistingEvidence(characters, desktops);
     }
 
     public Optional<CharacterProfile> findCharacter(String characterId) {
@@ -25,6 +26,27 @@ public record CaseDefinition(
         return desktops.stream()
                 .filter(desktop -> desktop.id().equals(desktopId))
                 .findFirst();
+    }
+
+    /** Evidence a secret requires must exist, otherwise the team could never get the character to reveal it. */
+    private static void requireExistingEvidence(List<CharacterProfile> characters, List<Desktop> desktops) {
+        for (CharacterProfile character : characters) {
+            character.secrets().stream()
+                    .flatMap(secret -> secret.requiresEvidence().stream())
+                    .filter(evidence -> !exists(evidence, desktops))
+                    .findFirst()
+                    .ifPresent(evidence -> {
+                        throw new IllegalArgumentException("A secret of character '" + character.id() + "' requires "
+                                + evidence + ", which is not in this case");
+                    });
+        }
+    }
+
+    private static boolean exists(RequiredEvidence evidence, List<Desktop> desktops) {
+        return desktops.stream()
+                .filter(desktop -> desktop.id().equals(evidence.desktop()))
+                .flatMap(desktop -> desktop.findApp(evidence.app()).stream())
+                .anyMatch(app -> app.findItem(evidence.item()).isPresent());
     }
 
     /**

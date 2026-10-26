@@ -33,7 +33,10 @@ export function useSolvedCaseIds(teamId: string) {
   })
 }
 
-/** Submits the chosen option per question. The response is the updated verdict, including the new score. */
+/**
+ * Submits the typed answer per question. The backend grades them with the LLM, which takes a few seconds. The response
+ * is the updated verdict, including the new attempt.
+ */
 export function useSubmitVerdict(teamId: string, caseId: string) {
   const queryClient = useQueryClient()
   return useMutation({

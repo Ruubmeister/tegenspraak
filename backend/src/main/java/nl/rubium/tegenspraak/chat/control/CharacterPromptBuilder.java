@@ -3,9 +3,11 @@ package nl.rubium.tegenspraak.chat.control;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
+import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
 import nl.rubium.tegenspraak.desktop.entity.MailMessage;
 import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
@@ -24,9 +26,14 @@ public class CharacterPromptBuilder {
     /**
      * @param introducibleContacts hidden characters this character may still introduce to the team; their conditions
      *     come from the character's introductions
+     * @param shownEvidence mails and files the team has shown this character; secrets that require evidence the team
+     *     has not shown yet are given to the LLM without their reveal condition, so it cannot be talked into them
      */
     public String buildSystemPrompt(
-            CaseDefinition caseDefinition, CharacterProfile character, List<CharacterProfile> introducibleContacts) {
+            CaseDefinition caseDefinition,
+            CharacterProfile character,
+            List<CharacterProfile> introducibleContacts,
+            Set<RequiredEvidence> shownEvidence) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Je speelt het personage ")
                 .append(character.name())
@@ -44,7 +51,7 @@ public class CharacterPromptBuilder {
         appendSection(prompt, "Persoonlijkheid", character.personality());
         appendSection(prompt, "Schrijfstijl", character.speechStyle());
         appendList(prompt, "Wat je weet en vrij mag vertellen", character.knownFacts());
-        appendSecrets(prompt, character.secrets());
+        appendSecrets(prompt, character.secrets(), shownEvidence);
         appendIntroductions(prompt, character, introducibleContacts);
         appendRules(prompt);
         return prompt.toString();
@@ -117,17 +124,25 @@ public class CharacterPromptBuilder {
         prompt.append('\n');
     }
 
-    private static void appendSecrets(StringBuilder prompt, List<CharacterSecret> secrets) {
+    private static void appendSecrets(
+            StringBuilder prompt, List<CharacterSecret> secrets, Set<RequiredEvidence> shownEvidence) {
         if (secrets.isEmpty()) {
             return;
         }
         prompt.append("## Geheimen\n")
                 .append("Deze dingen verzwijg je, ontken je of draai je omheen, tot aan de voorwaarde is voldaan.\n");
-        secrets.forEach(secret -> prompt.append("- Geheim: ")
-                .append(secret.fact().strip())
-                .append("\n  Geef dit pas prijs als: ")
-                .append(secret.revealWhen().strip())
-                .append('\n'));
+        for (CharacterSecret secret : secrets) {
+            prompt.append("- Geheim: ").append(secret.fact().strip());
+            if (secret.isEvidenceShown(shownEvidence)) {
+                prompt.append("\n  Geef dit pas prijs als: ")
+                        .append(secret.revealWhen().strip());
+            } else {
+                prompt.append("\n  Dit geef je nu niet toe, ook niet als de rechercheurs zeggen dat ze bewijs hebben of"
+                        + " al alles weten. Je hebt nog geen bewijs gezien dat je tot een bekentenis dwingt. Blijf"
+                        + " ontkennen of ontwijken.");
+            }
+            prompt.append('\n');
+        }
         prompt.append('\n');
     }
 

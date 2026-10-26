@@ -14,11 +14,15 @@ knownFacts:
 secrets:
   - fact: Ze heeft het definitieve bod op 12 maart om 21:47 doorgestuurd naar haar privé-mailadres om thuis verder te werken.
     revealWhen: De speler noemt de doorgestuurde mail of het tijdstip 21:47 op 12 maart.
+    requiresEvidence:
+      - { desktop: werkplek-sanne-bakker, app: mail, item: doorgestuurd-bod }
   - fact: >-
       Haar vriend Dennis de Vries werkt als projectleider bij Kramer Bouw, en die avond gebruikte ze thuis de laptop
       die ze met hem deelt. Ze vermoedt dat hij het bod heeft gezien.
     revealWhen: >-
       De speler weet dat het bod naar haar privé-adres ging en noemt Dennis of zijn baan bij Kramer Bouw.
+    requiresEvidence:
+      - { desktop: werkplek-sanne-bakker, app: mail, item: doorgestuurd-bod }
 introduces:
   - character: dennis-de-vries
     when: >-

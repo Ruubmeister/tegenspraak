@@ -26,6 +26,10 @@ secrets:
     revealWhen: >-
       De rechercheurs confronteren hem met de pakbon waaruit blijkt dat het nieuwe onderdeel pas op 12 juni is
       geleverd, of met zijn mail van 5 juni over de bypass.
+    requiresEvidence:
+      - { desktop: facilitair-systeem-hbi, app: beheer, item: pakbon }
+      - { desktop: laptop-arjen-kuiper, app: mail, item: bypass }
+    requiredCount: 1
 introduces:
   - character: bart-de-wit
     when: >-

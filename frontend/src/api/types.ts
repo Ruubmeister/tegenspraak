@@ -132,28 +132,29 @@ export interface ChatMessage {
   attachments: EvidenceItem[]
 }
 
-export interface VerdictOption {
-  id: string
-  label: string
-}
-
 export interface VerdictQuestion {
   id: string
   question: string
-  options: VerdictOption[]
 }
 
-export interface VerdictScore {
+/** Only the number of correct answers is shown, not which answers were correct. */
+export interface VerdictAttempt {
+  number: number
+  submittedBy: string
+  submittedAt: string
   correctAnswers: number
   totalQuestions: number
-  submittedBy: string
+  /** The typed answer per question id; empty for attempts from before answers were typed. */
+  answers: Record<string, string>
 }
 
-/** The epilogue reveals what really happened, so the backend only sends it once the case is solved. */
+/** The epilogue reveals what really happened, so the backend only sends it once the case is solved or failed. */
 export interface Verdict {
   questions: VerdictQuestion[]
-  attempts: number
+  maxAttempts: number
+  attemptsLeft: number
   solved: boolean
-  lastScore: VerdictScore | null
+  failed: boolean
+  attempts: VerdictAttempt[]
   epilogue: string | null
 }

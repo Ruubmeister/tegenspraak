@@ -21,6 +21,10 @@ secrets:
     revealWhen: >-
       De rechercheurs laten zien dat de onderhoudsmodus om 02:51 via de app van gebruiker 1 werd aangezet, en weten
       dat gebruiker 1 Victor is.
+    requiresEvidence:
+      - { desktop: dossier-hollandia, app: dossier, item: alarmexport }
+      - { desktop: laptop-victor-lindeboom, app: mail, item: app-melding }
+    requiredCount: 1
   - fact: >-
       Hij liet bij Hendrik Pauw kopieën maken van de twee Brandts en verkocht de originelen via Luc Verstraeten in
       Antwerpen voor 610.000 euro. In het depot hingen alleen de kopieën. Hij geeft dit pas toe als hij geen kant meer
@@ -28,9 +32,13 @@ secrets:
     revealWhen: >-
       De rechercheurs confronteren hem met de betaling van Verstraeten Fine Art en met de werkorder of verklaring van
       Hendrik Pauw over de kopieën.
+    requiresEvidence:
+      - { desktop: laptop-victor-lindeboom, app: mail, item: bijschrijving }
   - fact: >-
       Hij is zelf om 02:58 met zijn eigen sleutel door de achterdeur naar binnen gegaan en heeft de oliekachel op de
       hoogste stand tegen de doeken gezet. Hij zag geen andere uitweg met de schuld bij de bank.
     revealWhen: >-
       Hij heeft de verkoop van de originelen al toegegeven, en de rechercheurs wijzen erop dat de achterdeur om 02:58
       werd geopend terwijl het alarm in onderhoudsmodus stond.
+    requiresEvidence:
+      - { desktop: dossier-hollandia, app: dossier, item: alarmexport }

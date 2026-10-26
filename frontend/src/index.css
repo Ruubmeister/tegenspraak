@@ -915,28 +915,65 @@ a.attachment-chip:hover {
   gap: 1rem;
 }
 
-.verdict-form fieldset {
+.verdict-question {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.verdict-question label {
+  font-weight: 600;
+}
+
+.verdict-question textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.verdict-attempts-left {
+  font-weight: 600;
+}
+
+.verdict-confirm {
   margin: 0;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-error);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius);
+}
+
+.verdict-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.verdict-history {
+  margin-top: 2rem;
+}
+
+.verdict-history details {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.verdict-form legend {
-  font-weight: 600;
-  padding: 0 0.25rem;
-}
-
-.verdict-form label {
-  display: flex;
-  gap: 0.5rem;
-  align-items: baseline;
+.verdict-history summary {
   cursor: pointer;
+}
+
+.verdict-history dt {
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.verdict-history dd {
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* Small screens: the case navigation becomes a menu and mail and files show either the list or the opened item */

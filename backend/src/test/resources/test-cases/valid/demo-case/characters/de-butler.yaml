@@ -8,6 +8,12 @@ knownFacts:
 secrets:
   - fact: Hij was in de bibliotheek.
     revealWhen: De speler noemt de bibliotheek.
+  - fact: Hij kent het testament.
+    revealWhen: De speler laat het testament of de brief zien.
+    requiresEvidence:
+      - { desktop: landhuis, app: bestanden, item: kluis }
+      - { desktop: landhuis, app: mail, item: brief }
+    requiredCount: 1
 introduces:
   - character: de-tuinman
     when: De speler vraagt wie er in de tuin was.

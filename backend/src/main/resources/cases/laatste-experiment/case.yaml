@@ -48,68 +48,27 @@ solution:
   questions:
     - id: wie
       question: Wie is verantwoordelijk voor de dood van Eva Brink?
-      options:
-        - id: arjen-kuiper
-          label: Arjen Kuiper, de groepsleider
-        - id: ruud-kamphuis
-          label: Ruud Kamphuis, de technicus
-        - id: thomas-veldkamp
-          label: Thomas Veldkamp, de collega-postdoc
-        - id: bart-de-wit
-          label: Bart de Wit, de nachtbeveiliger
-        - id: niemand
-          label: Niemand, het was een ongeluk
-      answer: arjen-kuiper
+      answer: Arjen Kuiper, de groepsleider.
     - id: opgesloten
       question: Waarom kwam Eva Brink de ruimte niet uit?
-      options:
-        - id: bewusteloos
-          label: Ze raakte bewusteloos voordat ze de noodknop kon bereiken
-        - id: noodknop-defect
-          label: De noodknop aan de binnenkant was defect
-        - id: nachtgrendel
-          label: De nachtgrendel was van buitenaf dichtgeschoven, waardoor de noodknop de deur niet opende
-        - id: badge-geblokkeerd
-          label: Haar badge was die avond geblokkeerd, zodat de deur niet openging
-      answer: nachtgrendel
+      answer: >-
+        Kernpunten: de mechanische nachtgrendel was van buitenaf dichtgeschoven; daardoor opende de deur niet toen ze
+        op de noodknop drukte.
     - id: alarm
       question: Waarom ging het zuurstofalarm niet af?
-      options:
-        - id: bypass
-          label: De sensor stond al sinds 5 juni in bypass; het onderhoudslog is achteraf vervalst
-        - id: uitgezet-door-dader
-          label: De dader heeft de sensor die avond uitgeschakeld
-        - id: stroomstoring
-          label: Door een stroomstoring werkte de ventilatie niet
-        - id: genegeerd
-          label: Het alarm ging wel af, maar de beveiliging reageerde niet
-      answer: bypass
+      answer: >-
+        Kernpunten: de zuurstofsensor stond al sinds 5 juni in bypass, waardoor ook de ventilatie niet aansloeg; het
+        onderhoudslog waarin staat dat de sensor op 6 juni was vervangen, is achteraf vervalst.
     - id: motief
       question: Wat was het motief?
-      options:
-        - id: fraude
-          label: Eva stond op het punt datamanipulatie in het Nature-artikel te melden
-        - id: vaste-aanstelling
-          label: Eva was de concurrent voor een vaste aanstelling
-        - id: plagiaat
-          label: Eva zou een collega aangeven voor plagiaat
-        - id: relatie
-          label: Een uit de hand gelopen persoonlijke relatie
-      answer: fraude
+      answer: >-
+        Kernpunt: Eva had ontdekt dat een deel van de monsters in Kuipers Nature-artikel verzonnen was en stond op het
+        punt die datafraude bij de vertrouwenspersoon te melden.
     - id: opzet
-      question: Wat beschrijft het handelen van de verantwoordelijke het best?
-      options:
-        - id: onwetend
-          label: Hij schoof de grendel dicht zonder te weten dat er iemand binnen was
-        - id: bewust-risico
-          label: >-
-            Hij sloot haar bewust op om haar bewijs weg te nemen, terwijl hij wist dat de sensor in bypass stond en de
-            vulling om 22:00 begon
-        - id: vergiftigd
-          label: Hij liet de stikstof handmatig in de ruimte stromen om haar te doden
-        - id: ruzie
-          label: Hij duwde haar tijdens een ruzie de ruimte in en raakte in paniek
-      answer: bewust-risico
+      question: Wat wist de verantwoordelijke toen hij handelde, en wat wilde hij bereiken?
+      answer: >-
+        Kernpunten: hij wist dat Eva in de ruimte was; hij wist dat de sensor in bypass stond en dat de vulling om
+        22:00 begon; hij wilde haar tot de ochtend opsluiten om haar bewijs (zoals haar labjournaal) weg te nemen.
   epilogue: >-
     Eva Brink had ontdekt dat 38 van de 112 monsters in het Nature-artikel van Arjen Kuiper nooit hebben bestaan. Op 8
     juni mailde ze hem dat ze die avond de originele dozen uit de cryo-opslag zou halen. Kuiper kwam om 21:48 terug

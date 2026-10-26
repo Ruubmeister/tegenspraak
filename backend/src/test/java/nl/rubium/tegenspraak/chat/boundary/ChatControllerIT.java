@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -36,6 +37,9 @@ class ChatControllerIT extends IntegrationTest {
             "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"mail\", \"itemId\": \"deadline-herinnering\"}";
     private static final String NOTES_FILE =
             "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"bestanden\", \"itemId\": \"notities\"}";
+    private static final String FORWARDED_BID =
+            "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"mail\", \"itemId\": \"doorgestuurd-bod\"}";
+    private static final String FORWARDED_BID_REVEAL_CONDITION = "De speler noemt de doorgestuurde mail";
     private static final String LOCKED_DIARY =
             "{\"desktopId\": \"werkplek-sanne-bakker\", \"appId\": \"bestanden\", \"itemId\": \"dagboek\"}";
 
@@ -185,6 +189,29 @@ class ChatControllerIT extends IntegrationTest {
                 .andExpect(jsonPath("$[0].attachments[0].title").value("Bod Oude Suikerfabriek"))
                 .andExpect(jsonPath("$[0].attachments[0].ownerName").value("Sanne Bakker"))
                 .andExpect(jsonPath("$[1].attachments.length()").value(0));
+    }
+
+    @Test
+    void sendMessage_givenRequiredEvidenceNeverShown_expectSecretRevealConditionKeptFromCharacter() throws Exception {
+        givenCharacterReplies("Daar weet ik niets van.");
+
+        sendHallo(player, messages);
+
+        verify(chatModel)
+                .call(argThat((Prompt prompt) ->
+                        !prompt.getSystemMessage().getText().contains(FORWARDED_BID_REVEAL_CONDITION)));
+    }
+
+    @Test
+    void sendMessage_givenRequiredEvidenceShownInEarlierMessage_expectSecretRevealConditionGiven() throws Exception {
+        givenCharacterReplies("Oh.");
+        sendWithAttachments(FORWARDED_BID).andExpect(status().isOk());
+
+        sendHallo(player, messages);
+
+        verify(chatModel, times(2))
+                .call(argThat((Prompt prompt) ->
+                        prompt.getSystemMessage().getText().contains(FORWARDED_BID_REVEAL_CONDITION)));
     }
 
     @Test
