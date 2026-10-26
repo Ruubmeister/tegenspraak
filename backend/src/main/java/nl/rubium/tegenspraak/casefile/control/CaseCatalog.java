@@ -6,15 +6,21 @@ import java.util.Map;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CaseCatalog {
 
     private final Map<String, CaseDefinition> casesById = new LinkedHashMap<>();
+    private final CaseFileLoader caseFileLoader;
+    private final String casesLocation;
 
     public CaseCatalog(CaseFileLoader caseFileLoader, @Value("${tegenspraak.cases.location}") String casesLocation) {
+        this.caseFileLoader = caseFileLoader;
+        this.casesLocation = casesLocation;
         caseFileLoader
                 .loadAll(casesLocation)
                 .forEach(caseDefinition -> casesById.put(caseDefinition.id(), caseDefinition));
@@ -42,5 +48,9 @@ public class CaseCatalog {
         return getCase(caseId)
                 .findDesktop(desktopId)
                 .orElseThrow(() -> new CaseContentNotFoundException("Unknown desktop: " + desktopId));
+    }
+
+    public Resource getPhotoImage(String caseId, String desktopId, Photo photo) {
+        return caseFileLoader.photoImage(casesLocation + "/" + getCase(caseId).id(), desktopId, photo);
     }
 }

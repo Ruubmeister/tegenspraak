@@ -12,7 +12,13 @@ export function useEvidence(teamId: string, caseId: string) {
   })
 }
 
-const KIND_LABELS: Record<EvidenceKind, string> = { mail: 'Mail', file: 'Bestand' }
+const KIND_LABELS: Record<EvidenceKind, string> = {
+  mail: 'Mail',
+  file: 'Bestand',
+  event: 'Afspraak',
+  photo: 'Foto',
+  webpage: 'Webpagina',
+}
 
 export function evidenceKindLabel(kind: EvidenceKind): string {
   return KIND_LABELS[kind]

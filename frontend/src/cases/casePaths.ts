@@ -9,7 +9,7 @@ export function chatPagePath(teamId: string, caseId: string, characterId: string
   return `${casePagePath(teamId, caseId)}/chat/${encodeURIComponent(characterId)}`
 }
 
-/** Opens the computer with the mail or file already selected. */
+/** Opens the computer with the item already selected. */
 export function evidencePagePath(teamId: string, caseId: string, evidence: EvidenceItem): string {
   const selection = new URLSearchParams({ app: evidence.appId, item: evidence.itemId })
   return `${casePagePath(teamId, caseId)}/computer/${encodeURIComponent(evidence.desktopId)}?${selection}`

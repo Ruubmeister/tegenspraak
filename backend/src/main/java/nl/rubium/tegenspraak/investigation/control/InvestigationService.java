@@ -14,6 +14,7 @@ import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
 import nl.rubium.tegenspraak.desktop.entity.Lock;
 import nl.rubium.tegenspraak.desktop.entity.LockableItem;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.investigation.entity.TeamUnlockRepository;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttempt;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttemptRepository;
@@ -83,6 +84,16 @@ public class InvestigationService {
                 .toList();
     }
 
+    /** A photo whose image the team may see: it exists, and neither its desktop nor the photo itself is locked. */
+    public Photo requireOpenPhoto(UUID teamId, UUID playerId, String caseId, EvidenceRef ref) {
+        return getProgress(teamId, playerId, caseId)
+                .findOpenEvidence(ref)
+                .map(EvidenceItem::item)
+                .filter(Photo.class::isInstance)
+                .map(Photo.class::cast)
+                .orElseThrow(() -> new CaseContentNotFoundException("No open photo: " + ref));
+    }
+
     /** A wrong code must not roll back, or the stored wrong attempt that feeds the cooldown would be lost. */
     @Transactional(noRollbackFor = WrongCodeException.class)
     public TeamProgress unlockDesktop(UUID teamId, UUID playerId, String caseId, String desktopId, String code) {
@@ -94,7 +105,7 @@ public class InvestigationService {
         return getProgress(teamId, playerId, caseId);
     }
 
-    /** A mail or file on a locked desktop can only be unlocked after the desktop itself. Wrong codes are kept. */
+    /** An item on a locked desktop can only be unlocked after the desktop itself. Wrong codes are kept. */
     @Transactional(noRollbackFor = WrongCodeException.class)
     public TeamProgress unlockItem(
             UUID teamId, UUID playerId, String caseId, String desktopId, String appId, String itemId, String code) {

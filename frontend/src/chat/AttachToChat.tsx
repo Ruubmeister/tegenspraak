@@ -16,7 +16,7 @@ interface AttachResult {
   outcome: AddAttachmentOutcome
 }
 
-/** Adds the mail or file being read to the unsent message for a contact, to show it to them in the chat. */
+/** Adds the opened desktop item to the unsent message for a contact, to show it to them in the chat. */
 export function AttachToChat({ teamId, caseId, evidence, contacts }: AttachToChatProps) {
   const [isChoosing, setChoosing] = useState(false)
   const [result, setResult] = useState<AttachResult>()

@@ -159,6 +159,13 @@ class InvestigationControllerIT extends IntegrationTest {
     }
 
     @Test
+    void getPhotoImage_givenItemThatIsNoPhoto_expectNotFound() throws Exception {
+        mockMvc.perform(get(casePath() + "/desktops/werkplek-sanne-bakker/apps/bestanden/items/notities/image")
+                        .with(user(player)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void unlockItem_givenUnknownItem_expectNotFound() throws Exception {
         mockMvc.perform(post(sanneDesktopPath() + "/apps/bestanden/items/bestaat-niet/unlock")
                         .with(user(player))

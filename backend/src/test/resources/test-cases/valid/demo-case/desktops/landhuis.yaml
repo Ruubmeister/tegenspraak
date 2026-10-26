@@ -28,3 +28,33 @@ apps:
           code: Kandelaar 7
           hint: Waarmee en welke kamer?
         content: Het testament.
+  - type: calendar
+    id: agenda
+    title: Agenda
+    events:
+      - id: diner
+        title: Diner met de familie
+        start: 2026-01-01T20:00:00
+        end: 2026-01-01T23:00:00
+        location: Eetzaal
+        attendees: [De Butler, De Tuinman]
+        notes: Soep vooraf.
+  - type: photos
+    id: fotos
+    title: Foto's
+    photos:
+      - id: portret
+        album: Familie
+        title: Portret van de heer des huizes
+        takenAt: 2025-12-24T18:00:00
+        image: portret.png
+        description: Een oude man in de bibliotheek, met een kandelaar op tafel.
+  - type: browser
+    id: browser
+    title: Browser
+    pages:
+      - id: zoekopdracht
+        url: https://www.zoeken.nl/?q=testament+wijzigen
+        title: testament wijzigen - Zoeken
+        visitedAt: 2026-01-01T22:15:00
+        content: Hoe wijzig ik een testament zonder notaris?

@@ -29,6 +29,8 @@ import nl.rubium.tegenspraak.desktop.entity.FileEntry;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
 import nl.rubium.tegenspraak.desktop.entity.Lock;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
+import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import nl.rubium.tegenspraak.investigation.entity.TeamUnlockRepository;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttempt;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttemptRepository;
@@ -64,11 +66,25 @@ class InvestigationServiceTest {
             OwnerType.ORGANISATION,
             "Computer in de hal.",
             new Lock("1234", "Het jaartal"),
-            List.of(new FilesApp(
-                    "bestanden",
-                    "Bestanden",
-                    List.of(new FileEntry(
-                            "kluis", "Prive", "kluis.txt", "Het testament.", new Lock("kandelaar", "Wapen"))))));
+            List.of(
+                    new FilesApp(
+                            "bestanden",
+                            "Bestanden",
+                            List.of(new FileEntry(
+                                    "kluis", "Prive", "kluis.txt", "Het testament.", new Lock("kandelaar", "Wapen")))),
+                    new PhotosApp(
+                            "fotos",
+                            "Foto's",
+                            List.of(
+                                    new Photo("tuin", "Huis", "Tuin", null, "tuin.jpg", "De kas.", null),
+                                    new Photo(
+                                            "portret",
+                                            "Familie",
+                                            "Portret",
+                                            null,
+                                            "portret.jpg",
+                                            "Een man met een kandelaar.",
+                                            new Lock("kandelaar", "Wapen"))))));
     private static final CaseDefinition CASE_DEFINITION = new CaseDefinition(
             CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of(COMPUTER));
 
@@ -210,5 +226,40 @@ class InvestigationServiceTest {
                 .mapToObj(index ->
                         new WrongCodeAttempt(TEAM_ID, CASE_ID, SAFE_TARGET, NOW.minusSeconds(50 - index * 10L)))
                 .forEach(recentWrongAttempts::add);
+    }
+
+    @Test
+    void requireOpenPhoto_givenOpenPhotoOnUnlockedDesktop_expectPhoto() {
+        unlockedTargets.add("desktop:computer");
+
+        Photo photo = investigationService.requireOpenPhoto(
+                TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "tuin"));
+
+        assertThat(photo.image()).isEqualTo("tuin.jpg");
+    }
+
+    @Test
+    void requireOpenPhoto_givenDesktopStillLocked_expectNotFound() {
+        assertThatThrownBy(() -> investigationService.requireOpenPhoto(
+                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "tuin")))
+                .isInstanceOf(CaseContentNotFoundException.class);
+    }
+
+    @Test
+    void requireOpenPhoto_givenLockedPhoto_expectNotFound() {
+        unlockedTargets.add("desktop:computer");
+
+        assertThatThrownBy(() -> investigationService.requireOpenPhoto(
+                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "portret")))
+                .isInstanceOf(CaseContentNotFoundException.class);
+    }
+
+    @Test
+    void requireOpenPhoto_givenItemThatIsNoPhoto_expectNotFound() {
+        unlockedTargets.addAll(List.of("desktop:computer", SAFE_TARGET));
+
+        assertThatThrownBy(() -> investigationService.requireOpenPhoto(
+                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "bestanden", "kluis")))
+                .isInstanceOf(CaseContentNotFoundException.class);
     }
 }

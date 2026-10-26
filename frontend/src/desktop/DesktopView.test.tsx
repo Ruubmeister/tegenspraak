@@ -86,9 +86,14 @@ function withDiary(diary: FileEntry): Desktop {
   }
 }
 
-async function openDiary() {
+async function openApp(title: string) {
   const user = userEvent.setup()
-  await user.click(screen.getByRole('button', { name: 'Bestanden' }))
+  await user.click(screen.getByRole('button', { name: title }))
+  return user
+}
+
+async function openDiary() {
+  const user = await openApp('Bestanden')
   await user.click(screen.getByRole('button', { name: /dagboek\.txt/ }))
   return user
 }
@@ -98,16 +103,79 @@ describe('DesktopView', () => {
     vi.unstubAllGlobals()
   })
 
-  it('DesktopView_givenMailApp_expectOnlyFirstFolderListed', () => {
+  it('DesktopView_givenNoInitialSelection_expectIconsOwnerAndNoWindow', () => {
     renderDesktop(desktop)
+
+    const icons = screen.getByRole('navigation', { name: "Programma's" })
+    expect(icons).toHaveTextContent('Mail')
+    expect(icons).toHaveTextContent('Bestanden')
+    expect(screen.getByRole('heading', { name: 'Sanne Bakker' })).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Mail' })).not.toBeInTheDocument()
+  })
+
+  it('DesktopView_givenAppIconClicked_expectWindowAndTaskbarButton', async () => {
+    renderDesktop(desktop)
+
+    await openApp('Mail')
+
+    expect(screen.getByRole('region', { name: 'Mail' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Venster Mail' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('DesktopView_givenCloseClicked_expectWindowAndTaskbarButtonGone', async () => {
+    renderDesktop(desktop)
+    const user = await openApp('Mail')
+
+    await user.click(screen.getByRole('button', { name: 'Sluiten' }))
+
+    expect(screen.queryByRole('region', { name: 'Mail' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Venster Mail' })).not.toBeInTheDocument()
+  })
+
+  it('DesktopView_givenMinimizedAndRestoredFromTaskbar_expectSelectionKept', async () => {
+    renderDesktop(desktop)
+    const user = await openApp('Mail')
+    await user.click(screen.getByRole('button', { name: /^Bod/ }))
+
+    await user.click(screen.getByRole('button', { name: 'Minimaliseren' }))
+    expect(screen.queryByRole('region', { name: 'Mail' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Venster Mail' }))
+
+    expect(screen.getByRole('region', { name: 'Mail' })).toBeInTheDocument()
+    expect(screen.getByText('We gaan voor 4.250.000.')).toBeInTheDocument()
+  })
+
+  it('DesktopView_givenMaximizeClicked_expectRestoreButton', async () => {
+    renderDesktop(desktop)
+    const user = await openApp('Mail')
+
+    await user.click(screen.getByRole('button', { name: 'Maximaliseren' }))
+
+    expect(screen.getByRole('button', { name: 'Verkleinen' })).toBeInTheDocument()
+  })
+
+  it('DesktopView_givenOtherIconClickedWhileAppOpen_expectWindowSwitchesApp', async () => {
+    renderDesktop(desktop)
+    const user = await openApp('Mail')
+
+    await user.click(screen.getByRole('button', { name: 'Bestanden' }))
+
+    expect(screen.getByRole('region', { name: 'Bestanden' })).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Mail' })).not.toBeInTheDocument()
+  })
+
+  it('DesktopView_givenMailApp_expectOnlyFirstFolderListed', async () => {
+    renderDesktop(desktop)
+
+    await openApp('Mail')
 
     expect(screen.getByRole('button', { name: /^Bod/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /FW: Bod/ })).not.toBeInTheDocument()
   })
 
   it('DesktopView_givenOtherFolderAndMessageSelected_expectMessageBodyShown', async () => {
-    const user = userEvent.setup()
     renderDesktop(desktop)
+    const user = await openApp('Mail')
 
     await user.click(screen.getByRole('button', { name: 'Verzonden' }))
     await user.click(screen.getByRole('button', { name: /FW: Bod/ }))
@@ -117,10 +185,9 @@ describe('DesktopView', () => {
   })
 
   it('DesktopView_givenFilesAppOpened_expectFileContentShownOnSelect', async () => {
-    const user = userEvent.setup()
     renderDesktop(desktop)
+    const user = await openApp('Bestanden')
 
-    await user.click(screen.getByRole('button', { name: 'Bestanden' }))
     await user.click(screen.getByRole('button', { name: 'notities.txt' }))
 
     expect(screen.getByText('bod definitief maken')).toBeInTheDocument()
@@ -173,9 +240,10 @@ describe('DesktopView', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Te veel foute codes.')
   })
 
-  it('DesktopView_givenLockedDesktop_expectUnlockFormAndNoApps', () => {
+  it('DesktopView_givenLockedDesktop_expectLockScreenWithOwnerAndNoApps', () => {
     renderDesktop({ ...desktop, lock: { hint: 'Het jaartal' }, apps: [] })
 
+    expect(screen.getByRole('heading', { name: 'Sanne Bakker' })).toBeInTheDocument()
     expect(screen.getByText('Deze computer is vergrendeld.')).toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: "Programma's" })).not.toBeInTheDocument()
   })
@@ -183,6 +251,7 @@ describe('DesktopView', () => {
   it('DesktopView_givenInitialSelectionInOtherFolder_expectMailOpened', () => {
     renderDesktop(desktop, { appId: 'mail', itemId: 'sent-1' })
 
+    expect(screen.getByRole('region', { name: 'Mail' })).toBeInTheDocument()
     expect(screen.getByText('even thuis afmaken')).toBeInTheDocument()
   })
 
@@ -193,8 +262,8 @@ describe('DesktopView', () => {
   })
 
   it('DesktopView_givenMailAttachedForContact_expectMailInDraftOfThatChat', async () => {
-    const user = userEvent.setup()
     renderDesktop(desktop)
+    const user = await openApp('Mail')
     await user.click(screen.getByRole('button', { name: /^Bod/ }))
 
     await user.click(screen.getByRole('button', { name: 'Voeg toe aan bericht' }))
@@ -218,8 +287,8 @@ describe('DesktopView', () => {
   })
 
   it('DesktopView_givenOpenedMailAndBackClicked_expectMessageListShownAgain', async () => {
-    const user = userEvent.setup()
     renderDesktop(desktop)
+    const user = await openApp('Mail')
     await user.click(screen.getByRole('button', { name: /^Bod/ }))
 
     await user.click(screen.getByRole('button', { name: /Terug naar Inbox/ }))

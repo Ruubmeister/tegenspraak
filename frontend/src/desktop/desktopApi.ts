@@ -4,7 +4,7 @@ import type { Desktop } from '../api/types'
 import { caseOverviewQueryKey } from '../cases/casesApi'
 import { teamPath } from '../teams/teamsApi'
 
-/** Teammates can unlock mails and files, so an open desktop is refreshed regularly. */
+/** Teammates can unlock items, so an open desktop is refreshed regularly. */
 const DESKTOP_REFRESH_MS = 10_000
 
 /** Identifies a desktop as seen by one team. */
@@ -22,6 +22,11 @@ export interface ItemUnlock {
 
 function desktopPath({ teamId, caseId, desktopId }: DesktopLocation): string {
   return `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/desktops/${encodeURIComponent(desktopId)}`
+}
+
+/** The image of an open photo; the session cookie authorizes the request like any API call. */
+export function photoImagePath(location: DesktopLocation, appId: string, itemId: string): string {
+  return `${desktopPath(location)}/apps/${encodeURIComponent(appId)}/items/${encodeURIComponent(itemId)}/image`
 }
 
 function desktopQueryKey({ teamId, caseId, desktopId }: DesktopLocation) {

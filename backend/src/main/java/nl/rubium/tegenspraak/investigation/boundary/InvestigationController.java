@@ -1,15 +1,21 @@
 package nl.rubium.tegenspraak.investigation.boundary;
 
 import jakarta.validation.Valid;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.investigation.control.CodeCooldownException;
+import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -83,6 +89,23 @@ public class InvestigationController {
         TeamProgress progress = investigationService.unlockItem(
                 teamId, player.getId(), caseId, desktopId, appId, itemId, request.code());
         return DesktopResponse.from(caseCatalog.getDesktop(caseId, desktopId), progress);
+    }
+
+    /** Only for photos the team can see; locked photos answer 404 like unknown ones. */
+    @GetMapping("/desktops/{desktopId}/apps/{appId}/items/{itemId}/image")
+    public ResponseEntity<Resource> getPhotoImage(
+            @PathVariable UUID teamId,
+            @PathVariable String caseId,
+            @PathVariable String desktopId,
+            @PathVariable String appId,
+            @PathVariable String itemId,
+            @AuthenticationPrincipal PlayerPrincipal player) {
+        Photo photo = investigationService.requireOpenPhoto(
+                teamId, player.getId(), caseId, new EvidenceRef(desktopId, appId, itemId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(photo.mediaType()))
+                .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())
+                .body(caseCatalog.getPhotoImage(caseId, desktopId, photo));
     }
 
     @ExceptionHandler(CodeCooldownException.class)

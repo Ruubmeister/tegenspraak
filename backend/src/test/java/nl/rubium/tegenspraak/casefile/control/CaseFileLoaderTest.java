@@ -10,10 +10,14 @@ import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
+import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
+import nl.rubium.tegenspraak.desktop.entity.CalendarApp;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
+import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -87,14 +91,16 @@ class CaseFileLoaderTest {
     }
 
     @Test
-    void loadAll_givenDesktopWithMailAndFiles_expectTypedApps() {
+    void loadAll_givenDesktopWithAllAppTypes_expectTypedApps() {
         Desktop desktop = loader.loadAll("classpath:test-cases/valid")
                 .getFirst()
                 .desktops()
                 .getFirst();
 
         assertThat(desktop.ownerType()).isEqualTo(OwnerType.ORGANISATION);
-        assertThat(desktop.apps()).hasSize(2);
+        assertThat(desktop.apps())
+                .extracting(app -> (Object) app.getClass())
+                .containsExactly(MailApp.class, FilesApp.class, CalendarApp.class, PhotosApp.class, BrowserApp.class);
         assertThat(desktop.apps().get(0))
                 .isInstanceOfSatisfying(
                         MailApp.class,
@@ -104,6 +110,50 @@ class CaseFileLoaderTest {
                 .isInstanceOfSatisfying(
                         FilesApp.class,
                         files -> assertThat(files.files().getFirst().name()).isEqualTo("menu.txt"));
+    }
+
+    @Test
+    void loadAll_givenCalendarPhotosAndBrowser_expectItemsLoaded() {
+        Desktop desktop = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .desktops()
+                .getFirst();
+
+        assertThat(desktop.apps().get(2))
+                .isInstanceOfSatisfying(
+                        CalendarApp.class,
+                        calendar -> assertThat(calendar.events().getFirst().attendees())
+                                .containsExactly("De Butler", "De Tuinman"));
+        assertThat(desktop.apps().get(3))
+                .isInstanceOfSatisfying(
+                        PhotosApp.class,
+                        photos -> assertThat(photos.photos().getFirst().image()).isEqualTo("portret.png"));
+        assertThat(desktop.apps().get(4))
+                .isInstanceOfSatisfying(
+                        BrowserApp.class,
+                        browser -> assertThat(browser.pages().getFirst().visitedAt())
+                                .isEqualTo(LocalDateTime.of(2026, 1, 1, 22, 15)));
+    }
+
+    @Test
+    void photoImage_givenLoadedPhoto_expectImageNextToDesktopFile() throws Exception {
+        Desktop desktop = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .desktops()
+                .getFirst();
+        Photo photo = (Photo)
+                desktop.findApp("fotos").flatMap(app -> app.findItem("portret")).orElseThrow();
+
+        assertThat(loader.photoImage("classpath:test-cases/valid/demo-case", "landhuis", photo)
+                        .getContentAsByteArray())
+                .startsWith(0x89, 'P', 'N', 'G');
+    }
+
+    @Test
+    void loadAll_givenPhotoWithoutImageFile_expectStartupFailure() {
+        assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/missing-image"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("bestaat-niet.jpg");
     }
 
     @Test

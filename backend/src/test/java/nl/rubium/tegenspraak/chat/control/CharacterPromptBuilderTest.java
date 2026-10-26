@@ -12,10 +12,18 @@ import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
+import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
+import nl.rubium.tegenspraak.desktop.entity.BrowserPage;
+import nl.rubium.tegenspraak.desktop.entity.CalendarApp;
+import nl.rubium.tegenspraak.desktop.entity.CalendarEvent;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
+import nl.rubium.tegenspraak.desktop.entity.LockableItem;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
 import nl.rubium.tegenspraak.desktop.entity.MailMessage;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
+import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
 import org.junit.jupiter.api.Test;
 
@@ -133,6 +141,85 @@ class CharacterPromptBuilderTest {
                 Onderwerp: Bod
 
                 We gaan voor 4.250.000.
+                --- Einde bijlage 1 ---""");
+    }
+
+    @Test
+    void formatPlayerMessage_givenPhotoAttachment_expectDescriptionInsteadOfImage() {
+        Photo photo = new Photo(
+                "strand",
+                "Vakantie",
+                "Strand Zandvoort",
+                LocalDateTime.of(2025, 7, 4, 15, 30),
+                "strand.jpg",
+                "Sanne en Dennis op het strand.",
+                null);
+        PhotosApp photosApp = new PhotosApp("fotos", "Foto's", List.of(photo));
+
+        String message = builder.formatPlayerMessage("anouk", "Kent u hem?", List.of(evidence(photosApp, photo)));
+
+        assertThat(message).isEqualTo("""
+                [anouk]: Kent u hem?
+
+                --- Bijlage 1: foto van de computer van Sanne Bakker ---
+                Titel: Strand Zandvoort
+                Album: Vakantie
+                Gemaakt op: 4 juli 2025 15:30
+
+                Wat er op de foto te zien is: Sanne en Dennis op het strand.
+                --- Einde bijlage 1 ---""");
+    }
+
+    @Test
+    void formatPlayerMessage_givenEventWithoutLocation_expectTimesAttendeesAndNotes() {
+        CalendarEvent event = new CalendarEvent(
+                "etentje",
+                "Etentje",
+                LocalDateTime.of(2026, 3, 14, 19, 0),
+                LocalDateTime.of(2026, 3, 14, 22, 0),
+                null,
+                List.of("Dennis", "Ouders"),
+                "Wijn meenemen.",
+                null);
+        CalendarApp calendarApp = new CalendarApp("agenda", "Agenda", List.of(event));
+
+        String message = builder.formatPlayerMessage("anouk", "Klopt dit?", List.of(evidence(calendarApp, event)));
+
+        assertThat(message).isEqualTo("""
+                [anouk]: Klopt dit?
+
+                --- Bijlage 1: afspraak van de computer van Sanne Bakker ---
+                Titel: Etentje
+                Van: 14 maart 2026 19:00
+                Tot: 14 maart 2026 22:00
+                Deelnemers: Dennis, Ouders
+
+                Wijn meenemen.
+                --- Einde bijlage 1 ---""");
+    }
+
+    @Test
+    void formatPlayerMessage_givenWebPageAttachment_expectAddressVisitTimeAndContent() {
+        BrowserPage page = new BrowserPage(
+                "zoekopdracht",
+                "https://www.zoeken.nl/?q=bod",
+                "bod - Zoeken",
+                LocalDateTime.of(2026, 3, 12, 22, 5),
+                "Resultaten voor bod",
+                null);
+        BrowserApp browserApp = new BrowserApp("browser", "Browser", List.of(page));
+
+        String message = builder.formatPlayerMessage("anouk", "En dit?", List.of(evidence(browserApp, page)));
+
+        assertThat(message).isEqualTo("""
+                [anouk]: En dit?
+
+                --- Bijlage 1: webpagina uit de browsergeschiedenis van de computer van Sanne Bakker ---
+                Adres: https://www.zoeken.nl/?q=bod
+                Titel: bod - Zoeken
+                Bezocht op: 12 maart 2026 22:05
+
+                Resultaten voor bod
                 --- Einde bijlage 1 ---""");
     }
 
@@ -266,5 +353,10 @@ class CharacterPromptBuilderTest {
     private static CaseDefinition caseWith(CharacterProfile character) {
         return new CaseDefinition(
                 "demo", CaseFixtures.manifestWithSetting("De butler deed het."), List.of(character), List.of());
+    }
+
+    private static EvidenceItem evidence(DesktopApp app, LockableItem item) {
+        Desktop desktop = new Desktop("werkplek", "Sanne Bakker", OwnerType.PERSON, "Laptop", null, List.of(app));
+        return new EvidenceItem(desktop, app, item);
     }
 }

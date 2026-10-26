@@ -93,8 +93,63 @@ export interface FilesApp {
   files: FileEntry[]
 }
 
-/** Discriminated on "type". A new desktop app needs a member here and a case in DesktopAppView. */
-export type DesktopApp = MailApp | FilesApp
+export interface CalendarEvent {
+  id: string
+  title: string
+  start: string
+  end: string
+  /** Location, attendees and notes are hidden while the event is locked. */
+  location: string | null
+  attendees: string[]
+  notes: string | null
+  lock: Lock | null
+}
+
+export interface CalendarApp {
+  type: 'calendar'
+  id: string
+  title: string
+  events: CalendarEvent[]
+}
+
+/** The image itself is loaded from its own endpoint, which refuses it while the photo is locked. */
+export interface Photo {
+  id: string
+  album: string
+  title: string
+  takenAt: string | null
+  /** Null while the photo is locked. */
+  description: string | null
+  lock: Lock | null
+}
+
+export interface PhotosApp {
+  type: 'photos'
+  id: string
+  title: string
+  photos: Photo[]
+}
+
+/** A visit in the browsing history. */
+export interface BrowserPage {
+  id: string
+  url: string
+  title: string
+  visitedAt: string
+  /** Null while the page is locked. */
+  content: string | null
+  lock: Lock | null
+}
+
+export interface BrowserApp {
+  type: 'browser'
+  id: string
+  title: string
+  pages: BrowserPage[]
+}
+
+/** Discriminated on "type". A new desktop app needs a member here, a case in DesktopAppView and an icon. */
+export type DesktopApp = MailApp | FilesApp | CalendarApp | PhotosApp | BrowserApp
 
 /** A locked desktop has no apps until the team enters its code. */
 export interface Desktop {
@@ -109,9 +164,9 @@ export interface Desktop {
 /** NOTICE messages are game events in the chat, such as a newly introduced contact. */
 export type MessageSender = 'PLAYER' | 'CHARACTER' | 'NOTICE'
 
-export type EvidenceKind = 'mail' | 'file'
+export type EvidenceKind = 'mail' | 'file' | 'event' | 'photo' | 'webpage'
 
-/** An opened mail or file that can be attached to a chat message. Carries the title only, never the content. */
+/** An opened desktop item that can be attached to a chat message. Carries the title only, never the content. */
 export interface EvidenceItem {
   desktopId: string
   appId: string

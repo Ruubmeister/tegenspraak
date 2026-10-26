@@ -13,6 +13,8 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseManifest;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.Photo;
+import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -28,9 +30,10 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
  * {location}/{case-id}/case.yaml
  * {location}/{case-id}/characters/{character-id}.yaml
  * {location}/{case-id}/desktops/{desktop-id}.yaml
+ * {location}/{case-id}/desktops/{desktop-id}/{image}   (photos of the photos app)
  * </pre>
  *
- * Folder and file names are the ids. Any invalid file fails startup, so broken case content is never served.
+ * Folder and file names are the ids. Any invalid or missing file fails startup, so broken case content is never served.
  */
 @Component
 public class CaseFileLoader {
@@ -62,7 +65,25 @@ public class CaseFileLoader {
         CaseManifest manifest = read(manifestResource, CaseManifest.class, null);
         List<CharacterProfile> characters = loadEntries(caseLocation + "/characters/*.yaml", CharacterProfile.class);
         List<Desktop> desktops = loadEntries(caseLocation + "/desktops/*.yaml", Desktop.class);
+        desktops.forEach(desktop -> requirePhotoImages(caseLocation, desktop));
         return new CaseDefinition(caseId, manifest, characters, desktops);
+    }
+
+    /** The image file of a photo, which exists for every photo of a loaded case. */
+    public Resource photoImage(String caseLocation, String desktopId, Photo photo) {
+        return resourceResolver.getResource(caseLocation + "/desktops/" + desktopId + "/" + photo.image());
+    }
+
+    private void requirePhotoImages(String caseLocation, Desktop desktop) {
+        desktop.apps().stream()
+                .filter(PhotosApp.class::isInstance)
+                .flatMap(app -> ((PhotosApp) app).photos().stream())
+                .filter(photo -> !photoImage(caseLocation, desktop.id(), photo).exists())
+                .findFirst()
+                .ifPresent(photo -> {
+                    throw new IllegalStateException("Missing image '" + photo.image() + "' of photo '" + photo.id()
+                            + "' in " + caseLocation + "/desktops/" + desktop.id());
+                });
     }
 
     private <T> List<T> loadEntries(String pattern, Class<T> type) {

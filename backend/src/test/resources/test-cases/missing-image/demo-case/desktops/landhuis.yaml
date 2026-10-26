@@ -1,0 +1,13 @@
+ownerName: Landhuis
+ownerType: organisation
+description: Computer in de hal.
+apps:
+  - type: photos
+    id: fotos
+    title: Foto's
+    photos:
+      - id: portret
+        album: Familie
+        title: Portret
+        image: bestaat-niet.jpg
+        description: Een oude man.

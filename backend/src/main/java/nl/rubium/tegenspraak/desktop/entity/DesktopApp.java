@@ -12,15 +12,18 @@ import java.util.Optional;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = MailApp.class, name = "mail"),
-    @JsonSubTypes.Type(value = FilesApp.class, name = "files")
+    @JsonSubTypes.Type(value = FilesApp.class, name = "files"),
+    @JsonSubTypes.Type(value = CalendarApp.class, name = "calendar"),
+    @JsonSubTypes.Type(value = PhotosApp.class, name = "photos"),
+    @JsonSubTypes.Type(value = BrowserApp.class, name = "browser")
 })
-public sealed interface DesktopApp permits MailApp, FilesApp {
+public sealed interface DesktopApp permits MailApp, FilesApp, CalendarApp, PhotosApp, BrowserApp {
 
     String id();
 
     String title();
 
-    /** The mails or files of this app. */
+    /** The mails, files, events, photos or visited pages of this app. */
     List<? extends LockableItem> items();
 
     default Optional<LockableItem> findItem(String itemId) {
