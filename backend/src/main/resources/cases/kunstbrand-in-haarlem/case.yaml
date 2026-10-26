@@ -33,54 +33,27 @@ solution:
   questions:
     - id: wie
       question: Wie heeft de brand gesticht?
-      options:
-        - id: victor-lindeboom
-          label: Victor Lindeboom, de eigenaar
-        - id: lotte-vermeulen
-          label: Lotte Vermeulen, de ontslagen assistente
-        - id: yara-haddou
-          label: Yara Haddou, de galeriemanager
-        - id: hendrik-pauw
-          label: Hendrik Pauw, de restaurator
-        - id: ongeluk
-          label: Niemand, het was een ongeluk met de kachel
-      answer: victor-lindeboom
+      answer: Victor Lindeboom, de eigenaar van de galerie.
     - id: wat-verbrandde
       question: Wat is er bij de brand werkelijk verloren gegaan?
-      options:
-        - id: originelen
-          label: De twee originele Brandts en vier kleinere werken
-        - id: kopieen
-          label: Twee kopieën van de Brandts en vier kleinere werken
-        - id: niets
-          label: Niets van waarde, het depot was al leeggehaald
-        - id: alleen-kleine-werken
-          label: Alleen de vier kleinere werken, de Brandts hingen in de galerie
-      answer: kopieen
+      answer: >-
+        Kernpunten: niet de originele Brandts maar twee kopieën ervan, die Hendrik Pauw had gemaakt; daarnaast de
+        vier kleinere werken in het depot.
     - id: originelen
       question: Waar zijn de originele schilderijen van Marius Brandt gebleven?
-      options:
-        - id: kluis-victor
-          label: In een kluis van Victor Lindeboom, om na de uitkering terug te halen
-        - id: verkocht-antwerpen
-          label: Verkocht via een kunsthandel in Antwerpen aan een privéverzamelaar
-        - id: atelier-pauw
-          label: Nog in het atelier van Hendrik Pauw in Amsterdam
-        - id: gestolen-lotte
-          label: Gestolen door Lotte Vermeulen voor haar ontslag
-      answer: verkocht-antwerpen
+      answer: >-
+        Kernpunt: Victor heeft ze verkocht via kunsthandel Verstraeten Fine Art in Antwerpen, die ze doorverkocht aan
+        een privéverzamelaar.
     - id: binnenkomst
       question: Hoe kwam de dader binnen zonder dat het alarm afging?
-      options:
-        - id: raam
-          label: Via een open raam aan de achterkant
-        - id: sleutel-lotte
-          label: Met een sleutel die Lotte Vermeulen nooit had ingeleverd
-        - id: app-onderhoudsmodus
-          label: Het alarm ging via de app in onderhoudsmodus, daarna de achterdeur met een eigen sleutel
-        - id: deur-open
-          label: Yara Haddou had de achterdeur die avond niet afgesloten
-      answer: app-onderhoudsmodus
+      answer: >-
+        Kernpunten: hij zette het alarm met de app op zijn telefoon in onderhoudsmodus en opende daarna de achterdeur
+        met zijn eigen sleutel.
+    - id: motief
+      question: Waarom heeft de dader de brand gesticht?
+      answer: >-
+        Kernpunten: hij zat in geldnood door zijn lening bij de bank; de brand moest de verkoop van de originelen
+        verbergen en een verzekeringsuitkering voor de verbrande "originelen" opleveren.
   epilogue: >-
     Victor Lindeboom zat diep in de schulden. In april liet hij zijn twee schilderijen van Marius Brandt naar
     restaurator Hendrik Pauw brengen en liet er kopieën van maken. De originelen verkocht hij via Luc Verstraeten in

@@ -21,7 +21,9 @@ import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
+import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
@@ -71,7 +73,11 @@ class ChatServiceTest {
             null,
             null,
             null,
-            null,
+            List.of(new CharacterSecret(
+                    "Hij koos het menu.",
+                    "De speler laat het menu zien.",
+                    List.of(new RequiredEvidence("laptop-butler", "bestanden", "menu")),
+                    null)),
             false,
             List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.")));
     private static final Desktop BUTLER_LAPTOP = new Desktop(
@@ -409,6 +415,42 @@ class ChatServiceTest {
 
     private static ChatMessage characterMessage(String content) {
         return ChatMessage.fromCharacter(TEAM_ID, CASE_ID, CHARACTER_ID, content);
+    }
+
+    @Test
+    void sendMessage_givenRequiredEvidenceNeverShown_expectSecretWithoutRevealConditionInPrompt() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Geen idee.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wij weten dat u het menu koos.", List.of());
+
+        assertThat(capturePromptMessages().getFirst().getText())
+                .contains("Geheim: Hij koos het menu.")
+                .doesNotContain("De speler laat het menu zien.");
+    }
+
+    @Test
+    void sendMessage_givenRequiredEvidenceAttachedToNewMessage_expectRevealConditionInPrompt() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Ach.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Kijk hier eens naar.", List.of(MENU_FILE));
+
+        assertThat(capturePromptMessages().getFirst().getText())
+                .contains("Geef dit pas prijs als: De speler laat het menu zien.");
+    }
+
+    @Test
+    void sendMessage_givenRequiredEvidenceShownEarlierInConversation_expectRevealConditionInPrompt() {
+        givenStoredHistoryNewestFirst();
+        when(chatMessageRepository.findAttachmentsInConversation(TEAM_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(List.of(new ChatAttachment("laptop-butler", "bestanden", "menu")));
+        givenModelReplies("Ach.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Weet u het nog?", List.of());
+
+        assertThat(capturePromptMessages().getFirst().getText())
+                .contains("Geef dit pas prijs als: De speler laat het menu zien.");
     }
 
     @Test

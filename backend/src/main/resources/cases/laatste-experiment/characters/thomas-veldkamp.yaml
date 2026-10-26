@@ -25,3 +25,5 @@ secrets:
       aan en zei: "Ik ga nog even naar beneden." Daarna ging hij naar huis. Hij zag Kuiper niet.
     revealWhen: >-
       De rechercheurs confronteren hem met het toegangslog van de hoofdingang, waarin hij om 21:34 vertrekt.
+    requiresEvidence:
+      - { desktop: politiedossier, app: dossier, item: toegang-hoofdingang }

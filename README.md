@@ -25,7 +25,8 @@ The backend is a single service, split into feature packages that each follow bo
 - `desktop`: virtual desktops made of typed apps (`mail`, `files`)
 - `investigation`: what a team can see and use in a case: introduced contacts and desktops, mails and files opened
   with their code. Unlocks are shared by the team
-- `verdict`: the team solves a case by answering its multiple choice questions; attempts are stored per team
+- `verdict`: the team solves a case by typing answers to its open questions, which an LLM grades against the expected
+  answers; a team gets a limited number of attempts per case (`tegenspraak.verdict.max-attempts`, 5)
 
 ## Running locally
 
@@ -94,13 +95,45 @@ Cases live in `backend/src/main/resources/cases/`. Folder and file names are the
 ```
 cases/{case-id}/case.yaml                   title, summary, introduction, setting (hidden truth), solution
 cases/{case-id}/characters/{id}.yaml        persona: name, role, description, personality, speechStyle,
-                                            knownFacts, secrets (fact + revealWhen), hidden, introduces
+                                            knownFacts, secrets (fact, revealWhen, requiresEvidence), hidden,
+                                            introduces
 cases/{case-id}/desktops/{id}.yaml          ownerName, ownerType (person|organisation), description, lock, apps
 ```
 
-The `solution` holds multiple choice `questions` (each with an `id`, `question`, `options` and the `answer` option
-id) and an `epilogue`. The case is solved when every answer is correct; a wrong attempt only tells the player how
-many answers were right. The epilogue is shown after solving, so it may reveal the whole truth.
+The `solution` holds open `questions` and an `epilogue`. The team types its answers; an LLM grades each one against
+the question's `answer`, which the team never sees. Write the `answer` as the key points a correct answer must contain:
+an answer that misses a key point, contradicts it or hedges ("A or B") is wrong.
+
+```yaml
+- id: opgesloten
+  question: Waarom kwam Eva Brink de ruimte niet uit?
+  answer: >-
+    Kernpunten: de mechanische nachtgrendel was van buitenaf dichtgeschoven; daardoor opende de deur niet toen ze
+    op de noodknop drukte.
+```
+
+The case is solved when every answer is correct. A wrong attempt only tells the team how many answers were right, not
+which ones. After the last wrong attempt the case is failed. The epilogue is shown once the case is solved or failed, so
+it may reveal the whole truth. A grading failure stores nothing, so it does not cost an attempt.
+
+### Secrets that need evidence
+
+A character gives up a secret once the `revealWhen` condition is met, as judged by its LLM. Players can bluff about
+evidence they do not have, so a secret can also list the mails or files the team must actually attach in the
+conversation with that character:
+
+```yaml
+secrets:
+  - fact: Hij kwam om 21:48 terug in het gebouw.
+    revealWhen: De rechercheurs confronteren hem met het toegangslog van de hoofdingang.
+    requiresEvidence:
+      - { desktop: politiedossier, app: dossier, item: toegang-hoofdingang }
+    requiredCount: 1 # optional; without it every listed item is required
+```
+
+Until enough of the evidence has been shown (in any earlier message or the current one), the character's prompt only
+tells it to deny the secret; the `revealWhen` condition is left out, so the LLM cannot be talked into it. Every listed
+item must exist in the case, or startup fails.
 
 ### Hidden contacts
 

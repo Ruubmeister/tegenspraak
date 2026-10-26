@@ -27,6 +27,8 @@ secrets:
     revealWhen: >-
       De rechercheurs confronteren hem met het toegangslog van de hoofdingang, waarin hij om 21:48 binnenkomt en om
       22:20 vertrekt.
+    requiresEvidence:
+      - { desktop: politiedossier, app: dossier, item: toegang-hoofdingang }
   - fact: >-
       Hij haalde om 21:52 de sleutel van de nachtgrendel uit de sleutelkast, schoof de grendel van B0.14 dicht en
       legde de sleutel op 9 juni om 05:58 terug. Eerst beweert hij dat hij de grendel routinematig dichtschoof omdat
@@ -34,6 +36,8 @@ secrets:
     revealWhen: >-
       Hij heeft al toegegeven die avond in het gebouw te zijn geweest, en de rechercheurs confronteren hem met het log
       van de sleutelkast.
+    requiresEvidence:
+      - { desktop: facilitair-systeem-hbi, app: beheer, item: sleutelkast }
   - fact: >-
       Hij wist dat Eva in B0.14 was, want ze had het hem om 18:05 gemaild. Hij wist ook van Ruud dat de sensor in
       bypass stond en dat de vulling om 22:00 begon. Hij wilde haar tot de ochtend weghouden van de monsters en haalde
@@ -43,3 +47,9 @@ secrets:
       Hij heeft het dichtschuiven van de grendel al toegegeven, en de rechercheurs confronteren hem met minstens twee
       van deze drie: Eva's mail van 18:05 over B0.14, de mail van Ruud over de bypass, en de noodknopmeldingen van
       22:11 tot 22:14.
+    requiresEvidence:
+      - { desktop: laptop-arjen-kuiper, app: mail, item: van-eva }
+      - { desktop: werkplek-eva-brink, app: mail, item: aan-kuiper }
+      - { desktop: laptop-arjen-kuiper, app: mail, item: bypass }
+      - { desktop: facilitair-systeem-hbi, app: beheer, item: deurlog-b-vleugel }
+    requiredCount: 2

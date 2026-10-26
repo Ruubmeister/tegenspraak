@@ -18,40 +18,17 @@ solution:
   questions:
     - id: wie
       question: Wie heeft het bedrag van het bod aan Kramer Bouw doorgegeven?
-      options:
-        - id: pieter-van-dijk
-          label: Pieter van Dijk
-        - id: mehmet-yilmaz
-          label: Mehmet Yilmaz
-        - id: sanne-bakker
-          label: Sanne Bakker
-        - id: joyce-verbeek
-          label: Joyce Verbeek
-        - id: dennis-de-vries
-          label: Dennis de Vries
-      answer: dennis-de-vries
+      answer: Dennis de Vries, de vriend van Sanne Bakker.
     - id: hoe
-      question: Hoe kwam het bedrag buiten Van Dijk Vastgoed terecht?
-      options:
-        - id: gedeelde-schijf
-          label: Het bod stond op de gedeelde schijf, waar iedereen bij kon.
-        - id: prive-mail
-          label: Het bod werd naar een privé-adres gestuurd en thuis geopend op een gedeelde laptop.
-        - id: portaal
-          label: Het aanbestedingsportaal van de gemeente heeft de inschrijvingen gelekt.
-        - id: omkoping
-          label: Kramer Bouw heeft een medewerker betaald voor het bedrag.
-      answer: prive-mail
+      question: Hoe kwam die persoon aan het bedrag van het bod?
+      answer: >-
+        Kernpunten: Sanne Bakker stuurde het definitieve bod naar haar privé-mailadres; Dennis zag het bod thuis op de
+        gedeelde laptop, waar haar mail openstond.
     - id: opzet
-      question: Heeft Sanne Bakker het bod bewust gelekt?
-      options:
-        - id: samenwerking
-          label: Ja, ze heeft het samen met haar vriend gepland.
-        - id: onvoorzichtig
-          label: Nee, ze was onvoorzichtig, maar heeft het niet bewust doorgegeven.
-        - id: betaald
-          label: Ja, ze is door Kramer Bouw betaald.
-      answer: onvoorzichtig
+      question: Heeft Sanne Bakker het bod bewust gelekt? Leg uit.
+      answer: >-
+        Kernpunten: nee, ze lekte het niet bewust; ze was onvoorzichtig door het bod tegen de regels naar haar
+        privé-adres te sturen en haar mail thuis open te laten staan.
   epilogue: >-
     Op de avond van 12 maart stuurde Sanne Bakker het definitieve bod naar haar privé-adres om thuis bijlage B
     te controleren. Ze werkte op de laptop die ze deelt met haar vriend Dennis de Vries, projectleider bij Kramer

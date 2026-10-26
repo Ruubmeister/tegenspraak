@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface VerdictAttemptRepository extends JpaRepository<VerdictAttempt, UUID> {
 
-    List<VerdictAttempt> findByTeamIdAndCaseIdOrderBySubmittedAtAsc(UUID teamId, String caseId);
+    List<VerdictAttempt> findByTeamIdAndCaseIdOrderByAttemptNumberAsc(UUID teamId, String caseId);
 
     @Query("select distinct attempt.caseId from VerdictAttempt attempt"
             + " where attempt.teamId = :teamId and attempt.solved = true")

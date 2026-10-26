@@ -6,10 +6,7 @@ solution:
   questions:
     - id: dader
       question: Wie deed het?
-      options:
-        - id: de-butler
-          label: De butler
-        - id: de-tuinman
-          label: De tuinman
-      answer: de-kok
+    - id: wapen
+      question: Waarmee?
+      answer: Met de kandelaar.
   epilogue: De butler bekende alles.

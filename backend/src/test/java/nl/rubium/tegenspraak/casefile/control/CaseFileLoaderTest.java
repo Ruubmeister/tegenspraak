@@ -8,7 +8,7 @@ import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
-import nl.rubium.tegenspraak.casefile.entity.SolutionOption;
+import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
@@ -42,10 +42,34 @@ class CaseFileLoaderTest {
                 .getFirst();
 
         assertThat(butler.knownFacts()).containsExactly("Het diner begon om acht uur.");
-        assertThat(butler.secrets()).singleElement().satisfies(secret -> {
+        assertThat(butler.secrets()).first().satisfies(secret -> {
             assertThat(secret.fact()).isEqualTo("Hij was in de bibliotheek.");
             assertThat(secret.revealWhen()).isEqualTo("De speler noemt de bibliotheek.");
+            assertThat(secret.requiresEvidence()).isEmpty();
         });
+    }
+
+    @Test
+    void loadAll_givenSecretWithRequiredEvidence_expectEvidenceAndCountLoaded() {
+        CharacterProfile butler = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .characters()
+                .getFirst();
+
+        assertThat(butler.secrets().get(1)).satisfies(secret -> {
+            assertThat(secret.requiresEvidence())
+                    .containsExactly(
+                            new RequiredEvidence("landhuis", "bestanden", "kluis"),
+                            new RequiredEvidence("landhuis", "mail", "brief"));
+            assertThat(secret.requiredCount()).isEqualTo(1);
+        });
+    }
+
+    @Test
+    void loadAll_givenSecretRequiringUnknownEvidence_expectStartupFailure() {
+        assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-evidence"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("testament");
     }
 
     @Test
@@ -78,13 +102,13 @@ class CaseFileLoaderTest {
         assertThat(solution.epilogue()).isEqualTo("De butler bekende alles.");
         assertThat(solution.questions()).singleElement().satisfies(question -> {
             assertThat(question.id()).isEqualTo("dader");
-            assertThat(question.options()).extracting(SolutionOption::id).containsExactly("de-butler", "de-tuinman");
-            assertThat(question.answer()).isEqualTo("de-butler");
+            assertThat(question.question()).isEqualTo("Wie deed het?");
+            assertThat(question.answer()).isEqualTo("De butler.");
         });
     }
 
     @Test
-    void loadAll_givenSolutionAnswerThatIsNotAnOption_expectStartupFailure() {
+    void loadAll_givenQuestionWithoutAnswer_expectStartupFailure() {
         assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-solution"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("case.yaml")
@@ -142,9 +166,12 @@ class CaseFileLoaderTest {
     }
 
     @Test
-    void loadAll_givenBundledCases_expectSampleCaseLoads() {
+    void loadAll_givenBundledCases_expectAllCasesLoad() {
         List<CaseDefinition> cases = loader.loadAll("classpath:cases");
 
-        assertThat(cases).extracting(CaseDefinition::id).contains("het-lek-bij-van-dijk");
+        assertThat(cases)
+                .extracting(CaseDefinition::id)
+                .containsExactly(
+                        "het-lek-bij-van-dijk", "kas-van-vv-rijnvogels", "kunstbrand-in-haarlem", "laatste-experiment");
     }
 }

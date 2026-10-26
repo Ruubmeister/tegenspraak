@@ -1,0 +1,8 @@
+name: De Butler
+role: Butler
+description: Altijd aanwezig.
+secrets:
+  - fact: Hij kent het testament.
+    revealWhen: De speler laat het testament zien.
+    requiresEvidence:
+      - { desktop: landhuis, app: bestanden, item: testament }

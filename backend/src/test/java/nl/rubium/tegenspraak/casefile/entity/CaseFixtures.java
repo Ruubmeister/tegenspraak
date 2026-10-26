@@ -8,9 +8,8 @@ public final class CaseFixtures {
     private CaseFixtures() {}
 
     public static CaseManifest manifestWithSetting(String setting) {
-        List<SolutionOption> options = List.of(new SolutionOption("ja", "Ja"), new SolutionOption("nee", "Nee"));
         CaseSolution solution =
-                new CaseSolution(List.of(new SolutionQuestion("dader", "De butler?", options, "ja")), "Einde.");
+                new CaseSolution(List.of(new SolutionQuestion("dader", "Wie deed het?", "De butler.")), "Einde.");
         return new CaseManifest("Demo", "Kort", "Intro", setting, solution);
     }
 }
