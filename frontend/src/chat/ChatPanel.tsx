@@ -1,8 +1,8 @@
-import { useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import type { CharacterSummary, ChatMessage, EvidenceItem } from '../api/types'
 import { AttachmentLinks, DraftAttachments } from './AttachmentChips'
 import { AttachmentPicker } from './AttachmentPicker'
-import { usePendingMessages, useConversation, useSendMessage } from './chatApi'
+import { usePendingMessages, useConversation, useMarkConversationRead, useSendMessage } from './chatApi'
 import {
   EMPTY_DRAFT,
   isSentDraft,
@@ -30,7 +30,8 @@ interface ChatPanelProps {
 }
 
 /**
- * The team's shared conversation with a character. Messages of teammates appear through regular refreshes. The draft,
+ * The team's shared conversation with a character. Messages of teammates and replies that arrive later appear through
+ * the team's live updates, and the conversation is marked read while it is on screen. The draft,
  * including up to three attached mails or files, is remembered per conversation, so the player can look up evidence
  * elsewhere and come back to it.
  */
@@ -48,6 +49,26 @@ export function ChatPanel({ teamId, caseId, character, currentUsername }: ChatPa
   const lengthCounterId = useId()
   const messagesBox = useRef<HTMLDivElement>(null)
   const followLatest = useRef(true)
+  const { mutate: markRead } = useMarkConversationRead(teamId, caseId, character.id)
+  const latestMessageId = messages?.at(-1)?.id
+  const markedMessageId = useRef<string | null>(null)
+
+  // A reply that arrives while the tab is in the background stays unread until the player comes back
+  useEffect(() => {
+    if (!latestMessageId) {
+      return
+    }
+    const messageId = latestMessageId
+    function markReadIfVisible() {
+      if (document.visibilityState === 'visible' && markedMessageId.current !== messageId) {
+        markedMessageId.current = messageId
+        markRead(messageId)
+      }
+    }
+    markReadIfVisible()
+    document.addEventListener('visibilitychange', markReadIfVisible)
+    return () => document.removeEventListener('visibilitychange', markReadIfVisible)
+  }, [latestMessageId, markRead])
 
   // Only scrolls the messages box, and only while the player has not scrolled up to read earlier messages
   useLayoutEffect(() => {

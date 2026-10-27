@@ -10,15 +10,19 @@ export interface SendMessageInput {
   attachments: EvidenceItem[]
 }
 
-/** Teammates write to the same conversation, so it is refreshed regularly while open. */
-const CONVERSATION_REFRESH_MS = 3_000
+/** Live updates arrive through useTeamEvents; this only catches up while the event stream is down. */
+const CONVERSATION_REFRESH_MS = 60_000
 
 function messagesPath(teamId: string, caseId: string, characterId: string): string {
   return `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/characters/${encodeURIComponent(characterId)}/messages`
 }
 
-function conversationQueryKey(teamId: string, caseId: string, characterId: string) {
+export function conversationQueryKey(teamId: string, caseId: string, characterId: string) {
   return ['conversation', teamId, caseId, characterId] as const
+}
+
+export function unreadConversationsQueryKey(teamId: string, caseId: string) {
+  return ['unread-conversations', teamId, caseId] as const
 }
 
 function sendMessageMutationKey(teamId: string, caseId: string, characterId: string) {
@@ -62,5 +66,33 @@ export function usePendingMessages(teamId: string, caseId: string, characterId: 
   return useMutationState({
     filters: { mutationKey: sendMessageMutationKey(teamId, caseId, characterId), status: 'pending' },
     select: (mutation) => mutation.state.variables as SendMessageInput,
+  })
+}
+
+/** Ids of the contacts whose conversation has messages the current player has not read yet. */
+export function useUnreadConversations(teamId: string, caseId: string) {
+  return useQuery({
+    queryKey: unreadConversationsQueryKey(teamId, caseId),
+    queryFn: () =>
+      apiRequest<string[]>('GET', `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/unread-conversations`),
+    refetchInterval: CONVERSATION_REFRESH_MS,
+  })
+}
+
+/**
+ * Marks the conversation read up to the given message. The marker disappears right away; the refetch afterwards
+ * brings it back if a newer message arrived meanwhile.
+ */
+export function useMarkConversationRead(teamId: string, caseId: string, characterId: string) {
+  const queryClient = useQueryClient()
+  const unreadQueryKey = unreadConversationsQueryKey(teamId, caseId)
+  return useMutation({
+    mutationFn: (messageId: string) =>
+      apiRequest<void>('PUT', `${messagesPath(teamId, caseId, characterId)}/read`, { messageId }),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: unreadQueryKey })
+      queryClient.setQueryData<string[]>(unreadQueryKey, (unread) => unread?.filter((id) => id !== characterId))
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: unreadQueryKey }),
   })
 }

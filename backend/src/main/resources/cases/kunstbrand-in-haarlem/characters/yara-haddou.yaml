@@ -32,3 +32,16 @@ introduces:
     when: >-
       Je hebt verteld over de restauratie bij Atelier Pauw, en de rechercheurs willen de restaurator spreken. Je geeft
       ze het nummer van Hendrik Pauw.
+consults:
+  - id: code-atelier-pauw
+    character: hendrik-pauw
+    about: De code van de beveiligde pc in Atelier Pauw, zodat de rechercheurs de werkorders kunnen inzien.
+    when: >-
+      Je hebt verteld over de restauratie bij Atelier Pauw, en de rechercheurs vragen of jij Hendrik kunt vragen hoe
+      ze in zijn administratie of op zijn pc kunnen kijken. Je stuurt Hendrik een berichtje en zegt dat je laat
+      weten wat hij antwoordt.
+    answer: >-
+      Hendrik kent Yara al jaren en vertrouwt haar. Hij vindt het vervelend, maar heeft niets te verbergen over de
+      restauratie. De code van de pc in zijn atelier is "spieraam". Hij vraagt of de rechercheurs zorgvuldig met
+      zijn administratie omgaan.
+    minimumMood: trusting

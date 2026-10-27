@@ -74,6 +74,32 @@ describe('ChatPanel', () => {
     expect(screen.getByText('Hoi, zeg het maar.')).toBeInTheDocument()
   })
 
+  it('ChatPanel_givenConversationShown_expectReadUpToLatestMessage', async () => {
+    const fetchMock = mockFetch({
+      [`GET ${MESSAGES_PATH}`]: () =>
+        jsonResponse([playerMessage('1', 'anouk', 'Hallo Sanne'), characterMessage('2', 'Hoi, zeg het maar.')]),
+      [`PUT ${MESSAGES_PATH}/read`]: () => statusResponse(204),
+    })
+
+    renderChatPanel()
+
+    await vi.waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        `${MESSAGES_PATH}/read`,
+        expect.objectContaining({ method: 'PUT', body: JSON.stringify({ messageId: '2' }) }),
+      ),
+    )
+  })
+
+  it('ChatPanel_givenEmptyConversation_expectNothingMarkedRead', async () => {
+    const fetchMock = mockFetch({ [`GET ${MESSAGES_PATH}`]: () => jsonResponse([]) })
+
+    renderChatPanel()
+
+    expect(await screen.findByText('Stuur Sanne Bakker een bericht.')).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalledWith(`${MESSAGES_PATH}/read`, expect.anything())
+  })
+
   it('ChatPanel_givenTeammateMessage_expectTeammateNameShownButNotOwnName', async () => {
     mockFetch({
       [`GET ${MESSAGES_PATH}`]: () =>

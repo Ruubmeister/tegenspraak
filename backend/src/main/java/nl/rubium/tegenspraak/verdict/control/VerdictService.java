@@ -8,11 +8,13 @@ import java.util.stream.Collectors;
 import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.SolutionQuestion;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAnswer;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttempt;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttemptRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class VerdictService {
     private final VerdictAttemptRepository verdictAttemptRepository;
     private final TeamService teamService;
     private final VerdictGrader verdictGrader;
+    private final ApplicationEventPublisher eventPublisher;
     private final int maxAttempts;
 
     public VerdictService(
@@ -34,11 +37,13 @@ public class VerdictService {
             VerdictAttemptRepository verdictAttemptRepository,
             TeamService teamService,
             VerdictGrader verdictGrader,
+            ApplicationEventPublisher eventPublisher,
             @Value("${tegenspraak.verdict.max-attempts}") int maxAttempts) {
         this.caseCatalog = caseCatalog;
         this.verdictAttemptRepository = verdictAttemptRepository;
         this.teamService = teamService;
         this.verdictGrader = verdictGrader;
+        this.eventPublisher = eventPublisher;
         this.maxAttempts = maxAttempts;
     }
 
@@ -70,6 +75,7 @@ public class VerdictService {
                         question.id(), answers.get(question.id()), correctQuestionIds.contains(question.id())))
                 .toList();
         storeAttempt(new VerdictAttempt(teamId, caseId, progress.attempts().size() + 1, playerName, gradedAnswers));
+        eventPublisher.publishEvent(TeamEvent.verdict(teamId, caseId));
         return loadProgress(teamId, caseId);
     }
 

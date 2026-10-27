@@ -3,10 +3,10 @@ import { apiRequest } from '../api/http'
 import type { Verdict } from '../api/types'
 import { teamPath } from '../teams/teamsApi'
 
-/** Any teammate can submit, so an open verdict is refreshed to show their attempts. */
-const VERDICT_REFRESH_MS = 5_000
+/** Live updates arrive through useTeamEvents; this only catches up while the event stream is down. */
+const VERDICT_REFRESH_MS = 60_000
 
-function solvedCasesQueryKey(teamId: string) {
+export function solvedCasesQueryKey(teamId: string) {
   return ['solved-cases', teamId] as const
 }
 
@@ -14,7 +14,7 @@ function verdictPath(teamId: string, caseId: string): string {
   return `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/verdict`
 }
 
-function verdictQueryKey(teamId: string, caseId: string) {
+export function verdictQueryKey(teamId: string, caseId: string) {
   return ['verdict', teamId, caseId] as const
 }
 

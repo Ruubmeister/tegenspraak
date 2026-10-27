@@ -8,6 +8,8 @@ import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
+import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
@@ -206,6 +208,24 @@ class CaseFileLoaderTest {
                         .singleElement()
                         .satisfies(introduction ->
                                 assertThat(introduction.character()).isEqualTo("de-tuinman")));
+    }
+
+    @Test
+    void loadAll_givenCharacterWithConsultation_expectConsultationAndUnlocksLoaded() {
+        CharacterProfile butler = loader.loadAll("classpath:test-cases/valid")
+                .getFirst()
+                .findCharacter("de-butler")
+                .orElseThrow();
+
+        assertThat(butler.findConsultation("kluiscode"))
+                .hasValue(new ContactConsultation(
+                        "kluiscode",
+                        "de-tuinman",
+                        "De code van de kluis",
+                        "De speler vraagt naar de kluis.",
+                        "De code is 1912.",
+                        Mood.FRIENDLY,
+                        List.of(new ConsultationUnlock(null, "landhuis", "bestanden", "kluis"))));
     }
 
     @Test

@@ -34,9 +34,11 @@ import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import nl.rubium.tegenspraak.investigation.entity.TeamUnlockRepository;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttempt;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttemptRepository;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 class InvestigationServiceTest {
 
@@ -47,7 +49,7 @@ class InvestigationServiceTest {
     private static final String SAFE_TARGET = "item:computer/bestanden/kluis";
 
     private static final CharacterProfile GARDENER = new CharacterProfile(
-            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null);
+            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null, null);
     private static final CharacterProfile BUTLER = new CharacterProfile(
             "de-butler",
             "De Butler",
@@ -59,6 +61,7 @@ class InvestigationServiceTest {
             null,
             false,
             List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", null)),
+            null,
             null);
     private static final Desktop COMPUTER = new Desktop(
             "computer",
@@ -92,12 +95,14 @@ class InvestigationServiceTest {
     private final TeamService teamService = mock(TeamService.class);
     private final TeamUnlockRepository teamUnlockRepository = mock(TeamUnlockRepository.class);
     private final WrongCodeAttemptRepository wrongCodeAttemptRepository = mock(WrongCodeAttemptRepository.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final InvestigationService investigationService = new InvestigationService(
             caseCatalog,
             teamService,
             teamUnlockRepository,
             wrongCodeAttemptRepository,
             Clock.fixed(NOW, ZoneOffset.UTC),
+            eventPublisher,
             5,
             Duration.ofMinutes(1));
     private final List<String> unlockedTargets = new ArrayList<>();
@@ -161,6 +166,21 @@ class InvestigationServiceTest {
         TeamProgress progress = investigationService.unlockDesktop(TEAM_ID, PLAYER_ID, CASE_ID, "computer", " 1234 ");
 
         assertThat(progress.isOpen(COMPUTER)).isTrue();
+    }
+
+    @Test
+    void unlockDesktop_givenCorrectCode_expectCaseEventPublished() {
+        investigationService.unlockDesktop(TEAM_ID, PLAYER_ID, CASE_ID, "computer", "1234");
+
+        verify(eventPublisher).publishEvent(TeamEvent.caseProgress(TEAM_ID, CASE_ID));
+    }
+
+    @Test
+    void unlockDesktop_givenWrongCode_expectNoEventPublished() {
+        assertThatThrownBy(() -> investigationService.unlockDesktop(TEAM_ID, PLAYER_ID, CASE_ID, "computer", "0000"))
+                .isInstanceOf(WrongCodeException.class);
+
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test
