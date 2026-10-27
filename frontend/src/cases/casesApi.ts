@@ -3,8 +3,8 @@ import { apiRequest } from '../api/http'
 import type { CaseOverview, CaseSummary } from '../api/types'
 import { teamPath } from '../teams/teamsApi'
 
-/** Teammates can unlock contacts and desktops, so the open case is refreshed regularly. */
-const CASE_REFRESH_MS = 10_000
+/** Live updates arrive through useTeamEvents; this only catches up while the event stream is down. */
+const CASE_REFRESH_MS = 60_000
 
 export function caseOverviewQueryKey(teamId: string, caseId: string) {
   return ['cases', teamId, caseId] as const

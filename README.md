@@ -21,10 +21,13 @@ The backend is a single service, split into feature packages that each follow bo
   one, and the last member to leave deletes the team with its progress
 - `chat`: a team's shared conversation with a character; the persona file becomes the LLM system prompt, and player
   messages reach the LLM as `[name]: ...` so the character can tell the detectives apart. A message can carry up to
-  three opened mails or files as attachments; only references are stored, and the character reads them in full
+  three opened mails or files as attachments; only references are stored, and the character reads them in full.
+  Characters can ask each other for information; the answer is scheduled and arrives a few minutes later. Each player
+  has their own read state per conversation, so contacts with new messages are marked
 - `desktop`: virtual desktops made of typed apps (`mail`, `files`)
 - `investigation`: what a team can see and use in a case: introduced contacts and desktops, mails and files opened
   with their code. Unlocks are shared by the team
+- `liveupdate`: pushes "something changed" signals to the team's open browsers as server-sent events
 - `verdict`: the team solves a case by typing answers to its open questions, which an LLM grades against the expected
   answers; a team gets a limited number of attempts per case (`tegenspraak.verdict.max-attempts`, 5)
 
@@ -47,7 +50,10 @@ npm run dev
 
 Production uses an existing Postgres server and no Docker; the packaged jar leaves out the Docker Compose support.
 Example configs are in `deploy/`: a systemd unit for the backend and an nginx site that serves the frontend build and
-proxies `/api` to the backend, so both share one origin.
+proxies `/api` to the backend, so both share one origin. The event stream needs nothing extra: the backend turns off
+nginx buffering for it with an `X-Accel-Buffering: no` header, and its heartbeat stays well within `proxy_read_timeout`.
+Browsers allow only six HTTP/1.1 connections per site and every open tab keeps one stream open, so enable HTTP/2 once
+HTTPS is set up (`listen 443 ssl; http2 on;`).
 
 ```bash
 # Build
@@ -81,9 +87,22 @@ password; without it a random password is generated and logged once at WARN leve
 memberships and deletes teams left without members; their messages stay in the chats of teams that remain. Deleting a
 player or resetting their password ends their open sessions.
 
-Chat and verdicts are shared within a team. The frontend refreshes an open conversation every 3 seconds and an open
-verdict every 5 seconds, so teammates see each other's messages and attempts. Messages to the same character within one
-team are handled one at a time, so the character always replies with the whole conversation in view.
+Chat and verdicts are shared within a team. Every open team or case page keeps a server-sent event stream open
+(`GET /api/teams/{teamId}/events`). Once a change is committed, the backend sends the team a small event that only says
+where to look (`CHAT` with case and character, `CASE`, `VERDICT` or `MEMBERS`); the frontend then reloads that data
+through the regular endpoints, so the stream never carries content and needs no access checks of its own. The browser
+reconnects by itself and reloads the team's data after a reconnect, and every view still polls once a minute in case
+the stream is down. A heartbeat every 25 seconds keeps proxies from closing the stream and closes it once the player
+left the team or the session ended; streams also end after 30 minutes, after which the browser reconnects
+(`tegenspraak.live-updates`). The streams are kept in memory, which works because the backend runs as a single
+instance.
+
+A contact whose conversation has a reply or notice the player has not read gets a dot in the case navigation (and on
+the menu button on small screens). An open conversation is marked read up to its newest message while the tab is
+visible. Read state is per player, so a reply a teammate already read is still new for the others.
+
+Messages to the same character within one team are handled one at a time, so the character always replies with the
+whole conversation in view.
 
 Without `ANTHROPIC_API_KEY` everything works except character replies, which return a 502 and an error in the chat.
 The model is configured in `backend/src/main/resources/application.yaml` (`spring.ai.anthropic.chat.model`).
@@ -96,7 +115,7 @@ Cases live in `backend/src/main/resources/cases/`. Folder and file names are the
 cases/{case-id}/case.yaml                   title, summary, introduction, setting (hidden truth), solution
 cases/{case-id}/characters/{id}.yaml        persona: name, role, description, personality, speechStyle,
                                             knownFacts, secrets (fact, revealWhen, requiresEvidence, minimumMood),
-                                            hidden, introduces, startingMood
+                                            hidden, introduces, startingMood, consults
 cases/{case-id}/desktops/{id}.yaml          ownerName, ownerType (person|organisation), description, lock, apps
 ```
 
@@ -147,7 +166,38 @@ introduces:
 ```
 
 The introducer's LLM gets an `introduce_contact` tool and calls it once the condition is met. The contact is then
-available to the whole team, and a notice appears in the chat. Every hidden character needs at least one introducer.
+available to the whole team, and a notice appears in the chat. Every hidden character needs at least one introducer,
+or a consultation that unlocks it (see below).
+
+### Asking other characters
+
+A character can send another character a message on behalf of the team, for example to find out the code of a
+machine. Only consultations listed in the case can happen:
+
+```yaml
+consults:
+  - id: code-atelier-pauw # unique per character
+    character: hendrik-pauw # the contact; may be hidden
+    about: De code van de beveiligde pc in Atelier Pauw.
+    when: De rechercheurs vragen of jij Hendrik kunt vragen hoe ze op zijn pc kunnen kijken.
+    answer: De code van de pc in zijn atelier is "spieraam".
+    minimumMood: trusting # optional, like introductions
+    unlocks: # optional, opened for the team once the answer arrives
+      - { character: luc-verstraeten } # a hidden character
+      - { desktop: atelier-pauw } # a locked desktop
+      - { desktop: atelier-pauw, app: werkorders, item: werkorder-kopieen } # a locked item
+```
+
+The character's LLM gets an `ask_contact` tool and calls it with its own question once `when` is met; a notice
+appears in the chat. After a random delay (`tegenspraak.consultations`, 2 to 5 minutes) the contact's LLM answers,
+then the asking character passes the answer on in a new chat message, and anything listed under `unlocks` opens with a
+notice. The contact only gets its persona and the `answer`, not its secrets or the case setting, so the question
+cannot get more out of it than the case author intended. The team sees the notices and the passed-on message, not the
+contact's own reply.
+
+Each consultation happens once per team. Due times are stored in the database, so pending answers survive a restart.
+A failed answer is retried (3 attempts in total); after that the request is dropped with a notice and the character
+can be asked again.
 
 ### Character mood
 

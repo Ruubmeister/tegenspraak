@@ -18,8 +18,10 @@ import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.investigation.entity.TeamUnlockRepository;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttempt;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttemptRepository;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,7 @@ public class InvestigationService {
     private final TeamUnlockRepository teamUnlockRepository;
     private final WrongCodeAttemptRepository wrongCodeAttemptRepository;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
     private final int maxWrongAttempts;
     private final Duration wrongAttemptWindow;
 
@@ -45,6 +48,7 @@ public class InvestigationService {
             TeamUnlockRepository teamUnlockRepository,
             WrongCodeAttemptRepository wrongCodeAttemptRepository,
             Clock clock,
+            ApplicationEventPublisher eventPublisher,
             @Value("${tegenspraak.locks.max-wrong-attempts}") int maxWrongAttempts,
             @Value("${tegenspraak.locks.wrong-attempt-window}") Duration wrongAttemptWindow) {
         this.caseCatalog = caseCatalog;
@@ -52,12 +56,18 @@ public class InvestigationService {
         this.teamUnlockRepository = teamUnlockRepository;
         this.wrongCodeAttemptRepository = wrongCodeAttemptRepository;
         this.clock = clock;
+        this.eventPublisher = eventPublisher;
         this.maxWrongAttempts = maxWrongAttempts;
         this.wrongAttemptWindow = wrongAttemptWindow;
     }
 
     public TeamProgress getProgress(UUID teamId, UUID playerId, String caseId) {
         teamService.requireMember(teamId, playerId);
+        return getTeamProgress(teamId, caseId);
+    }
+
+    /** Without a membership check, for game events that no player started, such as a contact answering. */
+    public TeamProgress getTeamProgress(UUID teamId, String caseId) {
         CaseDefinition caseDefinition = caseCatalog.getCase(caseId);
         return new TeamProgress(caseDefinition, new HashSet<>(teamUnlockRepository.findTargets(teamId, caseId)));
     }
@@ -82,6 +92,16 @@ public class InvestigationService {
         return characters.stream()
                 .filter(character -> unlock(teamId, caseId, UnlockTarget.character(character.id())))
                 .toList();
+    }
+
+    /**
+     * Unlocks a character, desktop or item that the game hands the team, such as a contact's answer to a consultation.
+     *
+     * @return true when the target was newly unlocked
+     */
+    @Transactional
+    public boolean unlockWithoutCode(UUID teamId, String caseId, UnlockTarget target) {
+        return unlock(teamId, caseId, target);
     }
 
     /** A photo whose image the team may see: it exists, and neither its desktop nor the photo itself is locked. */
@@ -132,7 +152,9 @@ public class InvestigationService {
             wrongCodeAttemptRepository.save(new WrongCodeAttempt(teamId, caseId, target.key(), now));
             throw new WrongCodeException(target.key());
         }
-        unlock(teamId, caseId, target);
+        if (unlock(teamId, caseId, target)) {
+            eventPublisher.publishEvent(TeamEvent.caseProgress(teamId, caseId));
+        }
     }
 
     private void requireNoCooldown(UUID teamId, String caseId, UnlockTarget target, Instant now) {

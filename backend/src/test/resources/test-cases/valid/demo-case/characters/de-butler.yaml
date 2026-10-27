@@ -20,3 +20,12 @@ introduces:
   - character: de-tuinman
     when: De speler vraagt wie er in de tuin was.
     minimumMood: trusting
+consults:
+  - id: kluiscode
+    character: de-tuinman
+    about: De code van de kluis
+    when: De speler vraagt naar de kluis.
+    answer: De code is 1912.
+    minimumMood: friendly
+    unlocks:
+      - { desktop: landhuis, app: bestanden, item: kluis }

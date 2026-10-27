@@ -70,6 +70,7 @@ class MoodTest {
                 null,
                 false,
                 List.of(new ContactIntroduction("de-tuinman", "Als ze ernaar vragen.", Mood.TRUSTING)),
+                null,
                 null);
 
         assertThat(character.mayIntroduce("de-tuinman", Mood.FRIENDLY)).isFalse();
@@ -80,7 +81,7 @@ class MoodTest {
     @Test
     void constructor_givenCharacterWithoutStartingMood_expectNeutral() {
         CharacterProfile character = new CharacterProfile(
-                "de-butler", "De Butler", "Rol", "Beschrijving", null, null, null, null, false, null, null);
+                "de-butler", "De Butler", "Rol", "Beschrijving", null, null, null, null, false, null, null, null);
 
         assertThat(character.startingMood()).isEqualTo(Mood.NEUTRAL);
     }

@@ -2,10 +2,12 @@ package nl.rubium.tegenspraak.team.control;
 
 import java.util.List;
 import java.util.UUID;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.entity.Team;
 import nl.rubium.tegenspraak.team.entity.TeamMember;
 import nl.rubium.tegenspraak.team.entity.TeamMemberRepository;
 import nl.rubium.tegenspraak.team.entity.TeamRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +20,17 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final JoinCodeGenerator joinCodeGenerator;
+    private final ApplicationEventPublisher eventPublisher;
 
     public TeamService(
             TeamRepository teamRepository,
             TeamMemberRepository teamMemberRepository,
-            JoinCodeGenerator joinCodeGenerator) {
+            JoinCodeGenerator joinCodeGenerator,
+            ApplicationEventPublisher eventPublisher) {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.joinCodeGenerator = joinCodeGenerator;
+        this.eventPublisher = eventPublisher;
     }
 
     /** The creator becomes the first member. */
@@ -44,6 +49,7 @@ public class TeamService {
                 .orElseThrow(() -> new TeamNotFoundException("No team with this join code"));
         if (!teamMemberRepository.existsByTeamIdAndPlayerId(team.getId(), playerId)) {
             teamMemberRepository.save(new TeamMember(team.getId(), playerId));
+            eventPublisher.publishEvent(TeamEvent.members(team.getId()));
         }
         return details(team);
     }
@@ -69,14 +75,20 @@ public class TeamService {
         teamMemberRepository.deleteByTeamIdAndPlayerId(teamId, playerId);
         if (teamMemberRepository.countByTeamId(teamId) == 0) {
             teamRepository.deleteById(teamId);
+        } else {
+            eventPublisher.publishEvent(TeamEvent.members(teamId));
         }
     }
 
     /** Guards every team scoped endpoint. Non-members get the same answer as for a missing team. */
     public void requireMember(UUID teamId, UUID playerId) {
-        if (!teamMemberRepository.existsByTeamIdAndPlayerId(teamId, playerId)) {
+        if (!isMember(teamId, playerId)) {
             throw new TeamNotFoundException("Player " + playerId + " is not a member of team " + teamId);
         }
+    }
+
+    public boolean isMember(UUID teamId, UUID playerId) {
+        return teamMemberRepository.existsByTeamIdAndPlayerId(teamId, playerId);
     }
 
     /** Called after deleting a player, whose memberships the database removed. */

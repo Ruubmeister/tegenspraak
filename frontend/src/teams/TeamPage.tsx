@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CaseList } from '../cases/CaseList'
+import { useTeamEvents } from './teamEvents'
 import { useLeaveTeam, useTeam, useTeamId } from './teamsApi'
 
 export function TeamPage() {
   const teamId = useTeamId()
   const { data: team, isPending, isError } = useTeam(teamId)
+  useTeamEvents(teamId)
 
   if (isPending) {
     return <p className="status">Team laden...</p>

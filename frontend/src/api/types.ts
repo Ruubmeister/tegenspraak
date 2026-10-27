@@ -161,6 +161,16 @@ export interface Desktop {
   apps: DesktopApp[]
 }
 
+/**
+ * Pushed by the backend when something changed for the team. It only says where to look; the data itself is loaded
+ * through the regular endpoints.
+ */
+export type TeamEvent =
+  | { type: 'CHAT'; caseId: string; characterId: string }
+  | { type: 'CASE'; caseId: string; characterId: null }
+  | { type: 'VERDICT'; caseId: string; characterId: null }
+  | { type: 'MEMBERS'; caseId: null; characterId: null }
+
 /** NOTICE messages are game events in the chat, such as a newly introduced contact. */
 export type MessageSender = 'PLAYER' | 'CHARACTER' | 'NOTICE'
 

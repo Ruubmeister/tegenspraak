@@ -74,7 +74,78 @@ class CaseDefinitionTest {
                 .hasMessageContaining("kasteel");
     }
 
-    private static CaseDefinition caseWithDesktop(CharacterProfile character) {
+    @Test
+    void constructor_givenConsultationOfOtherCharacterWithExistingUnlocks_expectValid() {
+        CharacterProfile butler = characterConsulting(
+                "de-kok",
+                new ConsultationUnlock(null, "landhuis", "bestanden", "menu"),
+                new ConsultationUnlock(null, "landhuis", null, null));
+
+        assertThatCode(() -> caseWithDesktop(butler, character("de-kok", false)))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void constructor_givenConsultationOfUnknownCharacter_expectIllegalArgument() {
+        assertThatThrownBy(() -> caseWithDesktop(characterConsulting("de-kok")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("de-kok")
+                .hasMessageContaining("not in this case");
+    }
+
+    @Test
+    void constructor_givenConsultationOfItself_expectIllegalArgument() {
+        assertThatThrownBy(() -> caseWithDesktop(characterConsulting("de-butler")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("asks the character itself");
+    }
+
+    @Test
+    void constructor_givenConsultationUnlockingUnknownItem_expectIllegalArgument() {
+        CharacterProfile butler =
+                characterConsulting("de-kok", new ConsultationUnlock(null, "landhuis", "bestanden", "testament"));
+
+        assertThatThrownBy(() -> caseWithDesktop(butler, character("de-kok", false)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("testament");
+    }
+
+    @Test
+    void constructor_givenConsultationUnlockingVisibleCharacter_expectIllegalArgument() {
+        CharacterProfile butler = characterConsulting("de-kok", new ConsultationUnlock("de-kok", null, null, null));
+
+        assertThatThrownBy(() -> caseWithDesktop(butler, character("de-kok", false)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("not a hidden character");
+    }
+
+    @Test
+    void constructor_givenHiddenCharacterOnlyUnlockedByConsultation_expectValid() {
+        CharacterProfile butler = characterConsulting("de-kok", new ConsultationUnlock("de-tuinman", null, null, null));
+
+        assertThatCode(() -> caseWithDesktop(butler, character("de-kok", false), character("de-tuinman", true)))
+                .doesNotThrowAnyException();
+    }
+
+    private static CharacterProfile characterConsulting(String contactId, ConsultationUnlock... unlocks) {
+        ContactConsultation consultation = new ContactConsultation(
+                "vraag", contactId, "Onderwerp", "Als ze ernaar vragen.", "Het antwoord.", null, List.of(unlocks));
+        return new CharacterProfile(
+                "de-butler",
+                "De Butler",
+                "Rol",
+                "Beschrijving",
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+                List.of(consultation));
+    }
+
+    private static CaseDefinition caseWithDesktop(CharacterProfile... characters) {
         Desktop hall = new Desktop(
                 "landhuis",
                 "Landhuis",
@@ -86,13 +157,24 @@ class CaseDefinitionTest {
                         "Bestanden",
                         List.of(new FileEntry("menu", "Documenten", "menu.txt", "Soep", null)))));
         return new CaseDefinition(
-                "demo", CaseFixtures.manifestWithSetting("Geheim"), List.of(character), List.of(hall));
+                "demo", CaseFixtures.manifestWithSetting("Geheim"), List.of(characters), List.of(hall));
     }
 
     private static CharacterProfile characterWithSecretRequiring(RequiredEvidence evidence) {
         CharacterSecret secret = new CharacterSecret("Feit", "Als ze het tonen.", List.of(evidence), null, null);
         return new CharacterProfile(
-                "de-butler", "De Butler", "Rol", "Beschrijving", null, null, null, List.of(secret), false, null, null);
+                "de-butler",
+                "De Butler",
+                "Rol",
+                "Beschrijving",
+                null,
+                null,
+                null,
+                List.of(secret),
+                false,
+                null,
+                null,
+                null);
     }
 
     private static CaseDefinition caseWith(CharacterProfile... characters) {
@@ -103,6 +185,7 @@ class CaseDefinitionTest {
         List<ContactIntroduction> introductions = Arrays.stream(introduces)
                 .map(introduced -> new ContactIntroduction(introduced, "Als de speler ernaar vraagt.", null))
                 .toList();
-        return new CharacterProfile(id, id, "Rol", "Beschrijving", null, null, null, null, hidden, introductions, null);
+        return new CharacterProfile(
+                id, id, "Rol", "Beschrijving", null, null, null, null, hidden, introductions, null, null);
     }
 }

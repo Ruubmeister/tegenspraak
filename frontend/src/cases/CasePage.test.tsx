@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { CaseOverview, Team } from '../api/types'
+import { FakeEventSource } from '../test/fakeEventSource'
 import { jsonResponse, mockFetch, renderWithProviders } from '../test/testUtils'
 import { CasePage } from './CasePage'
 
@@ -18,10 +19,11 @@ const hetLek: CaseOverview = {
   desktops: [],
 }
 
-function renderCasePage() {
+function renderCasePage(initialPath = '/teams/team-1/zaken/het-lek', unreadCharacterIds: string[] = []) {
   mockFetch({
     'GET /api/teams/team-1': () => jsonResponse(speurneuzen),
     'GET /api/teams/team-1/cases/het-lek': () => jsonResponse(hetLek),
+    'GET /api/teams/team-1/cases/het-lek/unread-conversations': () => jsonResponse(unreadCharacterIds),
   })
   renderWithProviders(
     <Routes>
@@ -30,7 +32,7 @@ function renderCasePage() {
         <Route path="chat/:characterId" element={<p>Gesprek geopend</p>} />
       </Route>
     </Routes>,
-    '/teams/team-1/zaken/het-lek',
+    initialPath,
   )
 }
 
@@ -71,4 +73,33 @@ describe('CasePage', () => {
 
     expect(screen.getByRole('navigation', { name: 'Zaak' })).not.toHaveClass('open')
   })
+
+  it('CasePage_givenUnreadConversation_expectContactAndMenuButtonMarked', async () => {
+    renderCasePage('/teams/team-1/zaken/het-lek', ['sanne-bakker'])
+
+    const contact = await screen.findByRole('link', { name: /Sanne Bakker/ })
+
+    expect(await within(contact).findByRole('img', { name: 'Nieuw bericht' })).toBeInTheDocument()
+    expect(within(screen.getByRole('button', { name: /Menu/ })).getByRole('img')).toBeInTheDocument()
+  })
+
+  it('CasePage_givenUnreadConversationOpen_expectNoMarker', async () => {
+    renderCasePage('/teams/team-1/zaken/het-lek/chat/sanne-bakker', ['sanne-bakker'])
+
+    expect(await screen.findByText('Gesprek geopend')).toBeInTheDocument()
+    await vi.waitFor(() => expect(fetchedPaths()).toContain('/api/teams/team-1/cases/het-lek/unread-conversations'))
+    expect(screen.queryByRole('img', { name: 'Nieuw bericht' })).not.toBeInTheDocument()
+  })
+
+  it('CasePage_givenOpened_expectTeamEventStreamOpened', async () => {
+    renderCasePage()
+
+    await screen.findByRole('button', { name: 'Menu' })
+
+    expect(FakeEventSource.instances.map((source) => source.url)).toContain('/api/teams/team-1/events')
+  })
 })
+
+function fetchedPaths(): string[] {
+  return vi.mocked(fetch).mock.calls.map(([input]) => input.toString())
+}

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 
 public record CaseDefinition(
@@ -14,6 +15,7 @@ public record CaseDefinition(
         desktops = List.copyOf(desktops);
         requireValidIntroductions(characters);
         requireExistingEvidence(characters, desktops);
+        requireValidConsultations(characters, desktops);
     }
 
     public Optional<CharacterProfile> findCharacter(String characterId) {
@@ -42,6 +44,44 @@ public record CaseDefinition(
         }
     }
 
+    /**
+     * A consultation must ask another character of this case, and everything it unlocks must exist; a character it
+     * unlocks must be hidden, like an introduced one.
+     */
+    private static void requireValidConsultations(List<CharacterProfile> characters, List<Desktop> desktops) {
+        Set<String> characterIds = characters.stream().map(CharacterProfile::id).collect(Collectors.toSet());
+        Set<String> hiddenIds = hiddenIds(characters);
+        for (CharacterProfile character : characters) {
+            for (ContactConsultation consultation : character.consults()) {
+                String description = "Consultation '" + consultation.id() + "' of character '" + character.id() + "'";
+                if (!characterIds.contains(consultation.character())) {
+                    throw new IllegalArgumentException(
+                            description + " asks '" + consultation.character() + "', who is not in this case");
+                }
+                if (consultation.character().equals(character.id())) {
+                    throw new IllegalArgumentException(description + " asks the character itself");
+                }
+                for (ConsultationUnlock unlock : consultation.unlocks()) {
+                    if (unlock.isCharacter() && !hiddenIds.contains(unlock.character())) {
+                        throw new IllegalArgumentException(description + " unlocks '" + unlock.character()
+                                + "', which is not a hidden character of this case");
+                    }
+                    if (!unlock.isCharacter() && !exists(unlock, desktops)) {
+                        throw new IllegalArgumentException(
+                                description + " unlocks " + unlock + ", which is not in this case");
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean exists(ConsultationUnlock unlock, List<Desktop> desktops) {
+        if (unlock.isItem()) {
+            return exists(new RequiredEvidence(unlock.desktop(), unlock.app(), unlock.item()), desktops);
+        }
+        return desktops.stream().anyMatch(desktop -> desktop.id().equals(unlock.desktop()));
+    }
+
     private static boolean exists(RequiredEvidence evidence, List<Desktop> desktops) {
         return desktops.stream()
                 .filter(desktop -> desktop.id().equals(evidence.desktop()))
@@ -51,13 +91,10 @@ public record CaseDefinition(
 
     /**
      * Introductions must point to hidden characters of this case, and every hidden character needs at least one
-     * introducer; otherwise the team could never reach it.
+     * introducer or a consultation that unlocks it; otherwise the team could never reach it.
      */
     private static void requireValidIntroductions(List<CharacterProfile> characters) {
-        Set<String> hiddenIds = characters.stream()
-                .filter(CharacterProfile::hidden)
-                .map(CharacterProfile::id)
-                .collect(Collectors.toSet());
+        Set<String> hiddenIds = hiddenIds(characters);
         for (CharacterProfile character : characters) {
             for (ContactIntroduction introduction : character.introduces()) {
                 if (!hiddenIds.contains(introduction.character())) {
@@ -70,8 +107,12 @@ public record CaseDefinition(
             }
         }
         Set<String> introducedIds = characters.stream()
-                .flatMap(character -> character.introduces().stream())
-                .map(ContactIntroduction::character)
+                .flatMap(character -> Stream.concat(
+                        character.introduces().stream().map(ContactIntroduction::character),
+                        character.consults().stream()
+                                .flatMap(consultation -> consultation.unlocks().stream())
+                                .filter(ConsultationUnlock::isCharacter)
+                                .map(ConsultationUnlock::character)))
                 .collect(Collectors.toSet());
         hiddenIds.stream()
                 .filter(hiddenId -> !introducedIds.contains(hiddenId))
@@ -80,5 +121,12 @@ public record CaseDefinition(
                     throw new IllegalArgumentException(
                             "Hidden character '" + hiddenId + "' is not introduced by any other character");
                 });
+    }
+
+    private static Set<String> hiddenIds(List<CharacterProfile> characters) {
+        return characters.stream()
+                .filter(CharacterProfile::hidden)
+                .map(CharacterProfile::id)
+                .collect(Collectors.toSet());
     }
 }

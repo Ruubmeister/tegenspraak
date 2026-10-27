@@ -3,10 +3,14 @@ import { apiRequest } from '../api/http'
 import type { EvidenceItem, EvidenceKind } from '../api/types'
 import { teamPath } from '../teams/teamsApi'
 
+export function evidenceQueryKey(teamId: string, caseId: string) {
+  return ['evidence', teamId, caseId] as const
+}
+
 /** Everything the team can attach to a message. Fetched fresh whenever the picker opens, so new unlocks show up. */
 export function useEvidence(teamId: string, caseId: string) {
   return useQuery({
-    queryKey: ['evidence', teamId, caseId],
+    queryKey: evidenceQueryKey(teamId, caseId),
     queryFn: () =>
       apiRequest<EvidenceItem[]>('GET', `${teamPath(teamId)}/cases/${encodeURIComponent(caseId)}/evidence`),
   })

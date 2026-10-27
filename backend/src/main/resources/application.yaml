@@ -12,6 +12,11 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  task:
+    scheduling:
+      pool:
+        # Answering consultations waits for the LLM; the event stream heartbeat must not wait behind it
+        size: 2
   ai:
     anthropic:
       api-key: ${ANTHROPIC_API_KEY:}
@@ -41,6 +46,20 @@ tegenspraak:
     max-history-messages: 40
     # Judges the tone of each player message to shift the character's mood; a small model keeps this fast and cheap
     tone-classifier-model: claude-haiku-5-5
+  consultations:
+    # A character that asks another character something gets the answer after a random delay in this range
+    min-reply-delay: 2m
+    max-reply-delay: 5m
+    # How often due answers are checked
+    poll-interval: 15s
+    # A failed answer is retried after retry-delay times the number of failures, up to max-attempts in total
+    retry-delay: 1m
+    max-attempts: 3
+  live-updates:
+    # Keeps proxies from closing idle event streams, and closes streams of players who left the team or logged out
+    heartbeat-interval: 25s
+    # Streams end after this long and the browser reconnects, which checks the session again
+    stream-timeout: 30m
   verdict:
     # A team that has not solved a case after this many attempts has failed it and gets to read the epilogue
     max-attempts: 5

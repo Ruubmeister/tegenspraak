@@ -1,12 +1,16 @@
 import { useState } from 'react'
-import { Link, NavLink, Outlet, useParams } from 'react-router'
+import { Link, NavLink, Outlet, useMatch, useParams } from 'react-router'
+import { useUnreadConversations } from '../chat/chatApi'
+import { UnreadDot } from '../chat/UnreadDot'
+import { useTeamEvents } from '../teams/teamEvents'
 import { useTeam, useTeamId } from '../teams/teamsApi'
 import { LockIcon } from '../desktop/UnlockForm'
 import { useCaseOverview } from './casesApi'
 
 /**
  * Shell of a case a team is working on: the navigation on the left, the selected chat or desktop on the right. On small
- * screens the navigation is a menu that opens over the content and closes once something is picked.
+ * screens the navigation is a menu that opens over the content and closes once something is picked. Contacts with
+ * messages the player has not read are marked, also on the menu button; the open chat never is.
  */
 export function CasePage() {
   const { caseId = '' } = useParams()
@@ -15,6 +19,9 @@ export function CasePage() {
   const { data: caseOverview, isPending, isError } = useCaseOverview(teamId, caseId)
   // Loading the team also checks membership before the shared conversations are opened
   const team = useTeam(teamId)
+  const { data: unreadCharacterIds = [] } = useUnreadConversations(teamId, caseId)
+  const openCharacterId = useMatch('/teams/:teamId/zaken/:caseId/chat/:characterId')?.params.characterId
+  useTeamEvents(teamId)
 
   if (isPending || team.isPending) {
     return <p className="status">Zaak laden...</p>
@@ -27,6 +34,8 @@ export function CasePage() {
   }
 
   const closeMenu = () => setMenuOpen(false)
+  const isUnread = (characterId: string) => characterId !== openCharacterId && unreadCharacterIds.includes(characterId)
+  const hasUnread = caseOverview.characters.some((character) => isUnread(character.id))
 
   return (
     <div className="case-page" onKeyDown={(event) => event.key === 'Escape' && closeMenu()}>
@@ -40,6 +49,7 @@ export function CasePage() {
           onClick={() => setMenuOpen((open) => !open)}
         >
           {isMenuOpen ? 'Sluiten' : 'Menu'}
+          {!isMenuOpen && hasUnread && <UnreadDot />}
         </button>
       </div>
       <nav id="case-nav" className={isMenuOpen ? 'case-nav open' : 'case-nav'} aria-label="Zaak">
@@ -53,7 +63,10 @@ export function CasePage() {
         <h2>Contacten</h2>
         {caseOverview.characters.map((character) => (
           <NavLink key={character.id} to={`chat/${character.id}`} onClick={closeMenu}>
-            <span className="nav-title">{character.name}</span>
+            <span className="nav-title">
+              {character.name}
+              {isUnread(character.id) && <UnreadDot />}
+            </span>
             <span className="nav-subtitle">{character.role}</span>
           </NavLink>
         ))}

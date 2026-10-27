@@ -4,10 +4,15 @@ import { apiRequest } from '../api/http'
 import type { Team } from '../api/types'
 
 const TEAMS_QUERY_KEY = ['teams'] as const
-const MEMBERS_REFRESH_MS = 10_000
+/** Live updates arrive through useTeamEvents; this only catches up while the event stream is down. */
+const MEMBERS_REFRESH_MS = 60_000
 
 export function teamPath(teamId: string): string {
   return `/api/teams/${encodeURIComponent(teamId)}`
+}
+
+export function teamQueryKey(teamId: string) {
+  return [...TEAMS_QUERY_KEY, teamId] as const
 }
 
 /** The team of the current route. Every route below /teams/:teamId has it. */
@@ -23,10 +28,9 @@ export function useTeams() {
   })
 }
 
-/** Refreshes now and then, so new members show up without reloading. */
 export function useTeam(teamId: string) {
   return useQuery({
-    queryKey: [...TEAMS_QUERY_KEY, teamId],
+    queryKey: teamQueryKey(teamId),
     queryFn: () => apiRequest<Team>('GET', teamPath(teamId)),
     refetchInterval: MEMBERS_REFRESH_MS,
   })

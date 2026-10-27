@@ -21,7 +21,7 @@ import org.springframework.ai.model.tool.ToolCallingChatOptions;
 class MessageToneClassifierTest {
 
     private static final CharacterProfile BUTLER = new CharacterProfile(
-            "de-butler", "De Butler", "Butler", "Altijd aanwezig.", null, null, null, null, false, null, null);
+            "de-butler", "De Butler", "Butler", "Altijd aanwezig.", null, null, null, null, false, null, null, null);
 
     private final ChatModel chatModel = mock(ChatModel.class);
     private final MessageToneClassifier classifier = new MessageToneClassifier(chatModel, "claude-haiku-5-5");

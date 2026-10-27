@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak.chat.control;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,73 +10,83 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nl.rubium.tegenspraak.casefile.control.CaseContentNotFoundException;
+import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
+import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
+import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
+import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.chat.entity.CharacterMood;
 import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
+import nl.rubium.tegenspraak.chat.entity.ConsultationRequest;
+import nl.rubium.tegenspraak.chat.entity.ConsultationRequestRepository;
+import nl.rubium.tegenspraak.chat.entity.ConsultationStatus;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
+import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
+import nl.rubium.tegenspraak.desktop.entity.LockableItem;
 import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
 import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nl.rubium.tegenspraak.investigation.control.UnlockTarget;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.model.tool.ToolCallingChatOptions;
-import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 public class ChatService {
 
     public static final int MAX_ATTACHMENTS = 3;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChatService.class);
-
-    /** Guards against a model that keeps calling tools instead of answering. */
-    private static final int MAX_TOOL_ROUNDS = 3;
-
     private final CharacterPromptBuilder characterPromptBuilder;
     private final ChatMessageRepository chatMessageRepository;
     private final CharacterMoodRepository characterMoodRepository;
+    private final ConsultationRequestRepository consultationRequestRepository;
     private final MessageToneClassifier messageToneClassifier;
-    private final ChatModel chatModel;
-    private final ToolCallingManager toolCallingManager;
+    private final CharacterReplyModel characterReplyModel;
     private final InvestigationService investigationService;
     private final ConversationLocks conversationLocks;
+    private final ConsultationSchedule consultationSchedule;
+    private final TransactionTemplate transactionTemplate;
+    private final ApplicationEventPublisher eventPublisher;
     private final int maxHistoryMessages;
 
     public ChatService(
             CharacterPromptBuilder characterPromptBuilder,
             ChatMessageRepository chatMessageRepository,
             CharacterMoodRepository characterMoodRepository,
+            ConsultationRequestRepository consultationRequestRepository,
             MessageToneClassifier messageToneClassifier,
-            ChatModel chatModel,
-            ToolCallingManager toolCallingManager,
+            CharacterReplyModel characterReplyModel,
             InvestigationService investigationService,
             ConversationLocks conversationLocks,
+            ConsultationSchedule consultationSchedule,
+            TransactionTemplate transactionTemplate,
+            ApplicationEventPublisher eventPublisher,
             @Value("${tegenspraak.chat.max-history-messages}") int maxHistoryMessages) {
         this.characterPromptBuilder = characterPromptBuilder;
         this.chatMessageRepository = chatMessageRepository;
         this.characterMoodRepository = characterMoodRepository;
+        this.consultationRequestRepository = consultationRequestRepository;
         this.messageToneClassifier = messageToneClassifier;
-        this.chatModel = chatModel;
-        this.toolCallingManager = toolCallingManager;
+        this.characterReplyModel = characterReplyModel;
         this.investigationService = investigationService;
         this.conversationLocks = conversationLocks;
+        this.consultationSchedule = consultationSchedule;
+        this.transactionTemplate = transactionTemplate;
+        this.eventPublisher = eventPublisher;
         this.maxHistoryMessages = maxHistoryMessages;
     }
 
@@ -117,10 +128,11 @@ public class ChatService {
     }
 
     /**
-     * Progress is read inside the lock, so the character is only offered introductions that did not happen yet. Contacts
-     * the character introduced are unlocked for the team and announced with a notice in this conversation. Evidence
-     * shown with this message counts towards the character's secrets right away. The tone of the message changes the
-     * character's mood before it replies, so the reply already reacts to it; the new mood is only stored with the reply.
+     * Progress is read inside the lock, so the character is only offered introductions and consultations that did not
+     * happen yet. Contacts the character introduced are unlocked for the team, and questions it asked other characters
+     * are scheduled; both are announced with a notice in this conversation. Evidence shown with this message counts
+     * towards the character's secrets right away. The tone of the message changes the character's mood before it
+     * replies, so the reply already reacts to it; the new mood is only stored with the reply.
      */
     private ChatMessage replyAndStore(
             UUID playerId,
@@ -141,6 +153,9 @@ public class ChatService {
                 .filter(contact -> character.mayIntroduce(contact.id(), mood.getMood()))
                 .toList();
         IntroduceContactTool introduceContactTool = new IntroduceContactTool(introducible);
+        ConsultationPrompt consultations =
+                consultationPrompt(conversation, progress.caseDefinition(), character, mood.getMood());
+        AskContactTool askContactTool = new AskContactTool(consultations.askable());
 
         ChatMessage playerMessage = ChatMessage.fromPlayer(
                 conversation.teamId(),
@@ -152,24 +167,179 @@ public class ChatService {
         List<Message> prompt = new ArrayList<>();
         Set<RequiredEvidence> shownEvidence = shownEvidence(conversation, openAttachments);
         prompt.add(new SystemMessage(characterPromptBuilder.buildSystemPrompt(
-                progress.caseDefinition(), character, introducible, shownEvidence, mood.getMood())));
+                progress.caseDefinition(), character, introducible, consultations, shownEvidence, mood.getMood())));
         history.forEach(message -> prompt.add(toPromptMessage(message, progress)));
         prompt.add(toPromptMessage(playerMessage, progress));
 
-        String reply = askModel(prompt, introducible.isEmpty() ? null : introduceContactTool, character.id());
+        List<ToolCallback> tools = new ArrayList<>();
+        if (!introducible.isEmpty()) {
+            tools.add(introduceContactTool.toCallback());
+        }
+        if (!consultations.askable().isEmpty()) {
+            tools.add(askContactTool.toCallback());
+        }
+        String reply = characterReplyModel.reply(prompt, tools, character.id());
         ChatMessage characterMessage = ChatMessage.fromCharacter(
                 conversation.teamId(), conversation.caseId(), conversation.characterId(), reply);
-        List<ChatMessage> newMessages = new ArrayList<>(List.of(playerMessage, characterMessage));
-        investigationService
-                .introduceCharacters(conversation.teamId(), conversation.caseId(), introduceContactTool.introduced())
-                .forEach(contact -> newMessages.add(ChatMessage.notice(
-                        conversation.teamId(),
-                        conversation.caseId(),
-                        conversation.characterId(),
-                        character.name() + " heeft je in contact gebracht met " + contact.name() + ".")));
-        chatMessageRepository.saveAll(newMessages);
-        characterMoodRepository.save(mood);
+        transactionTemplate.executeWithoutResult(status -> {
+            List<ChatMessage> newMessages = new ArrayList<>(List.of(playerMessage, characterMessage));
+            List<CharacterProfile> introduced = investigationService.introduceCharacters(
+                    conversation.teamId(), conversation.caseId(), introduceContactTool.introduced());
+            introduced.forEach(contact -> newMessages.add(notice(
+                    conversation, character.name() + " heeft je in contact gebracht met " + contact.name() + ".")));
+            newMessages.addAll(scheduleQuestions(conversation, character, askContactTool.asked()));
+            chatMessageRepository.saveAll(newMessages);
+            characterMoodRepository.save(mood);
+            publishChanges(conversation, !introduced.isEmpty());
+        });
         return characterMessage;
+    }
+
+    /**
+     * Lets the asking character pass a contact's answer on to the team, as a new message in its conversation. The
+     * message, what the consultation unlocks and the answered request are stored together, so the answer is never
+     * posted twice.
+     *
+     * @throws CharacterUnavailableException when the LLM fails; nothing is stored then, so it can be retried
+     */
+    public ChatMessage relayConsultationAnswer(
+            ConsultationRequest request, ConsultationContact contact, CharacterProfile asker, String answer) {
+        Conversation conversation = new Conversation(request.getTeamId(), request.getCaseId(), request.getAskerId());
+        return conversationLocks.withLock(
+                conversation, () -> relayAndStore(conversation, request, contact, asker, answer));
+    }
+
+    private ChatMessage relayAndStore(
+            Conversation conversation,
+            ConsultationRequest request,
+            ConsultationContact contact,
+            CharacterProfile asker,
+            String answer) {
+        TeamProgress progress = investigationService.getTeamProgress(conversation.teamId(), conversation.caseId());
+        CharacterMood mood = currentMood(conversation, asker);
+        List<Message> prompt = new ArrayList<>();
+        prompt.add(new SystemMessage(characterPromptBuilder.buildSystemPrompt(
+                progress.caseDefinition(),
+                asker,
+                List.of(),
+                ConsultationPrompt.none(),
+                shownEvidence(conversation, List.of()),
+                mood.getMood())));
+        recentHistory(conversation).forEach(message -> prompt.add(toPromptMessage(message, progress)));
+        prompt.add(new UserMessage(
+                characterPromptBuilder.formatContactAnswer(contact.contact().name(), request.getQuestion(), answer)));
+
+        String reply = characterReplyModel.reply(prompt, List.of(), asker.id());
+        ChatMessage characterMessage = ChatMessage.fromCharacter(
+                conversation.teamId(), conversation.caseId(), conversation.characterId(), reply);
+        transactionTemplate.executeWithoutResult(status -> {
+            List<ChatMessage> newMessages = new ArrayList<>(List.of(characterMessage));
+            for (ConsultationUnlock unlock : contact.consultation().unlocks()) {
+                if (investigationService.unlockWithoutCode(
+                        conversation.teamId(), conversation.caseId(), unlockTarget(unlock))) {
+                    newMessages.add(notice(conversation, unlockNotice(progress.caseDefinition(), unlock)));
+                }
+            }
+            chatMessageRepository.saveAll(newMessages);
+            request.markAnswered();
+            consultationRequestRepository.save(request);
+            publishChanges(conversation, newMessages.size() > 1);
+        });
+        return characterMessage;
+    }
+
+    /**
+     * Consultations the character may still start: not asked before by this team, and allowed by its mood. Pending
+     * ones are listed too, so the character knows it is still waiting for an answer.
+     */
+    private ConsultationPrompt consultationPrompt(
+            Conversation conversation, CaseDefinition caseDefinition, CharacterProfile character, Mood mood) {
+        List<ConsultationRequest> requests = consultationRequestRepository.findByTeamIdAndCaseIdAndAskerId(
+                conversation.teamId(), conversation.caseId(), conversation.characterId());
+        Set<String> requestedIds =
+                requests.stream().map(ConsultationRequest::getConsultationId).collect(Collectors.toSet());
+        List<ConsultationContact> askable = character.consults().stream()
+                .filter(consultation -> !requestedIds.contains(consultation.id()))
+                .filter(consultation -> consultation.allows(mood))
+                .map(consultation -> withContact(caseDefinition, consultation))
+                .flatMap(Optional::stream)
+                .toList();
+        List<ConsultationContact> awaited = requests.stream()
+                .filter(request -> request.getStatus() == ConsultationStatus.PENDING)
+                .map(request -> character.findConsultation(request.getConsultationId()))
+                .flatMap(Optional::stream)
+                .map(consultation -> withContact(caseDefinition, consultation))
+                .flatMap(Optional::stream)
+                .toList();
+        return new ConsultationPrompt(askable, awaited);
+    }
+
+    private static Optional<ConsultationContact> withContact(
+            CaseDefinition caseDefinition, ContactConsultation consultation) {
+        return caseDefinition
+                .findCharacter(consultation.character())
+                .map(contact -> new ConsultationContact(consultation, contact));
+    }
+
+    /** Stores a request per question, answered by the scheduler once it is due, and returns the notices for them. */
+    private List<ChatMessage> scheduleQuestions(
+            Conversation conversation, CharacterProfile character, List<AskContactTool.AskedQuestion> questions) {
+        Instant now = consultationSchedule.now();
+        List<ChatMessage> notices = new ArrayList<>();
+        for (AskContactTool.AskedQuestion question : questions) {
+            consultationRequestRepository.save(new ConsultationRequest(
+                    conversation.teamId(),
+                    conversation.caseId(),
+                    conversation.characterId(),
+                    question.contact().consultation().id(),
+                    question.question(),
+                    now,
+                    consultationSchedule.replyDueAt(now)));
+            notices.add(notice(
+                    conversation,
+                    character.name() + " heeft " + question.contact().contact().name() + " een bericht gestuurd."));
+        }
+        return notices;
+    }
+
+    /** Pushed to the team once the transaction commits, see TeamEventStreams. */
+    private void publishChanges(Conversation conversation, boolean unlockedSomething) {
+        eventPublisher.publishEvent(
+                TeamEvent.chat(conversation.teamId(), conversation.caseId(), conversation.characterId()));
+        if (unlockedSomething) {
+            eventPublisher.publishEvent(TeamEvent.caseProgress(conversation.teamId(), conversation.caseId()));
+        }
+    }
+
+    private static UnlockTarget unlockTarget(ConsultationUnlock unlock) {
+        if (unlock.isCharacter()) {
+            return UnlockTarget.character(unlock.character());
+        }
+        if (unlock.isItem()) {
+            return UnlockTarget.item(unlock.desktop(), unlock.app(), unlock.item());
+        }
+        return UnlockTarget.desktop(unlock.desktop());
+    }
+
+    /** The case was validated at startup, so everything an unlock points to exists. */
+    private static String unlockNotice(CaseDefinition caseDefinition, ConsultationUnlock unlock) {
+        if (unlock.isCharacter()) {
+            CharacterProfile contact =
+                    caseDefinition.findCharacter(unlock.character()).orElseThrow();
+            return "Je kunt nu contact opnemen met " + contact.name() + ".";
+        }
+        Desktop desktop = caseDefinition.findDesktop(unlock.desktop()).orElseThrow();
+        if (!unlock.isItem()) {
+            return "De computer van " + desktop.ownerName() + " is ontgrendeld.";
+        }
+        DesktopApp app = desktop.findApp(unlock.app()).orElseThrow();
+        LockableItem item = app.findItem(unlock.item()).orElseThrow();
+        return "\"" + new EvidenceItem(desktop, app, item).title() + "\" op de computer van " + desktop.ownerName()
+                + " is ontgrendeld.";
+    }
+
+    private static ChatMessage notice(Conversation conversation, String content) {
+        return ChatMessage.notice(conversation.teamId(), conversation.caseId(), conversation.characterId(), content);
     }
 
     private CharacterMood currentMood(Conversation conversation, CharacterProfile character) {
@@ -248,70 +418,5 @@ public class ChatService {
             case CHARACTER -> new AssistantMessage(message.getContent());
             case NOTICE -> throw new IllegalArgumentException("Notices are not part of the prompt");
         };
-    }
-
-    /** The tool is null when the character has nobody left to introduce. */
-    private String askModel(List<Message> prompt, IntroduceContactTool introduceContactTool, String characterId) {
-        ChatResponse response;
-        try {
-            response = introduceContactTool == null
-                    ? chatModel.call(new Prompt(prompt))
-                    : callWithTool(new Prompt(prompt, optionsWithTool(introduceContactTool)));
-        } catch (RuntimeException e) {
-            LOG.warn("LLM call failed for character {}", characterId, e);
-            throw new CharacterUnavailableException("LLM call failed for character " + characterId, e);
-        }
-        Generation replyGeneration = finalGeneration(response);
-        String reply =
-                replyGeneration == null ? null : replyGeneration.getOutput().getText();
-        if (reply == null || reply.isBlank()) {
-            String finishReason = replyGeneration == null
-                    ? "none"
-                    : replyGeneration.getMetadata().getFinishReason();
-            LOG.warn("Empty reply from character {}, finish reason: {}", characterId, finishReason);
-            throw new CharacterUnavailableException("Empty reply from character " + characterId);
-        }
-        return reply.strip();
-    }
-
-    /**
-     * The chat model only returns the tool call, it does not execute it. The tool runs here and its result goes back to
-     * the model, until the model answers with text.
-     */
-    private ChatResponse callWithTool(Prompt prompt) {
-        Prompt currentPrompt = prompt;
-        ChatResponse response = chatModel.call(currentPrompt);
-        for (int round = 0; round < MAX_TOOL_ROUNDS && response != null && response.hasToolCalls(); round++) {
-            List<Message> history =
-                    toolCallingManager.executeToolCalls(currentPrompt, response).conversationHistory();
-            currentPrompt = new Prompt(history, prompt.getOptions());
-            response = chatModel.call(currentPrompt);
-        }
-        return response;
-    }
-
-    /**
-     * Runtime options replace the model's configured options instead of being merged with them, so the tool is added to
-     * a copy of the configured options.
-     */
-    private ChatOptions optionsWithTool(IntroduceContactTool introduceContactTool) {
-        if (!(chatModel.getOptions() instanceof ToolCallingChatOptions defaultOptions)) {
-            throw new IllegalStateException("The chat model does not support tool calling");
-        }
-        return defaultOptions
-                .mutate()
-                .toolCallbacks(introduceContactTool.toCallback())
-                .build();
-    }
-
-    /**
-     * Thinking blocks come back as separate generations before the answer, so the text reply is the last generation,
-     * not the first.
-     */
-    private static Generation finalGeneration(ChatResponse response) {
-        if (response == null || response.getResults().isEmpty()) {
-            return null;
-        }
-        return response.getResults().getLast();
     }
 }

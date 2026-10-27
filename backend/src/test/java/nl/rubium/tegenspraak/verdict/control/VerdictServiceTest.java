@@ -21,6 +21,7 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseManifest;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.SolutionQuestion;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamNotFoundException;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAnswer;
@@ -28,6 +29,7 @@ import nl.rubium.tegenspraak.verdict.entity.VerdictAttempt;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttemptRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 
 class VerdictServiceTest {
@@ -42,8 +44,9 @@ class VerdictServiceTest {
     private final TeamService teamService = mock(TeamService.class);
     private final VerdictAttemptRepository verdictAttemptRepository = mock(VerdictAttemptRepository.class);
     private final VerdictGrader verdictGrader = mock(VerdictGrader.class);
-    private final VerdictService verdictService =
-            new VerdictService(caseCatalog, verdictAttemptRepository, teamService, verdictGrader, MAX_ATTEMPTS);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final VerdictService verdictService = new VerdictService(
+            caseCatalog, verdictAttemptRepository, teamService, verdictGrader, eventPublisher, MAX_ATTEMPTS);
     private final List<VerdictAttempt> storedAttempts = new ArrayList<>();
 
     @BeforeEach
@@ -77,6 +80,15 @@ class VerdictServiceTest {
             assertThat(attempt.getCorrectAnswers()).isEqualTo(2);
             assertThat(attempt.getTotalQuestions()).isEqualTo(2);
         });
+    }
+
+    @Test
+    void submit_givenAttemptStored_expectVerdictEventPublished() {
+        givenGraderMarksCorrect("dader");
+
+        verdictService.submit(TEAM_ID, PLAYER_ID, "anouk", CASE_ID, ANSWERS);
+
+        verify(eventPublisher).publishEvent(TeamEvent.verdict(TEAM_ID, CASE_ID));
     }
 
     @Test

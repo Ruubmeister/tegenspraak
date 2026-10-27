@@ -4,8 +4,8 @@ import type { Desktop } from '../api/types'
 import { caseOverviewQueryKey } from '../cases/casesApi'
 import { teamPath } from '../teams/teamsApi'
 
-/** Teammates can unlock items, so an open desktop is refreshed regularly. */
-const DESKTOP_REFRESH_MS = 10_000
+/** Live updates arrive through useTeamEvents; this only catches up while the event stream is down. */
+const DESKTOP_REFRESH_MS = 60_000
 
 /** Identifies a desktop as seen by one team. */
 export interface DesktopLocation {
@@ -29,8 +29,13 @@ export function photoImagePath(location: DesktopLocation, appId: string, itemId:
   return `${desktopPath(location)}/apps/${encodeURIComponent(appId)}/items/${encodeURIComponent(itemId)}/image`
 }
 
+/** Every desktop of the case, so an unlock can refresh whichever one is open. */
+export function caseDesktopsQueryKey(teamId: string, caseId: string) {
+  return ['desktop', teamId, caseId] as const
+}
+
 function desktopQueryKey({ teamId, caseId, desktopId }: DesktopLocation) {
-  return ['desktop', teamId, caseId, desktopId] as const
+  return [...caseDesktopsQueryKey(teamId, caseId), desktopId] as const
 }
 
 export function useDesktop(location: DesktopLocation) {

@@ -33,7 +33,11 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 @SpringBootTest(
         properties = {
             "spring.ai.anthropic.api-key=test-key",
-            "tegenspraak.admin.initial-password=" + IntegrationTest.ADMIN_PASSWORD
+            "tegenspraak.admin.initial-password=" + IntegrationTest.ADMIN_PASSWORD,
+            // Tests answer due consultations themselves, so the scheduler must not get there first
+            "tegenspraak.consultations.poll-interval=1h",
+            // Test players have no registered session, so a heartbeat would close their event streams
+            "tegenspraak.live-updates.heartbeat-interval=1h"
         })
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)

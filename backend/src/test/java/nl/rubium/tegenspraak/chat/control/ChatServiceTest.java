@@ -13,7 +13,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +28,8 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseFixtures;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
+import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
+import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
 import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
@@ -32,6 +38,9 @@ import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
 import nl.rubium.tegenspraak.chat.entity.ChatMessage;
 import nl.rubium.tegenspraak.chat.entity.ChatMessageRepository;
+import nl.rubium.tegenspraak.chat.entity.ConsultationRequest;
+import nl.rubium.tegenspraak.chat.entity.ConsultationRequestRepository;
+import nl.rubium.tegenspraak.chat.entity.ConsultationStatus;
 import nl.rubium.tegenspraak.chat.entity.MessageSender;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
@@ -44,6 +53,8 @@ import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
 import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
+import nl.rubium.tegenspraak.investigation.control.UnlockTarget;
+import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +69,10 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Limit;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 class ChatServiceTest {
 
@@ -68,8 +82,19 @@ class ChatServiceTest {
     private static final String CHARACTER_ID = "de-butler";
     private static final Conversation CONVERSATION = new Conversation(TEAM_ID, CASE_ID, CHARACTER_ID);
 
+    private static final Instant NOW = Instant.parse("2026-10-27T20:00:00Z");
+    private static final CharacterProfile COOK = new CharacterProfile(
+            "de-kok", "De Kok", "Kok", "In de keuken.", null, null, null, null, false, null, null, null);
+    private static final ContactConsultation SAFE_CODE = new ContactConsultation(
+            "kluiscode",
+            "de-kok",
+            "De code van het dagboek",
+            "De speler vraagt naar het dagboek.",
+            "De code is 1234.",
+            null,
+            List.of(new ConsultationUnlock(null, "laptop-butler", "bestanden", "dagboek")));
     private static final CharacterProfile GARDENER = new CharacterProfile(
-            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null);
+            "de-tuinman", "De Tuinman", "Tuinman", "In de kas.", null, null, null, null, true, null, null, null);
     private static final CharacterProfile BUTLER = new CharacterProfile(
             CHARACTER_ID,
             "De Butler",
@@ -86,6 +111,7 @@ class ChatServiceTest {
                     null)),
             false,
             List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", null)),
+            null,
             null);
     private static final Desktop BUTLER_LAPTOP = new Desktop(
             "laptop-butler",
@@ -121,22 +147,36 @@ class ChatServiceTest {
     private static final EvidenceRef MENU_FILE = new EvidenceRef("laptop-butler", "bestanden", "menu");
     private static final EvidenceRef LOCKED_DIARY = new EvidenceRef("laptop-butler", "bestanden", "dagboek");
     private static final CaseDefinition CASE_DEFINITION = new CaseDefinition(
-            CASE_ID, CaseFixtures.manifestWithSetting("Geheim"), List.of(BUTLER, GARDENER), List.of(BUTLER_LAPTOP));
+            CASE_ID,
+            CaseFixtures.manifestWithSetting("Geheim"),
+            List.of(BUTLER, GARDENER, COOK),
+            List.of(BUTLER_LAPTOP));
 
     private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
     private final CharacterMoodRepository characterMoodRepository = mock(CharacterMoodRepository.class);
     private final MessageToneClassifier messageToneClassifier = mock(MessageToneClassifier.class);
     private final ChatModel chatModel = mock(ChatModel.class);
     private final InvestigationService investigationService = mock(InvestigationService.class);
+    private final ConsultationRequestRepository consultationRequestRepository =
+            mock(ConsultationRequestRepository.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final ChatService chatService = new ChatService(
             new CharacterPromptBuilder(),
             chatMessageRepository,
             characterMoodRepository,
+            consultationRequestRepository,
             messageToneClassifier,
-            chatModel,
-            ToolCallingManager.builder().build(),
+            new CharacterReplyModel(chatModel, ToolCallingManager.builder().build()),
             investigationService,
             new ConversationLocks(),
+            new ConsultationSchedule(
+                    Clock.fixed(NOW, ZoneOffset.UTC),
+                    Duration.ofMinutes(2),
+                    Duration.ofMinutes(2),
+                    Duration.ofMinutes(1),
+                    3),
+            new TransactionTemplate(mock(PlatformTransactionManager.class)),
+            eventPublisher,
             40);
     private final Set<String> unlockedTargets = new HashSet<>();
 
@@ -145,6 +185,8 @@ class ChatServiceTest {
         when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
                 .thenReturn(BUTLER);
         when(investigationService.getProgress(TEAM_ID, PLAYER_ID, CASE_ID))
+                .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
+        when(investigationService.getTeamProgress(TEAM_ID, CASE_ID))
                 .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
         when(characterMoodRepository.findByTeamIdAndCaseIdAndCharacterId(TEAM_ID, CASE_ID, CHARACTER_ID))
                 .thenReturn(Optional.empty());
@@ -316,6 +358,37 @@ class ChatServiceTest {
     }
 
     @Test
+    void sendMessage_givenModelReply_expectChatEventPublishedWithoutCaseEvent() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
+
+        verify(eventPublisher).publishEvent(TeamEvent.chat(TEAM_ID, CASE_ID, CHARACTER_ID));
+        verify(eventPublisher, never()).publishEvent(TeamEvent.caseProgress(TEAM_ID, CASE_ID));
+    }
+
+    @Test
+    void sendMessage_givenModelIntroducesContact_expectCaseEventPublished() {
+        givenStoredHistoryNewestFirst();
+        givenModelCallsToolThenReplies("{\"characterId\": \"de-tuinman\"}", "Vraag het De Tuinman maar.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wie was er in de tuin?", List.of());
+
+        verify(eventPublisher).publishEvent(TeamEvent.caseProgress(TEAM_ID, CASE_ID));
+    }
+
+    @Test
+    void sendMessage_givenModelFails_expectNoEventPublished() {
+        givenStoredHistoryNewestFirst();
+        when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of()))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
+    }
+
+    @Test
     void sendMessage_givenToolCalledWithUnknownId_expectNothingIntroduced() {
         givenStoredHistoryNewestFirst();
         givenModelCallsToolThenReplies("{\"characterId\": \"de-kok\"}", "Ik ken geen kok.");
@@ -381,16 +454,24 @@ class ChatServiceTest {
     }
 
     private void givenModelCallsToolThenReplies(String toolInput, String reply) {
+        givenModelCallsToolThenReplies("introduce_contact", toolInput, reply);
+    }
+
+    private void givenModelCallsToolThenReplies(String toolName, String toolInput, String reply) {
         when(chatModel.call(any(Prompt.class)))
-                .thenReturn(toolCallResponse(toolInput))
+                .thenReturn(toolCallResponse(toolName, toolInput))
                 .thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(reply)))));
     }
 
-    /** The chat model only reports the tool call, ChatService has to execute it. */
     private static ChatResponse toolCallResponse(String toolInput) {
+        return toolCallResponse("introduce_contact", toolInput);
+    }
+
+    /** The chat model only reports the tool call, ChatService has to execute it. */
+    private static ChatResponse toolCallResponse(String toolName, String toolInput) {
         AssistantMessage toolCall = AssistantMessage.builder()
                 .content("")
-                .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "introduce_contact", toolInput)))
+                .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", toolName, toolInput)))
                 .build();
         return new ChatResponse(List.of(new Generation(toolCall)));
     }
@@ -551,6 +632,7 @@ class ChatServiceTest {
                 null,
                 false,
                 List.of(new ContactIntroduction("de-tuinman", "De speler vraagt naar de tuin.", minimumMood)),
+                null,
                 null);
         when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
                 .thenReturn(butler);
@@ -698,5 +780,211 @@ class ChatServiceTest {
                 authorName,
                 content,
                 List.of(new ChatAttachment("laptop-butler", "mail", "afspraak")));
+    }
+
+    @Test
+    void sendMessage_givenAskableConsultation_expectAskToolOfferedAndTopicInPrompt() {
+        givenButlerConsulting(null);
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
+
+        Prompt prompt = capturePrompt();
+        assertThat(prompt.getOptions())
+                .isInstanceOfSatisfying(
+                        ToolCallingChatOptions.class,
+                        toolOptions -> assertThat(toolOptions.getToolCallbacks())
+                                .extracting(
+                                        callback -> callback.getToolDefinition().name())
+                                .containsExactly("introduce_contact", "ask_contact"));
+        assertThat(prompt.getInstructions().getFirst().getText())
+                .contains("## Mensen die je iets kunt vragen", "De Kok (id: kluiscode)");
+    }
+
+    @Test
+    void sendMessage_givenConsultationNeedsBetterMood_expectNoAskToolOffered() {
+        givenButlerConsulting(Mood.TRUSTING);
+        unlockedTargets.add("character:de-tuinman");
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Goedenavond.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of());
+
+        ChatOptions options = capturePrompt().getOptions();
+        boolean toolOffered = options instanceof ToolCallingChatOptions toolOptions
+                && !toolOptions.getToolCallbacks().isEmpty();
+        assertThat(toolOffered).isFalse();
+    }
+
+    @Test
+    void sendMessage_givenPendingConsultation_expectNoAskToolAndWaitingInPrompt() {
+        givenButlerConsulting(null);
+        unlockedTargets.add("character:de-tuinman");
+        when(consultationRequestRepository.findByTeamIdAndCaseIdAndAskerId(TEAM_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(List.of(pendingRequest()));
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("Ik heb nog niets gehoord.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "En de kok?", List.of());
+
+        Prompt prompt = capturePrompt();
+        boolean toolOffered = prompt.getOptions() instanceof ToolCallingChatOptions toolOptions
+                && !toolOptions.getToolCallbacks().isEmpty();
+        assertThat(toolOffered).isFalse();
+        assertThat(prompt.getInstructions().getFirst().getText())
+                .contains("## Waar je nog op wacht", "- De Kok, over: De code van het dagboek")
+                .doesNotContain("## Mensen die je iets kunt vragen");
+    }
+
+    @Test
+    void sendMessage_givenModelAsksContact_expectRequestScheduledAndNoticeStored() {
+        givenButlerConsulting(null);
+        givenStoredHistoryNewestFirst();
+        givenModelCallsToolThenReplies(
+                "ask_contact",
+                "{\"consultationId\": \"kluiscode\", \"question\": \"Weet jij de code?\"}",
+                "Ik vraag het de kok.");
+
+        chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Wat is de code?", List.of());
+
+        ArgumentCaptor<ConsultationRequest> request = ArgumentCaptor.forClass(ConsultationRequest.class);
+        verify(consultationRequestRepository).save(request.capture());
+        assertThat(request.getValue())
+                .extracting(
+                        ConsultationRequest::getTeamId,
+                        ConsultationRequest::getAskerId,
+                        ConsultationRequest::getConsultationId,
+                        ConsultationRequest::getQuestion,
+                        ConsultationRequest::getStatus,
+                        ConsultationRequest::getDueAt)
+                .containsExactly(
+                        TEAM_ID,
+                        CHARACTER_ID,
+                        "kluiscode",
+                        "Weet jij de code?",
+                        ConsultationStatus.PENDING,
+                        NOW.plus(Duration.ofMinutes(2)));
+        assertThat(savedMessages())
+                .extracting(ChatMessage::getSender, ChatMessage::getContent)
+                .containsExactly(
+                        tuple(MessageSender.PLAYER, "Wat is de code?"),
+                        tuple(MessageSender.CHARACTER, "Ik vraag het de kok."),
+                        tuple(MessageSender.NOTICE, "De Butler heeft De Kok een bericht gestuurd."));
+    }
+
+    @Test
+    void sendMessage_givenModelFailsAfterAskingContact_expectNoRequestStored() {
+        givenButlerConsulting(null);
+        givenStoredHistoryNewestFirst();
+        when(chatModel.call(any(Prompt.class)))
+                .thenReturn(
+                        toolCallResponse("ask_contact", "{\"consultationId\": \"kluiscode\", \"question\": \"Code?\"}"))
+                .thenThrow(new IllegalStateException("API down"));
+
+        assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Code?", List.of()))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(consultationRequestRepository, never()).save(any(ConsultationRequest.class));
+    }
+
+    @Test
+    void relayConsultationAnswer_givenAnswer_expectAnswerSentAsLastMessageAndReplyStored() {
+        givenStoredHistoryNewestFirst(characterMessage("Ik vraag het de kok."), playerMessage("anouk", "Code?"));
+        givenModelReplies("De kok zegt dat het 1234 is.");
+        ConsultationRequest request = pendingRequest();
+
+        chatService.relayConsultationAnswer(
+                request, new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
+
+        List<Message> sent = capturePromptMessages();
+        assertThat(sent)
+                .extracting(Message::getMessageType)
+                .containsExactly(MessageType.SYSTEM, MessageType.USER, MessageType.ASSISTANT, MessageType.USER);
+        assertThat(sent.getLast().getText())
+                .contains("Je hebt antwoord gekregen van De Kok", "Weet jij de code?", "Het is 1234.");
+        assertThat(savedMessages())
+                .extracting(ChatMessage::getSender, ChatMessage::getContent)
+                .startsWith(tuple(MessageSender.CHARACTER, "De kok zegt dat het 1234 is."));
+        assertThat(request.getStatus()).isEqualTo(ConsultationStatus.ANSWERED);
+        verify(consultationRequestRepository).save(request);
+    }
+
+    @Test
+    void relayConsultationAnswer_givenLockedItemUnlock_expectItemUnlockedAndNoticeStored() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("De kok zegt dat het 1234 is.");
+        when(investigationService.unlockWithoutCode(
+                        TEAM_ID, CASE_ID, UnlockTarget.item("laptop-butler", "bestanden", "dagboek")))
+                .thenReturn(true);
+
+        chatService.relayConsultationAnswer(
+                pendingRequest(), new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
+
+        assertThat(savedMessages())
+                .extracting(ChatMessage::getSender, ChatMessage::getContent)
+                .containsExactly(
+                        tuple(MessageSender.CHARACTER, "De kok zegt dat het 1234 is."),
+                        tuple(MessageSender.NOTICE, "\"dagboek.txt\" op de computer van De Butler is ontgrendeld."));
+        verify(eventPublisher).publishEvent(TeamEvent.chat(TEAM_ID, CASE_ID, CHARACTER_ID));
+        verify(eventPublisher).publishEvent(TeamEvent.caseProgress(TEAM_ID, CASE_ID));
+    }
+
+    @Test
+    void relayConsultationAnswer_givenAlreadyUnlocked_expectNoUnlockNotice() {
+        givenStoredHistoryNewestFirst();
+        givenModelReplies("De kok zegt dat het 1234 is.");
+
+        chatService.relayConsultationAnswer(
+                pendingRequest(), new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
+
+        assertThat(savedMessages()).extracting(ChatMessage::getSender).containsExactly(MessageSender.CHARACTER);
+    }
+
+    @Test
+    void relayConsultationAnswer_givenModelFails_expectNothingStoredAndRequestStillPending() {
+        givenStoredHistoryNewestFirst();
+        when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
+        ConsultationRequest request = pendingRequest();
+
+        assertThatThrownBy(() -> chatService.relayConsultationAnswer(
+                        request, new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234."))
+                .isInstanceOf(CharacterUnavailableException.class);
+        verify(chatMessageRepository, never()).saveAll(anyList());
+        verify(investigationService, never()).unlockWithoutCode(any(), any(), any());
+        assertThat(request.getStatus()).isEqualTo(ConsultationStatus.PENDING);
+    }
+
+    private static ConsultationRequest pendingRequest() {
+        return new ConsultationRequest(
+                TEAM_ID, CASE_ID, CHARACTER_ID, "kluiscode", "Weet jij de code?", NOW, NOW.plus(Duration.ofMinutes(2)));
+    }
+
+    private void givenButlerConsulting(Mood minimumMood) {
+        when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
+                .thenReturn(butlerConsulting(minimumMood));
+    }
+
+    private static CharacterProfile butlerConsulting(Mood minimumMood) {
+        ContactConsultation consultation = new ContactConsultation(
+                SAFE_CODE.id(),
+                SAFE_CODE.character(),
+                SAFE_CODE.about(),
+                SAFE_CODE.when(),
+                SAFE_CODE.answer(),
+                minimumMood,
+                SAFE_CODE.unlocks());
+        return new CharacterProfile(
+                CHARACTER_ID,
+                "De Butler",
+                "Butler",
+                "Altijd aanwezig.",
+                null,
+                null,
+                null,
+                null,
+                false,
+                BUTLER.introduces(),
+                null,
+                List.of(consultation));
     }
 }
