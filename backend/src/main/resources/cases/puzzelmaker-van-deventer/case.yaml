@@ -1,0 +1,83 @@
+title: De puzzelmaker van Deventer (expert)
+summary: >-
+  De vaste puzzelmaker van een regionale krant wordt dood gevonden onder aan zijn steile trap. Een ongeluk, zegt de
+  politie. Maar zijn laptop is weg, en zijn laatste puzzel is anders dan alle andere.
+difficulty: expert
+introduction: >-
+  Het is dinsdag 17 november. Op zaterdagochtend 14 november vond Joost Klaver zijn oom Wouter Klaver (63) dood onder
+  aan de steile trap van zijn grachtenpand aan de Bergstraat in Deventer. Wouter maakte al 25 jaar de Zaterdagbreker,
+  de puzzel van De IJsselbode. De politie houdt het op een val. Maar Anneke Visser, Wouters vriendin van puzzelclub De
+  Waag, gelooft er niets van: twee dagen voor zijn dood belde Wouter haar en zei "Als mij iets overkomt, los dan
+  zaterdag de breker op. Echt oplossen, Anneke." Die zaterdag stond zijn laatste puzzel in de krant. Anneke heeft
+  jullie ingeschakeld. Jullie hebben het politiedossier, de redactiecomputer van De IJsselbode en het systeem van het
+  Stadsarchief, waar Wouter vrijwilliger was. Zijn telefoon en een versleutelde cloudmap zijn beveiligd. Zijn laptop is
+  nergens gevonden.
+setting: >-
+  Wouter Klaver (63), weduwnaar, woonde aan de Bergstraat 19 in Deventer. Sinds zaterdag 6 oktober 2001 maakte hij de
+  Zaterdagbreker in De IJsselbode, van hoofdredacteur Hans Bloemendaal. Hij was vrijwilliger bij het Stadsarchief
+  Deventer (dinsdag en donderdag, catalogiseren) en wond elke woensdagavond het torenuurwerk van de Bergkerk op. In
+  februari 2025 verkocht de gemeente de grond van Havenkwartier Noord voor 3,1 miljoen euro aan Zandbergen Vastgoed van
+  Robbert Zandbergen (49). Daarbij werd 6,2 miljoen euro afgetrokken voor bodemsanering, op basis van rapport
+  2025-HK-17 van Bodemadvies Oost, getekend door ingenieur Marieke Dijkhuis (44). Een eerder rapport van haar, 2024-HK-09
+  van oktober 2024, stelde lichte verontreiniging vast met een sanering van 0,4 miljoen; zonder het nieuwe rapport was
+  de grond ongeveer 8,9 miljoen waard. Zandbergen had haar directeur Bert van Raalte onder druk gezet ("het rapport moet
+  aansluiten bij onze grondprijs") en Van Raalte dwong Marieke het nieuwe rapport te tekenen, met haar baan als inzet.
+  Op dinsdag 27 oktober vond Wouter het rapport van 2024 in een verkeerd opgeborgen archiefdoos (HK-2024-17) en
+  fotografeerde het. Hij mailde Marieke op 2 en 10 november op haar werkadres om uitleg en gaf haar tot maandag 16
+  november, daarna zou alles naar de krant en de gemeenteraad gaan. Op woensdag 4 november vroeg Marieke onder haar
+  eigen naam en met haar privéadres groenegrond82@gmail.com in het Stadsarchief de doos aan, maar die was uitgeleend
+  aan Wouter. Zandbergen hoorde van Van Raalte over de vrijwilliger en stuurde Wouter op 7 november een anonieme
+  dreigmail ("Laat het rusten, Klaver. Sommige dozen kun je beter dicht laten."); op 9 november klaagde hij bij Hans
+  Bloemendaal over Wouter met bijna dezelfde woorden. Op woensdag 11 november verstopte Wouter bij het opwinden van het
+  uurwerk een envelop onder een losse plank onder het uurwerk in de klokkenkamer van de Bergkerk, met een kopie van het
+  rapport van 2024 en een kaartje met het wachtwoord van zijn cloudmap: "schonegrond". Op donderdag 12 november stuurde
+  hij zijn laatste Zaterdagbreker (nr. 1306) in: een letterpuzzel waarvan de beginletters van de antwoorden KLOKKENKAMER
+  vormen. Die avond belde hij Anneke. Om 22:31 mailde Marieke vanaf haar privéadres of ze vrijdagavond mocht komen
+  praten; Wouter antwoordde vrijdagochtend "Kom maar na negen uur." Vrijdag 13 november van 20:10 tot 20:45 was neef
+  Joost Klaver (34) bij Wouter om 15.000 euro te lenen voor zijn schulden; Wouter weigerde, ze kregen ruzie en Wouter
+  zei dat hij nog bezoek kreeg. Joost appte om 20:52 sorry, Wouter antwoordde om 21:05. Overbuurvrouw Ria Hendriks zag
+  om 20:45 een man vertrekken en om 21:38 een vrouw met een fiets met een donkergroene fietstas met een lichtgroen
+  blad, het logo van Bodemadvies Oost, aanbellen. Marieke smeekte Wouter te wachten. Hij weigerde en liep de trap op om
+  Hans te bellen; boven aan de trap greep ze zijn linkerbovenarm, hij verloor zijn evenwicht en viel naar beneden. Om
+  21:52 registreerde zijn telefoon een harde val; om 21:53 werd de automatische noodoproep op het toestel geannuleerd
+  met "Ik ben in orde". Dat deed Marieke, in paniek. Ze nam zijn laptop mee, gooide die vanaf de Wilhelminabrug in de
+  IJssel en nam de trein van 22:17 naar Apeldoorn. Wouter leefde nog tot ongeveer 22:24. Zandbergen zat die avond van
+  19:30 tot 23:15 met zakenpartners in restaurant De Vischpoort in Zwolle. De politie ging uit van een val: een steile
+  trap, een glas wijn, pantoffels. Ria vertelde de agent eerst alleen over de man; toen ze terugbelde over de vrouw,
+  belde niemand haar terug. Zandbergen en Joost hebben Wouter niets aangedaan.
+solution:
+  questions:
+    - id: wie
+      question: Wie is verantwoordelijk voor de dood van Wouter Klaver?
+      answer: Marieke Dijkhuis, de ingenieur van Bodemadvies Oost.
+    - id: toedracht
+      question: Hoe kwam Wouter Klaver om het leven, en waarom was het geen gewoon ongeluk?
+      answer: >-
+        Kernpunten: hij viel van zijn trap tijdens een confrontatie, nadat de dader hem boven aan de trap bij zijn
+        arm greep; de dader annuleerde daarna de automatische noodoproep van zijn telefoon en liet hem stervend achter.
+    - id: ontdekking
+      question: Wat had Wouter Klaver ontdekt?
+      answer: >-
+        Kernpunten: het bodemrapport voor Havenkwartier Noord was vervalst; het eerdere rapport uit 2024 stelde maar
+        lichte verontreiniging vast, waardoor de gemeente de grond ver onder de waarde aan Zandbergen Vastgoed had
+        verkocht.
+    - id: bewijs
+      question: Waar had Wouter zijn bewijs verstopt, en hoe liet hij dat weten?
+      answer: >-
+        Kernpunten: in de klokkenkamer van de Bergkerk, onder het uurwerk; dat woord had hij verstopt in de
+        beginletters van de antwoorden van zijn laatste Zaterdagbreker.
+    - id: dreigmail
+      question: Wie stuurde de anonieme dreigmail aan Wouter, en wat had die persoon met zijn dood te maken?
+      answer: >-
+        Kernpunten: Robbert Zandbergen stuurde de dreigmail; hij had niets met de dood te maken, want hij zat die
+        avond in een restaurant in Zwolle.
+  epilogue: >-
+    Wouter Klaver had ontdekt dat het bodemrapport waarmee de gemeente de grond van Havenkwartier Noord voor een
+    fractie van de waarde aan Zandbergen Vastgoed verkocht, was vervalst. Hij voelde zich bedreigd en verstopte zijn
+    bewijs in de klokkenkamer van de Bergkerk, met een boodschap in zijn laatste puzzel. Op vrijdagavond kwam Marieke
+    Dijkhuis, die het valse rapport onder druk had getekend, hem smeken te zwijgen. Boven aan de trap greep ze hem
+    vast en hij viel. In paniek annuleerde ze zijn noodoproep, nam zijn laptop mee en liet hem achter. Marieke
+    Dijkhuis is aangehouden op verdenking van dood door schuld en het achterlaten van een hulpbehoevende. Duikers
+    vonden de laptop bij de Wilhelminabrug. Tegen Robbert Zandbergen en Bert van Raalte loopt een onderzoek naar
+    fraude en bedreiging, en de gemeenteraad heeft de verkoop van Havenkwartier Noord opgeschort. De IJsselbode
+    plaatste Wouters verhaal op de voorpagina, met zijn laatste Zaterdagbreker ernaast.

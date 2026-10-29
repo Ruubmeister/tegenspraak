@@ -1,0 +1,140 @@
+ownerName: Cornelia van Asperen
+ownerType: person
+description: De tablet van mevrouw Van Asperen, die op het dressoir in de woonkamer lag.
+lock:
+  code: "0505"
+  hint: "Toegangscode: de dag dat ik Huib leerde kennen (ddmm)"
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: rouwkaart
+        folder: Inbox
+        from: frank@fhbeheer.nl
+        to: cor.vanasperen@ziggo.nl
+        subject: Bericht van overlijden
+        sentAt: 2026-03-11T09:30:00
+        body: |
+          Lieve Cor,
+
+          Met verdriet laat ik je weten dat mijn moeder is overleden.
+
+              Wilhelmina Johanna Hoogendijk-Verbeek
+              "Mien"
+              * Breda, 12 maart 1938    † Breda, 9 maart 2026
+
+          Na jaren van hartfalen is zij rustig ingeslapen, thuis, zoals ze wilde.
+
+          De afscheidsdienst is op maandag 16 maart in de Sint-Antoniuskathedraal.
+
+          Frank
+      - id: overzicht-fleur
+        folder: Inbox
+        from: fleur.vanasperen@student.avans.nl
+        to: cor.vanasperen@ziggo.nl
+        subject: rare betalingen??
+        sentAt: 2026-09-22T22:48:00
+        body: |
+          Hoi tante Cor,
+
+          Ik snap deze betalingen echt niet. Sinds juli 2024 gaat er bijna elke maand geld naar FH Beheer en Advies,
+          rekening NL71 INGB 0006 4471 39. Omschrijving "advieskosten" of "onderhoud landgoed". Maar Kees betaal je
+          toch zelf contant?
+
+          Totaal juli 2024 t/m aug 2026: 26 maanden, EUR 384.500 (!!)
+          Grootste: 14-02-2025 EUR 42.000 "onderhoud dak koetshuis" -> is dat dak echt gedaan??
+
+          Btw ik wil niemand beschuldigen hoor, maar dit klopt niet. Zullen we het samen met de bank bekijken?
+
+          Liefs, Fleur
+      - id: kom-donderdag
+        folder: Verzonden
+        from: cor.vanasperen@ziggo.nl
+        to: frank@fhbeheer.nl
+        subject: "Re: brief notaris"
+        sentAt: 2026-09-30T22:15:00
+        body: |
+          Kom donderdag om twee uur. Joyce is dan vrij, dan kunnen we rustig praten.
+          Maar ik laat alles maandag door de bank nakijken, Frank. Dat staat vast.
+
+          Cor
+
+          > Lieve Cor,
+          >
+          > Ik schrik me rot van de brief van de notaris. Dit is allemaal een groot misverstand, begrijp me goed.
+          > Mag ik het je donderdag komen uitleggen, met z'n tweeën, zonder de familie erbij?
+          >
+          > Frank
+      - id: afspraak-bank
+        folder: Inbox
+        from: afspraken@rabobank.nl
+        to: cor.vanasperen@ziggo.nl
+        subject: Bevestiging van uw afspraak
+        sentAt: 2026-09-30T15:12:00
+        body: |
+          Geachte mevrouw Van Asperen,
+
+          Hierbij bevestigen wij uw afspraak op maandag 5 oktober 2026 om 10:00 uur, Rabobank Breda, Wilhelminasingel.
+          Onderwerp: doorlichting rekeningen en machtigingen. U komt samen met mevr. F. van Asperen.
+
+          Rabobank Breda
+  - type: calendar
+    id: agenda
+    title: Agenda
+    events:
+      - id: notaris
+        title: Notaris Smulders
+        start: 2026-09-29T10:30:00
+        end: 2026-09-29T11:45:00
+        location: Breda
+      - id: fleur
+        title: Fleur komt
+        start: 2026-09-30T14:00:00
+        end: 2026-09-30T17:00:00
+        notes: Bank bellen!
+      - id: frank-uitleg
+        title: Frank (uitleg)
+        start: 2026-10-01T14:00:00
+        end: 2026-10-01T15:30:00
+        location: Thuis
+        notes: Alleen. Hij moet het maar eens uitleggen.
+      - id: maarten-eten
+        title: Maarten komt eten
+        start: 2026-10-02T19:00:00
+        end: 2026-10-02T21:00:00
+        notes: Over geld beginnen? Nee. Testament vertellen.
+      - id: bank
+        title: Rabobank met Fleur
+        start: 2026-10-05T10:00:00
+        end: 2026-10-05T11:30:00
+        location: Rabobank Breda, Wilhelminasingel
+        attendees: [Cornelia van Asperen, Fleur van Asperen]
+  - type: browser
+    id: browser
+    title: Browser
+    pages:
+      - id: volmacht-intrekken
+        url: https://www.notaris.nl/volmacht-intrekken
+        title: Een volmacht intrekken - Notaris.nl
+        visitedAt: 2026-09-23T10:02:00
+        content: |
+          Een volmacht intrekken kan altijd. Laat de intrekking vastleggen bij de notaris en informeer de
+          gevolmachtigde schriftelijk. Vermoedt u misbruik? Laat dan uw rekeningen controleren door uw bank.
+      - id: verduistering
+        url: https://www.zoeken.nl/?q=gevolmachtigde+geld+van+rekening+gehaald+aangifte
+        title: gevolmachtigde geld van rekening gehaald aangifte - Zoeken
+        visitedAt: 2026-09-23T10:11:00
+        content: |
+          Misbruik van een volmacht kan verduistering zijn. U kunt aangifte doen bij de politie. Verzamel eerst
+          bankafschriften waarop de betalingen te zien zijn.
+      - id: geel-zien
+        url: https://www.gezondheidsinfo.nl/klachten/geel-zien
+        title: Alles geel zien - oorzaken - Gezondheidsinfo.nl
+        visitedAt: 2026-10-02T16:41:00
+        content: |
+          Geel zien (xanthopsie): alles lijkt een gele of groene waas te hebben.
+
+          Mogelijke oorzaken: geelzucht, bepaalde oogaandoeningen, en bijwerkingen van medicijnen.
+          Let op: gebruikt u digoxine (Lanoxin)? Dan kan geel zien, samen met misselijkheid en een trage hartslag,
+          wijzen op een te hoge spiegel in het bloed. Neem direct contact op met uw arts.

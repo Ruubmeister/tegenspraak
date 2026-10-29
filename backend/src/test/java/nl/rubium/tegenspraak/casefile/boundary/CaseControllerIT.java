@@ -29,6 +29,7 @@ class CaseControllerIT extends IntegrationTest {
         mockMvc.perform(get("/api/cases").with(user(player)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("het-lek-bij-van-dijk"))
-                .andExpect(jsonPath("$[0].title").value("Het lek bij Van Dijk Vastgoed (oefenzaak)"));
+                .andExpect(jsonPath("$[0].title").value("Het lek bij Van Dijk Vastgoed (oefenzaak)"))
+                .andExpect(jsonPath("$[0].difficulty").value("oefenzaak"));
     }
 }

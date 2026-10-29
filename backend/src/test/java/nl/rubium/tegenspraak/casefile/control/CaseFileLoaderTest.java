@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
 import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
+import nl.rubium.tegenspraak.casefile.entity.CaseDifficulty;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
@@ -34,6 +35,7 @@ class CaseFileLoaderTest {
         assertThat(cases).singleElement().satisfies(caseDefinition -> {
             assertThat(caseDefinition.id()).isEqualTo("demo-case");
             assertThat(caseDefinition.manifest().setting()).isEqualTo("De butler deed het.");
+            assertThat(caseDefinition.manifest().difficulty()).isEqualTo(CaseDifficulty.MAKKELIJK);
             assertThat(caseDefinition.characters())
                     .extracting(CharacterProfile::id)
                     .containsExactly("de-butler", "de-tuinman");
@@ -256,6 +258,11 @@ class CaseFileLoaderTest {
         assertThat(cases)
                 .extracting(CaseDefinition::id)
                 .containsExactly(
-                        "het-lek-bij-van-dijk", "kas-van-vv-rijnvogels", "kunstbrand-in-haarlem", "laatste-experiment");
+                        "het-lek-bij-van-dijk",
+                        "kas-van-vv-rijnvogels",
+                        "kunstbrand-in-haarlem",
+                        "laatste-experiment",
+                        "puzzelmaker-van-deventer",
+                        "testament-van-huize-wolfslaar");
     }
 }

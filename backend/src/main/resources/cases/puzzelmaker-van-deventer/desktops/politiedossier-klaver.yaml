@@ -1,0 +1,62 @@
+ownerName: Politie Oost-Nederland
+ownerType: organisation
+description: Het politiedossier over het overlijden van Wouter Klaver.
+apps:
+  - type: files
+    id: dossier
+    title: Dossier
+    files:
+      - id: aantreffen
+        folder: Proces-verbaal
+        name: PV_aantreffen_14-11.txt
+        content: |
+          Proces-verbaal van bevindingen
+          Datum: 14 november 2026, 10:40
+
+          Om 10:07 melding van J. Klaver (neef): oom levenloos aangetroffen, Bergstraat 19, Deventer.
+          Slachtoffer: W. Klaver (63), op de vloer van de gang, onder aan de trap naar de eerste verdieping.
+          Trap: zeer steil (grachtenpand), zonder leuning aan de linkerzijde. Slachtoffer droeg pantoffels.
+          Woonkamer: één glas rode wijn op de salontafel, half leeg. Verlichting overal aan.
+          Geen braaksporen. Voordeur in het slot gevallen, niet op het nachtslot.
+          Telefoon slachtoffer in rechterbroekzak, beveiligd met code. Veiliggesteld.
+          Bureau eerste verdieping: geen laptop aangetroffen. Volgens neef had slachtoffer er altijd een.
+      - id: sectie
+        folder: Forensisch
+        name: Sectierapport_samenvatting.txt
+        content: |
+          NFI - samenvatting sectierapport W. Klaver
+
+          Doodsoorzaak: schedelbasisfractuur na val van grote hoogte (trap).
+          Na de val vermoedelijk direct bewusteloos. Overlijden niet onmiddellijk; mogelijk enige tijd later.
+          Tijdstip van overlijden: tussen 21:00 en 24:00 op 13 november 2026.
+          Alcohol: 0,2 promille.
+          Uitwendig: vier kleine ronde blauwe plekken aan de binnenzijde van de linkerbovenarm, recent.
+          Opmerking politie: vermoedelijk bij de val opgelopen.
+      - id: buurtonderzoek
+        folder: Onderzoek
+        name: Buurtonderzoek_Bergstraat.txt
+        content: |
+          Buurtonderzoek Bergstraat, 14 november 2026
+
+          nr. 17: niet thuis geweest (weekend weg).
+          nr. 21: niets gezien of gehoord.
+          nr. 22 (R. Hendriks, overbuurvrouw): zag vrijdag rond 20:45 een jonge man boos het pand verlaten.
+               Denkt aan de neef. Getuige wilde nog iets zeggen over "later", maar werd gebeld en vroeg of
+               ze terug mocht bellen.
+          nr. 24: hoorde "rond tien uur" een harde bons, dacht aan de buren aan de andere kant.
+
+          Aanvulling 16-11: R. Hendriks heeft teruggebeld. Nog niet teruggebeld.
+      - id: verklaringen
+        folder: Onderzoek
+        name: Verklaringen_samenvatting.txt
+        content: |
+          Samenvatting verklaringen
+
+          J. Klaver (neef, erfgenaam): was vrijdagavond thuis in Zutphen. Heeft sleutel. Vond oom om 10:00.
+          Oom was "de laatste tijd gespannen, iets met het archief".
+
+          H. Bloemendaal (hoofdredacteur De IJsselbode): slachtoffer leverde donderdag zoals altijd zijn puzzel
+          in. Zou maandag langskomen met "een verhaal". Weet niet waarover.
+
+          Voorlopige conclusie: ongeval. Slachtoffer is op de steile trap gevallen, mogelijk door pantoffels
+          en alcohol. Geen aanwijzingen voor betrokkenheid van derden.

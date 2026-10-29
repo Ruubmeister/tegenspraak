@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
+import nl.rubium.tegenspraak.casefile.entity.CaseDifficulty;
 import nl.rubium.tegenspraak.casefile.entity.CaseManifest;
 import nl.rubium.tegenspraak.casefile.entity.CaseSolution;
 import nl.rubium.tegenspraak.casefile.entity.SolutionQuestion;
@@ -57,7 +58,10 @@ class VerdictServiceTest {
                         new SolutionQuestion("wapen", "Waarmee?", "Met de kandelaar.")),
                 "De butler bekende alles.");
         CaseDefinition caseDefinition = new CaseDefinition(
-                CASE_ID, new CaseManifest("Demo", "Kort", "Intro", "Geheim", solution), List.of(), List.of());
+                CASE_ID,
+                new CaseManifest("Demo", "Kort", CaseDifficulty.MAKKELIJK, "Intro", "Geheim", solution),
+                List.of(),
+                List.of());
         when(caseCatalog.getCase(CASE_ID)).thenReturn(caseDefinition);
         when(verdictAttemptRepository.findByTeamIdAndCaseIdOrderByAttemptNumberAsc(TEAM_ID, CASE_ID))
                 .thenAnswer(invocation -> List.copyOf(storedAttempts));

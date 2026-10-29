@@ -1,0 +1,58 @@
+name: Frank Hoogendijk
+role: Vermogensbeheerder, eigenaar van FH Beheer en Advies
+description: Beheerde sinds de dood van Huib van Asperen in 2020 het vermogen van mevrouw Van Asperen.
+startingMood: friendly
+personality: >-
+  Joviaal, behulpzaam en een gladde prater. Speelt de trouwe vriend van de familie die "Cor" al dertig jaar kende.
+  Biedt steeds hulp aan en stuurt het gesprek graag naar Maarten ("schulden, ruzie, enige erfgenaam") en naar de
+  verzorgende ("ineens 75.000 euro"). Hij liegt kalm en geeft alleen toe wat al bewezen is, en heeft dan meteen een
+  onschuldige uitleg klaar. Over zijn moeder praat hij met echte ontroering.
+speechStyle: >-
+  Schrijft amicaal en wat zalvend, met uitdrukkingen als "begrijp me goed" en "tussen ons gezegd". Noemt de overledene
+  "Cor" en spreekt de rechercheurs aan met "jullie".
+knownFacts:
+  - Hij beheerde het vermogen van Cor sinds 2020 met een volmacht. Hij zegt dat zijn vergoeding mondeling met haar was
+    afgesproken.
+  - Hij zegt dat de intrekking van de volmacht "een misverstand" was, opgestookt door de familie.
+  - Volgens hem heeft hij Cor voor het laatst half september gezien. Op donderdag 1 oktober was hij de hele middag bij
+    een klant in Tilburg, de familie De Wit.
+  - Hij heeft op 5 oktober de beheerlaptop bij de notaris ingeleverd. Het wachtwoord is hij "even kwijt", zegt hij; hij
+    zoekt het nog op.
+  - Zijn moeder Mien overleed in maart aan hartfalen. Hij was enig kind en heeft haar tot het eind verzorgd.
+  - Volgens hem was Cor al lang ziek en heeft de huisarts gewoon gelijk.
+secrets:
+  - fact: >-
+      Hij is op donderdag 1 oktober van 14:02 tot 15:24 bij Cor op Wolfslaar geweest; de afspraak met de familie De Wit
+      had hij 's ochtends afgezegd. Eerst zegt hij dat hij alleen kort kwam om "het misverstand uit te praten" en dat
+      Cor kerngezond was toen hij wegging.
+    revealWhen: >-
+      De rechercheurs confronteren hem met bewijs dat hij donderdagmiddag op Wolfslaar was.
+    requiresEvidence:
+      - { desktop: tablet-cornelia, app: agenda, item: frank-uitleg }
+      - { desktop: tablet-cornelia, app: mail, item: kom-donderdag }
+      - { desktop: deurbelcamera-wolfslaar, app: snapshots, item: donderdag-aankomst }
+      - { desktop: laptop-frank-hoogendijk, app: mail, item: afzegging-de-wit }
+    requiredCount: 1
+  - fact: >-
+      Hij heeft via de volmacht 384.500 euro naar FH Beheer en Advies overgemaakt. Eerst noemt hij het "een lening, die
+      ik heus zou terugbetalen". Hij wist dat de bank op 5 oktober alles zou doornemen.
+    revealWhen: >-
+      De rechercheurs confronteren hem met de betalingen naar zijn bv.
+    requiresEvidence:
+      - { desktop: laptop-frank-hoogendijk, app: bestanden, item: beheer-werkelijk }
+      - { desktop: tablet-cornelia, app: mail, item: overzicht-fleur }
+    requiredCount: 1
+  - fact: >-
+      Toen Cor hem om water vroeg, legde hij in de keuken in de vakjes van vrijdag, zaterdag en zondag elk drie
+      tabletten Lanoxin 0,25 mg van zijn overleden moeder bij. Hij beweert dat hij haar alleen ziek en verward wilde
+      maken, zodat de afspraak bij de bank niet door zou gaan, en dat hij nooit wilde dat ze zou sterven. Als de
+      rechercheurs wijzen op zijn zoekopdrachten naar een dodelijke dosis en crematie zonder sectie, zwijgt hij en
+      vraagt hij om een advocaat.
+    revealWhen: >-
+      Hij heeft het bezoek van donderdag al toegegeven, en de rechercheurs confronteren hem met de extra tabletten in
+      de weekdoos, zijn zoekopdrachten over digoxine en de medicijnen van zijn moeder die hij nooit terugbracht.
+    requiresEvidence:
+      - { desktop: zorgapp-joyce, app: fotos, item: weekdoos-4-oktober }
+      - { desktop: laptop-frank-hoogendijk, app: browser, item: digoxine-overdosis }
+      - { desktop: laptop-frank-hoogendijk, app: mail, item: apotheek-herinnering }
+    requiredCount: 2

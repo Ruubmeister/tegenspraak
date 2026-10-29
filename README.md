@@ -112,7 +112,7 @@ The model is configured in `backend/src/main/resources/application.yaml` (`sprin
 Cases live in `backend/src/main/resources/cases/`. Folder and file names are the ids (lowercase kebab-case):
 
 ```
-cases/{case-id}/case.yaml                   title, summary, introduction, setting (hidden truth), solution
+cases/{case-id}/case.yaml                   title, summary, difficulty, introduction, setting (hidden truth), solution
 cases/{case-id}/characters/{id}.yaml        persona: name, role, description, personality, speechStyle,
                                             knownFacts, secrets (fact, revealWhen, requiresEvidence, minimumMood),
                                             hidden, introduces, startingMood, consults
@@ -243,14 +243,18 @@ need ids that are unique within their parent, because locks are addressed by the
 Unknown properties or invalid ids fail startup, so mistakes are caught immediately. Only a character's name, role and
 description are sent to the player; the setting, persona and lock codes stay on the server.
 
-The case list is sorted by id. The title ends with the difficulty, so players can pick a case that suits them:
+Every case sets a `difficulty` (`oefenzaak`, `makkelijk`, `gemiddeld`, `moeilijk` or `expert`). Players sort the case
+list by difficulty (easiest first by default, or hardest first) or by title; cases of the same difficulty are sorted
+by title. By convention the title also ends with the difficulty:
 
-| Case                    | Difficulty  | What makes it harder                                                           |
-| ----------------------- | ----------- | ------------------------------------------------------------------------------ |
-| `het-lek-bij-van-dijk`  | oefenzaak   | Walkthrough: two characters, direct clues                                      |
-| `kas-van-vv-rijnvogels` | makkelijk   | One red herring, one hidden witness, one lock with the code on another desktop |
-| `kunstbrand-in-haarlem` | gemiddeld   | A lying suspect, two hidden contacts, a lock code only a character knows       |
-| `laatste-experiment`    | moeilijk    | Several liars, a chain of introductions, a timeline to rebuild from logs       |
+| Case                            | Difficulty | What makes it harder                                                                                 |
+| ------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
+| `het-lek-bij-van-dijk`          | oefenzaak  | Walkthrough: two characters, direct clues                                                            |
+| `kas-van-vv-rijnvogels`         | makkelijk  | One red herring, one hidden witness, one lock with the code on another desktop                       |
+| `kunstbrand-in-haarlem`         | gemiddeld  | A lying suspect, two hidden contacts, a lock code only a character knows                             |
+| `laatste-experiment`            | moeilijk   | Several liars, a chain of introductions, a timeline to rebuild from logs                             |
+| `puzzelmaker-van-deventer`      | expert     | A puzzle to solve in the game, consultations that unlock a desktop and a file, two suspects to clear |
+| `testament-van-huize-wolfslaar` | expert     | Two convincing red herrings, mood-gated witnesses, chained lock codes, photo comparison              |
 
 Adding a new desktop app type: add a record implementing `DesktopApp` (and register it in `@JsonSubTypes`), add a
 matching response to `DesktopResponse` that leaves out locked content, add the type to `frontend/src/api/types.ts`,

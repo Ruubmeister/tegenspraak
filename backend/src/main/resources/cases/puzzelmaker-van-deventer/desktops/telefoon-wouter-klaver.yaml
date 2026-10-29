@@ -1,0 +1,196 @@
+ownerName: Wouter Klaver
+ownerType: person
+description: Kopie van de telefoon van Wouter Klaver, gevonden in zijn broekzak en veiliggesteld door de politie.
+lock:
+  code: "061001"
+  hint: "Toegangscode: de eerste Zaterdagbreker (ddmmjj)"
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: aan-dijkhuis-1
+        folder: Verzonden
+        from: wouter.klaver@kpnmail.nl
+        to: m.dijkhuis@bodemadviesoost.nl
+        subject: Bodemrapporten Havenkade Noord
+        sentAt: 2026-11-02T10:31:00
+        body: |
+          Geachte mevrouw Dijkhuis,
+
+          Als vrijwilliger van het Stadsarchief heb ik twee bodemrapporten over Havenkade Noord in handen, beide
+          met uw handtekening: 2024-HK-09 (lichte verontreiniging, sanering circa 0,4 miljoen) en 2025-HK-17
+          (zware verontreiniging, 6,2 miljoen). Op dezelfde grond, met drie maanden ertussen. Kunt u mij dat
+          uitleggen?
+
+          Met vriendelijke groet,
+          Wouter Klaver
+      - id: dreigmail
+        folder: Inbox
+        from: eenvriend@protonmail.com
+        to: wouter.klaver@kpnmail.nl
+        subject: (geen onderwerp)
+        sentAt: 2026-11-07T23:48:00
+        body: |
+          Laat het rusten, Klaver. Sommige dozen kun je beter dicht laten.
+      - id: aan-dijkhuis-2
+        folder: Verzonden
+        from: wouter.klaver@kpnmail.nl
+        to: m.dijkhuis@bodemadviesoost.nl
+        subject: "Re: Bodemrapporten Havenkade Noord"
+        sentAt: 2026-11-10T20:02:00
+        body: |
+          Mevrouw Dijkhuis,
+
+          U heeft niet gereageerd. Ik geef u tot maandag 16 november. Daarna gaat alles naar De IJsselbode en de
+          gemeenteraad. Ik denk niet dat u dit alleen heeft bedacht, en ik wil u de kans geven dat te vertellen.
+
+          Wouter Klaver
+      - id: verzoek-m
+        folder: Inbox
+        from: groenegrond82@gmail.com
+        to: wouter.klaver@kpnmail.nl
+        subject: Praten
+        sentAt: 2026-11-12T22:31:00
+        body: |
+          Meneer Klaver,
+
+          Ik moet u spreken, voor maandag. Niet via mijn werk, alstublieft. Mag ik morgenavond bij u langskomen?
+          Ik leg alles uit.
+
+          M.
+      - id: kom-maar
+        folder: Verzonden
+        from: wouter.klaver@kpnmail.nl
+        to: groenegrond82@gmail.com
+        subject: "Re: Praten"
+        sentAt: 2026-11-13T08:05:00
+        body: |
+          Kom maar na negen uur. Bergstraat 19, de groene deur. Ik zal luisteren, maar ik beloof niets.
+
+          W.K.
+  - type: files
+    id: berichten
+    title: Berichten
+    files:
+      - id: berichten-joost
+        folder: Chats
+        name: Chat_Joost.txt
+        content: |
+          Chat met Joost (neef)
+
+          vr 13-11  17:40  Joost:  oom ben je thuis vanavond? moet je wat vragen
+          vr 13-11  17:52  Wouter: Tot negen uur. Daarna krijg ik bezoek.
+          vr 13-11  20:52  Joost:  sorry oom ik was te fel. echt. morgen koffie?
+          vr 13-11  21:05  Wouter: Is goed jongen. Morgen 10 uur. Maar geld krijg je niet.
+          za 14-11  09:58  Joost:  ik sta voor de deur, doe je open?
+      - id: berichten-anneke
+        folder: Chats
+        name: Chat_Anneke.txt
+        content: |
+          Chat met Anneke (De Waag)
+
+          do 12-11  20:04  Wouter: Mag ik je even bellen?
+          do 12-11  20:05  Anneke: Natuurlijk!
+          do 12-11  20:31  Anneke: Je maakt me ongerust, Wouter. Wat is er aan de hand?
+          do 12-11  20:40  Wouter: Zaterdag. Begin bij het begin.
+  - type: files
+    id: gezondheid
+    title: Gezondheid
+    files:
+      - id: valdetectie
+        folder: Veiligheid
+        name: Valdetectie_13-11.txt
+        content: |
+          Gezondheid - valdetectie en hartslag, vrijdag 13 november 2026
+
+          21:52:07  Harde val gedetecteerd.
+          21:52:08  Melding op het scherm: "Het lijkt erop dat je bent gevallen." Noodoproep wordt over 60 seconden
+                    automatisch gestart.
+          21:53:02  Noodoproep geannuleerd op het toestel. Gekozen: "Ik ben in orde".
+          21:53:02  Na de val geen stappen of beweging meer geregistreerd.
+
+          Hartslag (gemeten via de telefoon in de broekzak):
+          21:40  96   21:50  118   22:00  54   22:10  47   22:20  41   22:24  38
+          Na 22:24 geen hartslag meer gemeten.
+  - type: calendar
+    id: agenda
+    title: Agenda
+    events:
+      - id: archief-27-oktober
+        title: Archief
+        start: 2026-10-27T10:00:00
+        end: 2026-10-27T16:00:00
+        notes: HK-2024-17!!
+      - id: klok-11-november
+        title: Klok Bergkerk
+        start: 2026-11-11T19:00:00
+        end: 2026-11-11T19:45:00
+        location: Bergkerk, toren
+        notes: Envelop meenemen.
+      - id: bezoek-13-november
+        title: M.
+        start: 2026-11-13T21:00:00
+        end: 2026-11-13T22:00:00
+        location: Thuis
+      - id: koffie-joost
+        title: Koffie Joost
+        start: 2026-11-14T10:00:00
+        end: 2026-11-14T11:00:00
+      - id: hans-16-november
+        title: Hans - het verhaal
+        start: 2026-11-16T10:00:00
+        end: 2026-11-16T11:30:00
+        location: Redactie De IJsselbode
+  - type: photos
+    id: fotos
+    title: Foto's
+    photos:
+      - id: archiefstuk
+        album: Archief
+        title: HK-2024-17, blad 4
+        takenAt: 2026-10-27T15:12:00
+        image: archiefstuk.png
+        description: >-
+          Foto van een bladzijde uit een rapport. Kop: "Bodemadvies Oost - rapport 2024-HK-09 - Havenkade Noord -
+          oktober 2024". Conclusie: "Lichte verontreiniging met zink en minerale olie, plaatselijk boven de
+          streefwaarde, nergens boven de interventiewaarde. Geschatte saneringskosten: EUR 400.000." Ondertekend:
+          "ir. M. Dijkhuis". In de hoek het logo van Bodemadvies Oost: een lichtgroen blad.
+      - id: uurwerk
+        album: Bergkerk
+        title: Uurwerk Bergkerk
+        takenAt: 2026-11-11T19:32:00
+        image: uurwerk.png
+        description: >-
+          Het oude ijzeren torenuurwerk van de Bergkerk, met tandwielen en gewichten aan kettingen. Op de houten
+          vloer eronder ligt één plank iets scheef, een paar centimeter hoger dan de rest.
+  - type: browser
+    id: browser
+    title: Browser
+    pages:
+      - id: verkoop-havenkwartier
+        url: https://www.deventer.nl/raad/besluiten/verkoop-grond-havenkwartier-noord
+        title: Raadsbesluit verkoop grond Havenkwartier Noord - Gemeente Deventer
+        visitedAt: 2026-10-27T21:40:00
+        content: |
+          Besluit 2025-014: de grond van Havenkwartier Noord wordt verkocht aan Zandbergen Vastgoed BV voor
+          EUR 3.100.000. Taxatiewaarde zonder verontreiniging: EUR 9.300.000. Aftrek saneringskosten volgens
+          bodemrapport 2025-HK-17 (Bodemadvies Oost): EUR 6.200.000.
+      - id: bodemadvies-team
+        url: https://www.bodemadviesoost.nl/ons-team
+        title: Ons team - Bodemadvies Oost
+        visitedAt: 2026-11-02T10:12:00
+        content: |
+          Bodemadvies Oost, Apeldoorn. Ons logo, het lichtgroene blad, staat voor schone grond.
+
+          Bert van Raalte - directeur
+          ir. Marieke Dijkhuis - senior bodemingenieur. "Ik fiets elke dag met mijn groene tas naar het station:
+          duurzaam begint bij jezelf."
+          Sander Koops - veldwerker
+      - id: bergkerk-uurwerk
+        url: https://www.zoeken.nl/?q=bergkerk+toren+uurwerk+vrijwilliger
+        title: bergkerk toren uurwerk vrijwilliger - Zoeken
+        visitedAt: 2026-11-10T22:05:00
+        content: |
+          Het torenuurwerk van de Bergkerk (1779) wordt nog altijd elke week met de hand opgewonden door een
+          vrijwilliger. De klokkenkamer is niet toegankelijk voor publiek.

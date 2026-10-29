@@ -1,0 +1,89 @@
+ownerName: Stadsarchief Deventer
+ownerType: organisation
+description: Het archiefsysteem van het Stadsarchief Deventer, waar Wouter Klaver vrijwilliger was.
+apps:
+  - type: files
+    id: archief
+    title: Archiefsysteem
+    files:
+      - id: uitleenlog
+        folder: Studiezaal
+        name: Uitleenlog_HK-2024-17.txt
+        content: |
+          Stadsarchief Deventer - uitleenlog bestanddeel HK-2024-17
+          Omschrijving: Havenkade, diversen 2024 (let op: bevat stukken uit bouwdossier Havenkade Noord,
+          verkeerd opgeborgen; hercatalogisering loopt)
+
+          27-10-2026  14:05  Uitgegeven aan vrijwilliger W. Klaver (catalogisering). Niet geretourneerd.
+          04-11-2026  13:20  Aangevraagd door bezoeker (studiezaal, reservering 2026-1104-03).
+                             Niet beschikbaar: in behandeling bij vrijwilliger.
+          16-11-2026  09:30  Teruggevonden in werkkast vrijwilliger W. Klaver. Compleet.
+      - id: bezoekersregister
+        folder: Studiezaal
+        name: Bezoekersregister_november.txt
+        lock:
+          code: SAD-AVG-7734
+          hint: "Afgeschermd (AVG). Alleen in te zien na een officieel verzoek van de politie aan de archivaris."
+        content: |
+          Stadsarchief Deventer - bezoekersregister studiezaal, november 2026
+
+          02-11  10:15  P. de Jong        pdejong@hotmail.com          Genealogie, doopboeken
+          03-11  14:00  S. Akkerman      s.akkerman@saxion.nl          Scriptie, stadsuitbreiding 1950-1970
+          04-11  13:20  M. Dijkhuis      groenegrond82@gmail.com       Bouwdossier Havenkade Noord, bodemrapport
+                                                                        2024 (reservering 2026-1104-03)
+          05-11  09:40  H. van Eck       hvaneck@ziggo.nl              Genealogie
+          10-11  11:10  T. Nijhof        tnijhof@deventer.nl           Monumentendossier Bergkerk
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: reservering
+        folder: Inbox
+        from: groenegrond82@gmail.com
+        to: studiezaal@stadsarchiefdeventer.nl
+        subject: Reservering studiezaal
+        sentAt: 2026-11-03T23:12:00
+        body: |
+          Geachte heer, mevrouw,
+
+          Ik wil morgen graag het bouwdossier van Havenkade Noord inzien, in het bijzonder het bodemrapport van
+          oktober 2024. Kan dat zonder verdere aanmelding?
+
+          Met vriendelijke groet,
+          M.
+      - id: koen-aan-wouter
+        folder: Verzonden
+        from: k.mulder@stadsarchiefdeventer.nl
+        to: wouter.klaver@kpnmail.nl
+        subject: Doos HK-2024-17
+        sentAt: 2026-11-04T15:02:00
+        body: |
+          Beste Wouter,
+
+          Vanmiddag vroeg een bezoekster naar doos HK-2024-17, die jij aan het catalogiseren bent. Ik heb gezegd
+          dat hij niet beschikbaar was. Ze leek nogal zenuwachtig. Je zei laatst dat je iets bijzonders in die doos
+          had gevonden; is er iets wat ik moet weten?
+
+          Met archivarische groet,
+          Koen
+  - type: calendar
+    id: rooster
+    title: Rooster vrijwilligers
+    events:
+      - id: wouter-27-oktober
+        title: W. Klaver - catalogisering bouwdossiers
+        start: 2026-10-27T10:00:00
+        end: 2026-10-27T16:00:00
+        location: Werkruimte 2
+      - id: reservering-4-november
+        title: Reservering studiezaal 2026-1104-03
+        start: 2026-11-04T13:20:00
+        end: 2026-11-04T14:00:00
+        location: Studiezaal
+        notes: Bouwdossier Havenkade Noord. Bezoeker vertrok na tien minuten.
+      - id: wouter-12-november
+        title: W. Klaver - catalogisering bouwdossiers
+        start: 2026-11-12T10:00:00
+        end: 2026-11-12T16:00:00
+        location: Werkruimte 2
+        notes: Wouter vroeg om de sleutel van de werkkast. "Even iets veilig opbergen."

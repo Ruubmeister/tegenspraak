@@ -10,6 +10,6 @@ public final class CaseFixtures {
     public static CaseManifest manifestWithSetting(String setting) {
         CaseSolution solution =
                 new CaseSolution(List.of(new SolutionQuestion("dader", "Wie deed het?", "De butler.")), "Einde.");
-        return new CaseManifest("Demo", "Kort", "Intro", setting, solution);
+        return new CaseManifest("Demo", "Kort", CaseDifficulty.MAKKELIJK, "Intro", setting, solution);
     }
 }

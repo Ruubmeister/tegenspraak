@@ -1,0 +1,135 @@
+ownerName: Frank Hoogendijk
+ownerType: person
+description: De beheerlaptop van mevrouw Van Asperen, waarop Frank Hoogendijk haar administratie deed. Ingeleverd bij de notaris.
+lock:
+  code: wilhelmina2026
+  hint: "Wachtwoordhint: voornaam van mama (voluit) + het jaar van afscheid"
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: apotheek-herinnering
+        folder: Inbox
+        from: info@apotheekdemark.nl
+        to: frank@fhbeheer.nl
+        subject: "Herinnering: medicijnen van uw moeder"
+        sentAt: 2026-04-14T10:05:00
+        body: |
+          Geachte heer Hoogendijk,
+
+          Na het overlijden van uw moeder, mevrouw W.J. Hoogendijk-Verbeek, heeft u aangegeven haar resterende
+          medicijnen bij ons in te leveren. Wij hebben die nog niet ontvangen. Het gaat onder meer om:
+
+          - Lanoxin (digoxine) 0,25 mg, 2 strips à 14 tabletten
+          - Furosemide 40 mg
+
+          Bewaar deze medicijnen niet thuis, zeker niet de Lanoxin: die is in een te hoge dosis gevaarlijk.
+
+          Met vriendelijke groet,
+          Apotheek De Mark, Breda
+      - id: brief-notaris
+        folder: Inbox
+        from: e.smulders@notarissmulders.nl
+        to: frank@fhbeheer.nl
+        subject: Intrekking volmacht mevrouw C. van Asperen
+        sentAt: 2026-09-30T11:20:00
+        body: |
+          Geachte heer Hoogendijk,
+
+          In opdracht van mevrouw C. van Asperen bericht ik u dat de algemene volmacht die zij u heeft verleend,
+          per 29 september 2026 is ingetrokken. Ik verzoek u uiterlijk 9 oktober alle administratie, inloggegevens
+          en de beheerlaptop over te dragen aan mijn kantoor. Mevrouw Van Asperen laat haar rekeningen op 5 oktober
+          met haar bank doornemen.
+
+          Hoogachtend,
+          mr. E. Smulders, notaris
+      - id: afzegging-de-wit
+        folder: Verzonden
+        from: frank@fhbeheer.nl
+        to: jdewit@kpnmail.nl
+        subject: Afspraak vanmiddag
+        sentAt: 2026-10-01T08:47:00
+        body: |
+          Beste Jan,
+
+          Helaas moet ik onze afspraak van vanmiddag in Tilburg verzetten, er is iets tussengekomen bij een
+          andere cliënt. Ik bel je volgende week voor een nieuwe datum.
+
+          Groet, Frank
+  - type: calendar
+    id: agenda
+    title: Agenda
+    events:
+      - id: klant-tilburg
+        title: Klant Tilburg (fam. De Wit)
+        start: 2026-10-01T13:30:00
+        end: 2026-10-01T16:30:00
+        location: Tilburg
+      - id: crematie
+        title: Crematie Cor
+        start: 2026-10-09T14:00:00
+        end: 2026-10-09T15:30:00
+        location: Crematorium Breda
+        notes: Speech voorbereiden.
+  - type: browser
+    id: browser
+    title: Browser
+    pages:
+      - id: digoxine-overdosis
+        url: https://www.zoeken.nl/?q=digoxine+overdosis+hoeveel+tabletten+dodelijk
+        title: digoxine overdosis hoeveel tabletten dodelijk - Zoeken
+        visitedAt: 2026-09-30T22:47:00
+        content: |
+          Digoxine-intoxicatie: symptomen zijn misselijkheid, braken, verwardheid, geel of groen zien en een trage
+          of onregelmatige hartslag. Bij ouderen met hartfalen kan een veelvoud van de dagdosis binnen een tot twee
+          dagen dodelijk zijn. Klachten worden vaak aangezien voor verergering van het hartfalen.
+      - id: digoxine-aantonen
+        url: https://www.zoeken.nl/?q=digoxine+aantonen+na+overlijden
+        title: digoxine aantonen na overlijden - Zoeken
+        visitedAt: 2026-09-30T22:58:00
+        content: |
+          Digoxine kan na het overlijden in bloed worden aangetoond, maar alleen als er toxicologisch onderzoek
+          wordt gedaan. Bij een natuurlijke dood, vastgesteld door de huisarts, gebeurt dat meestal niet.
+      - id: crematie-zonder-sectie
+        url: https://www.zoeken.nl/?q=crematie+zonder+sectie+verklaring+natuurlijke+dood
+        title: crematie zonder sectie verklaring natuurlijke dood - Zoeken
+        visitedAt: 2026-09-30T23:10:00
+        content: |
+          Na een verklaring van natuurlijk overlijden door de huisarts kan zonder verder onderzoek worden
+          gecremeerd. Na de crematie is toxicologisch onderzoek niet meer mogelijk.
+      - id: route-wolfslaar
+        url: https://www.kaarten.nl/route?van=Breda&naar=Wolfslaarlaan+Ulvenhout
+        title: Route Breda - Wolfslaarlaan, Ulvenhout - Kaarten
+        visitedAt: 2026-10-01T13:38:00
+        content: |
+          Route van Breda centrum naar Wolfslaarlaan, Ulvenhout: 7,4 km, 14 minuten via de Ulvenhoutselaan.
+      - id: crematie-uitstellen
+        url: https://www.zoeken.nl/?q=kan+notaris+crematie+tegenhouden
+        title: kan notaris crematie tegenhouden - Zoeken
+        visitedAt: 2026-10-04T21:02:00
+        content: |
+          Een executeur kan uitstel van de uitvaart vragen, bijvoorbeeld als er twijfel is over de doodsoorzaak.
+          De officier van justitie kan dan alsnog een schouw door een forensisch arts laten doen.
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: beheer-werkelijk
+        folder: Beheer CvA
+        name: beheer_CvA_werkelijk.txt
+        lock:
+          code: "7139"
+          hint: "Pincode: laatste vier cijfers van de rekening van mijn bv"
+        content: |
+          Overboekingen CvA -> FH (NIET in overdracht)
+
+          2024: jul 9.500 / aug 11.000 / sep 9.000 / okt 12.500 / nov 10.000 / dec 14.000
+          2025: jan 9.500 / feb 42.000 (dak koetshuis, niet gedaan) / mrt 12.000 / apr 11.500 / mei 13.000 /
+                jun 10.000 / jul 15.500 / aug 9.000 / sep 12.000 / okt 13.500 / nov 18.000 / dec 21.000
+          2026: jan 12.500 / feb 10.000 / mrt 14.000 / apr 11.500 / mei 16.000 / jun 13.000 / jul 22.000 / aug 32.500
+
+          Totaal: 384.500
+
+          Gat dichten voor de bank kijkt: onmogelijk.
+          Bank maandag 5/10. Daarvoor moet het geregeld zijn.

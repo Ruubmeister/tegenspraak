@@ -23,10 +23,14 @@ export interface Team {
   members: string[]
 }
 
+/** From easiest to hardest. */
+export type CaseDifficulty = 'oefenzaak' | 'makkelijk' | 'gemiddeld' | 'moeilijk' | 'expert'
+
 export interface CaseSummary {
   id: string
   title: string
   summary: string
+  difficulty: CaseDifficulty
 }
 
 export interface CharacterSummary {
