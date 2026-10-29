@@ -12,13 +12,13 @@ import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
-import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
 import nl.rubium.tegenspraak.desktop.entity.BrowserPage;
 import nl.rubium.tegenspraak.desktop.entity.CalendarApp;
 import nl.rubium.tegenspraak.desktop.entity.CalendarEvent;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.LockableItem;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
 import nl.rubium.tegenspraak.desktop.entity.MailMessage;
@@ -398,7 +398,7 @@ class CharacterPromptBuilderTest {
         return new CharacterSecret("Hij had schulden.", "De speler vraagt naar geld.", null, null, Mood.FRIENDLY);
     }
 
-    private static final RequiredEvidence LETTER = new RequiredEvidence("werkplek", "mail", "brief");
+    private static final ItemRef LETTER = new ItemRef("werkplek", "mail", "brief");
 
     private static CharacterSecret secretRequiringLetter() {
         return new CharacterSecret(

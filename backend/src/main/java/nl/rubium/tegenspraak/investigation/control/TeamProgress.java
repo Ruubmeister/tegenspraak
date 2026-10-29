@@ -7,6 +7,7 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.LockableItem;
 
 /** What a team has unlocked in a case, and therefore what it may see. */
@@ -41,7 +42,7 @@ public record TeamProgress(CaseDefinition caseDefinition, Set<String> unlockedTa
         return item.lock() == null || isUnlocked(UnlockTarget.item(desktop.id(), app.id(), item.id()));
     }
 
-    /** Mails and files the team can read, on desktops it has opened, in the order of the case files. */
+    /** Items the team can read, on desktops it has opened, in the order of the case files. */
     public List<EvidenceItem> openEvidence() {
         return caseDefinition.desktops().stream()
                 .filter(this::isOpen)
@@ -52,8 +53,8 @@ public record TeamProgress(CaseDefinition caseDefinition, Set<String> unlockedTa
                 .toList();
     }
 
-    /** Empty when the mail or file does not exist, or when the team cannot read it yet. */
-    public Optional<EvidenceItem> findOpenEvidence(EvidenceRef ref) {
+    /** Empty when the item does not exist, or when the team cannot read it yet. */
+    public Optional<EvidenceItem> findOpenEvidence(ItemRef ref) {
         return caseDefinition
                 .findDesktop(ref.desktopId())
                 .filter(this::isOpen)

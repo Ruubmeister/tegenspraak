@@ -23,10 +23,14 @@ export interface Team {
   members: string[]
 }
 
+/** From easiest to hardest. */
+export type CaseDifficulty = 'oefenzaak' | 'makkelijk' | 'gemiddeld' | 'moeilijk' | 'expert'
+
 export interface CaseSummary {
   id: string
   title: string
   summary: string
+  difficulty: CaseDifficulty
 }
 
 export interface CharacterSummary {
@@ -193,7 +197,7 @@ export interface ChatMessage {
   authorName: string | null
   content: string
   sentAt: string
-  /** Mails and files the author attached; empty for character messages and notices. */
+  /** Desktop items the author attached; empty for character messages and notices. */
   attachments: EvidenceItem[]
 }
 

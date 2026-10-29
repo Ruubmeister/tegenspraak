@@ -1,5 +1,7 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
+
 /**
  * What opens for the team once a contact answered a consultation: a hidden character ({@code character}), a locked
  * desktop ({@code desktop}) or a locked item on a desktop ({@code desktop}, {@code app} and {@code item}).
@@ -22,5 +24,10 @@ public record ConsultationUnlock(String character, String desktop, String app, S
 
     public boolean isItem() {
         return item != null;
+    }
+
+    /** Only for an unlock of an item, see {@link #isItem()}. */
+    public ItemRef itemRef() {
+        return new ItemRef(desktop, app, item);
     }
 }

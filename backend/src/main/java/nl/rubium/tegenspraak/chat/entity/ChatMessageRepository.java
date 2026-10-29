@@ -15,7 +15,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     List<ChatMessage> findByTeamIdAndCaseIdAndCharacterIdOrderBySentAtDesc(
             UUID teamId, String caseId, String characterId, Limit limit);
 
-    /** Every mail or file the team has ever shown this character, also messages beyond the prompt history. */
+    /** Every desktop item the team has ever shown this character, also messages beyond the prompt history. */
     @Query("select distinct attachment from ChatMessage message join message.attachments attachment"
             + " where message.teamId = :teamId and message.caseId = :caseId and message.characterId = :characterId")
     List<ChatAttachment> findAttachmentsInConversation(

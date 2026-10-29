@@ -5,14 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import nl.rubium.tegenspraak.chat.control.ChatService;
-import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 
 /** Attachments are optional; text is always required, so the character knows what the team asks. */
 public record SendMessageRequest(
         @NotBlank @Size(max = 1000) String content,
         @Size(max = ChatService.MAX_ATTACHMENTS) List<@Valid AttachmentRequest> attachments) {
 
-    List<EvidenceRef> attachmentRefs() {
+    List<ItemRef> attachmentRefs() {
         return attachments == null
                 ? List.of()
                 : attachments.stream().map(AttachmentRequest::toRef).toList();

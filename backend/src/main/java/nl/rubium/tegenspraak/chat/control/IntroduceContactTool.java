@@ -27,6 +27,11 @@ final class IntroduceContactTool implements Function<IntroduceContactTool.Reques
                 introducible.stream().collect(Collectors.toMap(CharacterProfile::id, character -> character));
     }
 
+    /** Without anyone to introduce, the tool is not offered to the LLM. */
+    boolean canIntroduce() {
+        return !introducibleById.isEmpty();
+    }
+
     ToolCallback toCallback() {
         return FunctionToolCallback.builder(NAME, this)
                 .description("Bring de rechercheurs in contact met een persoon die je kent, zodat ze die persoon"

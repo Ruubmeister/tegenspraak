@@ -8,10 +8,10 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.CharacterSecret;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
-import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.BrowserPage;
 import nl.rubium.tegenspraak.desktop.entity.CalendarEvent;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.MailMessage;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
@@ -35,7 +35,7 @@ public class CharacterPromptBuilder {
      * @param introducibleContacts hidden characters this character may still introduce to the team; their conditions
      *     come from the character's introductions
      * @param consultations who the character may still ask for information, and whose answer it is waiting for
-     * @param shownEvidence mails and files the team has shown this character; secrets that require evidence the team
+     * @param shownEvidence desktop items the team has shown this character; secrets that require evidence the team
      *     has not shown yet are given to the LLM without their reveal condition, so it cannot be talked into them
      * @param mood how the character feels about the team now; secrets that need a better mood are withheld the same way
      */
@@ -44,7 +44,7 @@ public class CharacterPromptBuilder {
             CharacterProfile character,
             List<CharacterProfile> introducibleContacts,
             ConsultationPrompt consultations,
-            Set<RequiredEvidence> shownEvidence,
+            Set<ItemRef> shownEvidence,
             Mood mood) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Je speelt het personage ")
@@ -260,7 +260,7 @@ public class CharacterPromptBuilder {
     }
 
     private static void appendSecrets(
-            StringBuilder prompt, List<CharacterSecret> secrets, Set<RequiredEvidence> shownEvidence, Mood mood) {
+            StringBuilder prompt, List<CharacterSecret> secrets, Set<ItemRef> shownEvidence, Mood mood) {
         if (secrets.isEmpty()) {
             return;
         }

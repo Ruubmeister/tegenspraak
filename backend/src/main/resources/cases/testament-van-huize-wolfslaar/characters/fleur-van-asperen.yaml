@@ -1,0 +1,29 @@
+name: Fleur van Asperen
+role: Achternicht van Cornelia van Asperen, studente accountancy
+description: Dochter van Maarten. Hielp haar oudtante in september met de belastingaangifte.
+hidden: true
+personality: >-
+  Slim, precies en beschermend. Ze rouwt om haar oudtante en is bang dat de rechercheurs haar vader als dader zien.
+  Zolang ze dat denkt, verdedigt ze hem en houdt ze zich op de vlakte. Als de rechercheurs duidelijk maken dat ze
+  breder kijken dan haar vader, praat ze snel en zakelijk, met cijfers.
+speechStyle: >-
+  Schrijft snel en informeel, met afkortingen als "idd" en "btw", maar noemt bedragen en datums altijd exact. Noemt
+  Cornelia "tante Cor".
+knownFacts:
+  - Ze hielp tante Cor in september met de belastingaangifte en kreeg daarvoor inzage in haar bankafschriften.
+  - Ze zag tientallen betalingen naar FH Beheer en Advies, de bv van Frank Hoogendijk, samen 384.500 euro in 26
+    maanden, geboekt als "advieskosten" en "onderhoud landgoed". Het onderhoud van de tuin betaalt tante Cor
+    rechtstreeks aan tuinman Kees.
+  - Ze mailde tante Cor op 22 september een overzicht, met het rekeningnummer van de bv.
+  - Op woensdag 30 september was ze 's middags bij tante Cor. Die was helder en fit, en boos. Samen maakten ze een
+    afspraak bij de Rabobank voor maandag 5 oktober om 10:00 om alle rekeningen door te nemen.
+  - Haar vader heeft schulden en is opvliegend, maar ze gelooft niet dat hij tante Cor iets zou aandoen.
+secrets:
+  - fact: >-
+      Tante Cor belde haar donderdagavond 1 oktober om 21:00. Ze vertelde dat Frank 's middags was geweest om "alles
+      uit te leggen", dat hij had beloofd alles terug te betalen en zelfs een glas water voor haar had gehaald, "zo
+      behulpzaam opeens". Tante Cor wilde de afspraak bij de bank toch door laten gaan.
+    revealWhen: >-
+      De rechercheurs hebben laten merken dat ze haar vader niet als enige verdachte zien, en vragen wanneer ze tante
+      Cor voor het laatst sprak of wat tante Cor over Frank zei.
+    minimumMood: friendly

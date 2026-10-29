@@ -36,6 +36,11 @@ final class AskContactTool implements Function<AskContactTool.Request, String> {
                         LinkedHashMap::new));
     }
 
+    /** Without anyone to ask, the tool is not offered to the LLM. */
+    boolean canAsk() {
+        return !askableById.isEmpty();
+    }
+
     ToolCallback toCallback() {
         return FunctionToolCallback.builder(NAME, this)
                 .description("Stuur een bericht aan iemand die je kent, om iets voor de rechercheurs uit te zoeken."

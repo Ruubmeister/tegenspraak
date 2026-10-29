@@ -1,0 +1,74 @@
+ownerName: Wouter Klaver
+ownerType: person
+description: De versleutelde cloudmap "Zaterdag" van Wouter Klaver, gevonden via de cloudopslag van zijn mailadres.
+lock:
+  code: schonegrond
+  hint: "Wachtwoordhint: ligt onder de tandwielen"
+apps:
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: rapport-2024
+        folder: Havenkade
+        name: Rapport_2024-HK-09_scan.txt
+        content: |
+          Bodemadvies Oost - rapport 2024-HK-09 - Havenkade Noord - oktober 2024 (scan, samenvatting)
+
+          Onderzoek: 24 boringen, 6 peilbuizen.
+          Conclusie: lichte verontreiniging met zink en minerale olie, plaatselijk boven de streefwaarde, nergens
+          boven de interventiewaarde. Geen sanering noodzakelijk voor woningbouw, behalve plaatselijk afgraven.
+          Geschatte kosten: EUR 400.000.
+          Ondertekend: ir. M. Dijkhuis, senior bodemingenieur
+      - id: rapport-2025
+        folder: Havenkade
+        name: Rapport_2025-HK-17.txt
+        content: |
+          Bodemadvies Oost - rapport 2025-HK-17 - Havenkade Noord - januari 2025 (openbaar, bij raadsbesluit)
+
+          Onderzoek: "aanvullend onderzoek", aantal boringen niet vermeld.
+          Conclusie: ernstige verontreiniging met zink, minerale olie en PAK, op meerdere plaatsen boven de
+          interventiewaarde. Volledige sanering noodzakelijk.
+          Geschatte kosten: EUR 6.200.000.
+          Ondertekend: ir. M. Dijkhuis, senior bodemingenieur
+      - id: notities
+        folder: Havenkade
+        name: Notities.txt
+        content: |
+          27/10  HK-2024-17: rapport 2024 gevonden, verkeerd opgeborgen. Gefotografeerd.
+          27/10  Raadsbesluit: verkocht voor 3,1 mln. Zonder het rapport van 2025 was het 9,3 - 0,4 = 8,9 mln.
+                 De gemeente is 5,8 miljoen kwijt. Wie wist dat er een eerder rapport was?
+          02/11  Mevr. Dijkhuis gemaild. Ze tekende allebei. Waarom? Wie zette haar onder druk?
+          04/11  Koen: iemand vroeg naar doos HK-17. Een vrouw, zenuwachtig.
+          07/11  Dreigmail, 's nachts. "Sommige dozen." Die toon ken ik ergens van.
+          10/11  Dijkhuis nog een keer gemaild. Tot maandag. Hans ingelicht, zonder details.
+          11/11  Envelop in de toren. Breker 1306 is klaar. Anneke begint wel bij het begin.
+          12/11  M. wil praten. Ze klinkt bang, niet gevaarlijk. Vrijdag na negen.
+      - id: brief-gemeenteraad
+        folder: Havenkade
+        name: Concept_brief_gemeenteraad.txt
+        content: |
+          Aan de gemeenteraad van Deventer (CONCEPT, versturen ma 16/11)
+
+          Geachte raadsleden,
+
+          Bij de verkoop van Havenkwartier Noord heeft u zich gebaseerd op bodemrapport 2025-HK-17. In het
+          Stadsarchief bevindt zich een eerder rapport van hetzelfde bureau en dezelfde ingenieur, 2024-HK-09,
+          waarin de verontreiniging licht is en de sanering 0,4 miljoen kost. Het verschil voor de gemeente is
+          ongeveer 5,8 miljoen euro. Bijgevoegd vindt u beide rapporten en een mail van de koper aan het bureau.
+
+          W. Klaver
+  - type: photos
+    id: fotos
+    title: Foto's
+    photos:
+      - id: mail-zandbergen
+        album: Havenkade
+        title: Uitgeprinte mail in HK-2024-17
+        takenAt: 2026-10-29T14:40:00
+        image: mail-zandbergen.png
+        description: >-
+          Foto van een uitgeprinte mail die tussen de stukken in de archiefdoos zat. Van: r.zandbergen@
+          zandbergenvastgoed.nl. Aan: b.vanraalte@bodemadviesoost.nl. Datum: 6 januari 2025. Onderwerp: rapport HK.
+          Tekst: "Bert, het rapport moet aansluiten bij onze grondprijs, anders gaat de deal niet door en kun je
+          fluiten naar de vervolgopdrachten. Regel het met je ingenieur. R.Z."

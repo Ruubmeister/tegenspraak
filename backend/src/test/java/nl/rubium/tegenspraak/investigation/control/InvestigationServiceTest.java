@@ -27,6 +27,7 @@ import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.Lock;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
@@ -253,7 +254,7 @@ class InvestigationServiceTest {
         unlockedTargets.add("desktop:computer");
 
         Photo photo = investigationService.requireOpenPhoto(
-                TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "tuin"));
+                TEAM_ID, PLAYER_ID, CASE_ID, new ItemRef("computer", "fotos", "tuin"));
 
         assertThat(photo.image()).isEqualTo("tuin.jpg");
     }
@@ -261,7 +262,7 @@ class InvestigationServiceTest {
     @Test
     void requireOpenPhoto_givenDesktopStillLocked_expectNotFound() {
         assertThatThrownBy(() -> investigationService.requireOpenPhoto(
-                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "tuin")))
+                        TEAM_ID, PLAYER_ID, CASE_ID, new ItemRef("computer", "fotos", "tuin")))
                 .isInstanceOf(CaseContentNotFoundException.class);
     }
 
@@ -270,7 +271,7 @@ class InvestigationServiceTest {
         unlockedTargets.add("desktop:computer");
 
         assertThatThrownBy(() -> investigationService.requireOpenPhoto(
-                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "fotos", "portret")))
+                        TEAM_ID, PLAYER_ID, CASE_ID, new ItemRef("computer", "fotos", "portret")))
                 .isInstanceOf(CaseContentNotFoundException.class);
     }
 
@@ -279,7 +280,7 @@ class InvestigationServiceTest {
         unlockedTargets.addAll(List.of("desktop:computer", SAFE_TARGET));
 
         assertThatThrownBy(() -> investigationService.requireOpenPhoto(
-                        TEAM_ID, PLAYER_ID, CASE_ID, new EvidenceRef("computer", "bestanden", "kluis")))
+                        TEAM_ID, PLAYER_ID, CASE_ID, new ItemRef("computer", "bestanden", "kluis")))
                 .isInstanceOf(CaseContentNotFoundException.class);
     }
 }

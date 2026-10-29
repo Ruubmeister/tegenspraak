@@ -21,7 +21,11 @@ function renderTeamPage() {
 function mockTeamRequests(extraHandlers = {}) {
   return mockFetch({
     'GET /api/teams/team-1': () => jsonResponse(speurneuzen),
-    'GET /api/cases': () => jsonResponse([{ id: 'het-lek', title: 'Het lek', summary: 'Een bod lekte uit.' }]),
+    'GET /api/cases': () =>
+      jsonResponse([
+        { id: 'puzzelmaker', title: 'De puzzelmaker', summary: 'Een laatste puzzel.', difficulty: 'expert' },
+        { id: 'het-lek', title: 'Het lek', summary: 'Een bod lekte uit.', difficulty: 'oefenzaak' },
+      ]),
     'GET /api/teams/team-1/solved-cases': () => jsonResponse(['het-lek']),
     ...extraHandlers,
   })
@@ -43,6 +47,21 @@ describe('TeamPage', () => {
     const caseLink = await screen.findByRole('link', { name: /Het lek/ })
     expect(caseLink).toHaveAttribute('href', '/teams/team-1/zaken/het-lek')
     expect(caseLink).toHaveTextContent('Opgelost')
+  })
+
+  it('TeamPage_givenCases_expectEasiestFirstAndHardestFirstAfterChangingSort', async () => {
+    mockTeamRequests()
+    renderTeamPage()
+    const caseTitles = () => screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
+
+    expect(await screen.findByRole('link', { name: /Het lek/ })).toBeInTheDocument()
+    expect(caseTitles()).toEqual(['Het lek', 'De puzzelmaker'])
+
+    await userEvent
+      .setup()
+      .selectOptions(screen.getByRole('combobox', { name: 'Sorteren op' }), 'Moeilijkheid (moeilijk eerst)')
+
+    expect(caseTitles()).toEqual(['De puzzelmaker', 'Het lek'])
   })
 
   it('TeamPage_givenNonMember_expectErrorMessage', async () => {

@@ -2,19 +2,16 @@ package nl.rubium.tegenspraak.casefile.entity;
 
 import java.util.List;
 import java.util.Set;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 
 /**
  * Something a character hides until {@code revealWhen} is met. When {@code requiresEvidence} is set, the team must also
- * have shown the character at least {@code requiredCount} of those mails or files as attachments; until then the
+ * have shown the character at least {@code requiredCount} of those desktop items as attachments; until then the
  * character denies it, whatever the team claims. Without a count, all of them are required. With a {@code minimumMood},
  * the character also keeps the secret until it feels at least that good about the team.
  */
 public record CharacterSecret(
-        String fact,
-        String revealWhen,
-        List<RequiredEvidence> requiresEvidence,
-        Integer requiredCount,
-        Mood minimumMood) {
+        String fact, String revealWhen, List<ItemRef> requiresEvidence, Integer requiredCount, Mood minimumMood) {
 
     public CharacterSecret {
         if (fact == null || fact.isBlank() || revealWhen == null || revealWhen.isBlank()) {
@@ -35,7 +32,7 @@ public record CharacterSecret(
     }
 
     /** True when the team has shown the character enough of the required evidence, or when none is required. */
-    public boolean isEvidenceShown(Set<RequiredEvidence> shownEvidence) {
+    public boolean isEvidenceShown(Set<ItemRef> shownEvidence) {
         long shownCount =
                 requiresEvidence.stream().filter(shownEvidence::contains).count();
         return shownCount >= requiredCount;

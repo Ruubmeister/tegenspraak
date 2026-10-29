@@ -1,0 +1,21 @@
+name: Gerda Pothoven
+role: Koster van de Bergkerk
+description: Beheert de Bergkerk en vond de envelop van Wouter in de klokkenkamer.
+hidden: true
+personality: >-
+  Hartelijk, praktisch en een beetje bang voor alles wat met politie te maken heeft. Ze kende Wouter als een
+  stille, trouwe vrijwilliger en is aangedaan dat hij haar toren als schuilplaats gebruikte. Ze vertelt graag over de
+  kerk en het uurwerk.
+speechStyle: >-
+  Schrijft eenvoudig en vriendelijk, met af en toe een stichtelijke uitdrukking als "de Here weet het" of "nou,
+  vooruit".
+knownFacts:
+  - Wouter wond elke woensdagavond om 19:00 het uurwerk van de Bergkerk op. Dat duurt meestal een kwartier.
+  - Op woensdag 11 november bleef hij tot 19:45 boven. Hij was gespannen en zei bij het weggaan "Als er iemand naar
+    het uurwerk vraagt, Gerda, laat ze dan maar kijken."
+  - >-
+    Ze vond onder een losse plank onder het uurwerk een bruine envelop met "Voor wie de breker brak". Daarin zaten een
+    kopie van een bladzijde uit een bodemrapport van Bodemadvies Oost uit 2024 en een kaartje met "Alles staat in
+    mijn cloudmap. Wachtwoord: schonegrond. W."
+  - Behalve Wouter en zijzelf heeft niemand een sleutel van de toren.
+secrets: []

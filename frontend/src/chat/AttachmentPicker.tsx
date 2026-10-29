@@ -10,7 +10,7 @@ interface AttachmentPickerProps {
   onClose: () => void
 }
 
-/** Lists the mails and files the team has opened, grouped per computer, to attach to the message. */
+/** Lists the items the team has opened, grouped per computer, to attach to the message. */
 export function AttachmentPicker({ teamId, caseId, selected, onToggle, onClose }: AttachmentPickerProps) {
   const { data: evidence, isPending, isError } = useEvidence(teamId, caseId)
   const isFull = selected.length >= MAX_ATTACHMENTS

@@ -1,0 +1,128 @@
+ownerName: Notariskantoor Smulders
+ownerType: organisation
+description: Het dossier van notaris Ellen Smulders over de nalatenschap van Cornelia van Asperen.
+apps:
+  - type: files
+    id: dossier
+    title: Dossier
+    files:
+      - id: gespreksnotitie
+        folder: Nalatenschap Van Asperen
+        name: Gespreksnotitie_29-09.txt
+        content: |
+          Gespreksnotitie mr. E. Smulders - dinsdag 29 september 2026, 10:30-11:45
+          Cliënt: mevr. C. van Asperen (81), Huize Wolfslaar, Ulvenhout
+
+          - Cliënt is helder en weet precies wat ze wil. Geen twijfel aan wilsbekwaamheid.
+          - Wijziging testament: legaat EUR 75.000 aan J. Mertens (verzorgende), rest in gelijke delen aan
+            neef M. van Asperen en achternicht F. van Asperen. Executeur: ondergetekende (was: F. Hoogendijk).
+          - Intrekking algemene volmacht F. Hoogendijk, per heden. Brief aan dhr. Hoogendijk volgt morgen.
+          - Cliënt wil "alles laten nakijken". Iemand uit de familie heeft "iets gevonden in mijn rekeningen".
+            Noemt geen namen. Afspraak met haar bank volgt.
+          - Bij vertrek, letterlijk: "Als mij iets overkomt, kijk dan naar mijn geld."
+      - id: testament-2026
+        folder: Nalatenschap Van Asperen
+        name: Testament_2026_samenvatting.txt
+        content: |
+          Uiterste wil C. van Asperen - verleden 29 september 2026 (samenvatting)
+
+          Herroeping van alle eerdere uiterste wilsbeschikkingen.
+          Legaat: EUR 75.000 aan mevr. J. Mertens, uit dankbaarheid voor vijf jaar zorg.
+          Erfgenamen, ieder voor de helft: dhr. M. van Asperen (neef) en mevr. F. van Asperen (achternicht).
+          Executeur: mr. E. Smulders.
+      - id: testament-2019
+        folder: Nalatenschap Van Asperen
+        name: Testament_2019_samenvatting.txt
+        content: |
+          Uiterste wil C. van Asperen - verleden 11 april 2019 (samenvatting, herroepen op 29-09-2026)
+
+          Enig erfgenaam: dhr. M. van Asperen (neef).
+          Executeur: dhr. F. Hoogendijk, met ruime bevoegdheden tot beheer en vereffening.
+      - id: intrekking-volmacht
+        folder: Correspondentie
+        name: Brief_intrekking_volmacht_30-09.txt
+        content: |
+          Aangetekend en per e-mail
+          Aan: dhr. F. Hoogendijk, FH Beheer en Advies, Breda
+          Datum: 30 september 2026
+
+          Geachte heer Hoogendijk,
+
+          In opdracht van mevrouw C. van Asperen bericht ik u dat de algemene volmacht die zij u heeft verleend,
+          per 29 september 2026 is ingetrokken. Ik verzoek u uiterlijk 9 oktober alle administratie, inloggegevens
+          en de beheerlaptop over te dragen aan mijn kantoor. Mevrouw Van Asperen laat haar rekeningen op 5 oktober
+          met haar bank doornemen.
+
+          Hoogachtend,
+          mr. E. Smulders, notaris
+      - id: overdrachtsoverzicht
+        folder: Correspondentie
+        name: Overdrachtsoverzicht_FH_05-10.txt
+        content: |
+          FH Beheer en Advies - overdrachtsoverzicht vermogen C. van Asperen
+          Aangeleverd 5 oktober 2026
+
+          Beheerperiode: mei 2020 - september 2026
+          Beheervergoeding: EUR 1.250 per maand, conform mondelinge afspraak met mevr. Van Asperen.
+          Overige kosten: incidenteel onderhoud landgoed, via FH doorbelast.
+          Alle stukken zijn in orde. Beheerlaptop wordt hierbij ingeleverd; wachtwoord volgt.
+
+          F. Hoogendijk
+      - id: verklaring-overlijden
+        folder: Overlijden
+        name: Verklaring_overlijden_04-10.txt
+        content: |
+          Kopie verklaring van overlijden
+          Overledene: C. van Asperen, geboren 2 februari 1945
+          Datum en plaats: 4 oktober 2026, Huize Wolfslaar, Ulvenhout (aangetroffen 07:30)
+          Behandelend arts: I. Bosman, huisarts
+          Natuurlijke dood: ja. Oorzaak: hartfalen.
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: mail-maarten
+        folder: Inbox
+        from: maarten@vanasperenklussen.nl
+        to: e.smulders@notarissmulders.nl
+        subject: Testament tante Cor
+        sentAt: 2026-10-05T08:14:00
+        body: |
+          Mevrouw Smulders,
+
+          Ik hoor nu pas dat de verzorgster van mijn tante ineens 75.000 euro krijgt. Een week voor ze sterft!
+          Die vrouw vulde ook nog eens elke week haar pillen. Ik wil dat dit wordt uitgezocht.
+
+          M. van Asperen
+      - id: mail-frank
+        folder: Inbox
+        from: frank@fhbeheer.nl
+        to: e.smulders@notarissmulders.nl
+        subject: Overdracht Van Asperen
+        sentAt: 2026-10-05T16:40:00
+        body: |
+          Geachte mevrouw Smulders,
+
+          Wat een verdrietig bericht over Cor. Ik kende haar dertig jaar.
+          Zoals gevraagd heb ik vandaag de laptop en mijn overdrachtsoverzicht bij uw kantoor afgegeven. Het
+          wachtwoord ben ik even kwijt, dat zoek ik voor u op. Gezien de omstandigheden lijkt het mij het beste
+          de familie niet te belasten met uitstel van de crematie.
+
+          Met vriendelijke groet,
+          Frank Hoogendijk
+  - type: calendar
+    id: agenda
+    title: Agenda
+    events:
+      - id: testament
+        title: Testament mevr. Van Asperen
+        start: 2026-09-29T10:30:00
+        end: 2026-09-29T11:45:00
+        location: Notariskantoor Smulders, Breda
+        attendees: [Ellen Smulders, Cornelia van Asperen]
+      - id: crematie
+        title: Crematie mevr. Van Asperen
+        start: 2026-10-09T14:00:00
+        end: 2026-10-09T15:30:00
+        location: Crematorium Breda
+        notes: Kan op verzoek van de executeur worden uitgesteld, alleen met medische of juridische grond.

@@ -1,0 +1,72 @@
+ownerName: Huize Wolfslaar
+ownerType: organisation
+description: Het account van de deurbelcamera bij de voordeur van Huize Wolfslaar, beheerd door Maarten van Asperen.
+lock:
+  code: bobbie1974
+  hint: "Account M. van Asperen. Wachtwoordhint: onze eerste hond + mijn geboortejaar"
+apps:
+  - type: photos
+    id: snapshots
+    title: Momentopnamen
+    photos:
+      - id: woensdag-fleur
+        album: Week 40
+        title: Beweging voordeur - wo 30-09 13:57
+        takenAt: 2026-09-30T13:57:00
+        image: woensdag-fleur.png
+        description: >-
+          Een jonge vrouw met een rugzak zet een fiets tegen de muur naast de voordeur. Geen auto op de oprit.
+      - id: donderdag-aankomst
+        album: Week 40
+        title: Beweging voordeur - do 01-10 14:02
+        takenAt: 2026-10-01T14:02:00
+        image: donderdag-aankomst.png
+        description: >-
+          Een donkerblauwe Volvo stationwagen staat op de oprit, kenteken gedeeltelijk leesbaar: "..-KX-..". Een man
+          van rond de zestig in een donkere jas met een bruine leren tas loopt naar de voordeur.
+      - id: donderdag-vertrek
+        album: Week 40
+        title: Beweging voordeur - do 01-10 15:24
+        takenAt: 2026-10-01T15:24:00
+        image: donderdag-vertrek.png
+        description: >-
+          Dezelfde man in de donkere jas met de bruine leren tas loopt van de voordeur naar de donkerblauwe Volvo.
+      - id: vrijdag-maarten
+        album: Week 40
+        title: Beweging voordeur - vr 02-10 18:58
+        takenAt: 2026-10-02T18:58:00
+        image: vrijdag-maarten.png
+        description: >-
+          Een stevige man van rond de vijftig in een werkjas belt aan. Op de oprit staat een witte bestelbus met de
+          tekst "Van Asperen Klussen".
+      - id: vrijdag-maarten-weg
+        album: Week 40
+        title: Beweging voordeur - vr 02-10 21:16
+        takenAt: 2026-10-02T21:16:00
+        image: vrijdag-maarten-weg.png
+        description: >-
+          Dezelfde man in de werkjas loopt met grote passen naar de witte bestelbus. De voordeur achter hem staat nog
+          half open.
+  - type: files
+    id: log
+    title: Gebeurtenissen
+    files:
+      - id: bewegingslog
+        folder: Week 40
+        name: Bewegingen_voordeur_week_40.txt
+        content: |
+          Deurbelcamera Huize Wolfslaar - bewegingen voordeur
+          (De verzorgende gebruikt de achterdeur vanaf het koetshuis; die heeft geen camera.)
+
+          ma 28-09  10:12  Pakketbezorger
+          di 29-09  09:51  Taxi (vertrek)
+          di 29-09  12:24  Taxi (aankomst)
+          wo 30-09  13:57  Bezoeker (fiets)
+          wo 30-09  17:08  Bezoeker (fiets, vertrek)
+          do 01-10  14:02  Bezoeker (auto)
+          do 01-10  15:24  Bezoeker (auto, vertrek)
+          vr 02-10  18:58  Bezoeker (bestelbus)
+          vr 02-10  21:16  Bezoeker (bestelbus, vertrek)
+          za 03-10  12:58  Bezoeker (auto) - grijze Toyota, dr. Bosman
+          za 03-10  13:31  Bezoeker (auto, vertrek)
+          zo 04-10  08:22  Bezoeker (auto) - grijze Toyota, dr. Bosman

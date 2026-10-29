@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 import nl.rubium.tegenspraak.auth.control.PlayerPrincipal;
 import nl.rubium.tegenspraak.casefile.control.CaseCatalog;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.investigation.control.CodeCooldownException;
-import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
 import org.springframework.core.io.Resource;
@@ -101,7 +101,7 @@ public class InvestigationController {
             @PathVariable String itemId,
             @AuthenticationPrincipal PlayerPrincipal player) {
         Photo photo = investigationService.requireOpenPhoto(
-                teamId, player.getId(), caseId, new EvidenceRef(desktopId, appId, itemId));
+                teamId, player.getId(), caseId, new ItemRef(desktopId, appId, itemId));
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(photo.mediaType()))
                 .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())

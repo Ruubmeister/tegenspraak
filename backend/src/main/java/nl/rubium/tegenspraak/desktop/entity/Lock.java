@@ -3,7 +3,7 @@ package nl.rubium.tegenspraak.desktop.entity;
 import java.util.Locale;
 
 /**
- * A code that must be entered before a desktop, mail or file opens. The hint is shown to the player; the code never
+ * A code that must be entered before a desktop or one of its items opens. The hint is shown to the player; the code never
  * leaves the server. Codes are compared without case and whitespace, so "Kat 2019" matches "kat2019".
  */
 public record Lock(String code, String hint) {

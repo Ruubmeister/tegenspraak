@@ -1,0 +1,81 @@
+ownerName: Joyce Mertens
+ownerType: person
+description: De zorgapp waarin Joyce Mertens het zorglogboek, haar rooster en de foto's van de weekdoos bijhoudt.
+apps:
+  - type: files
+    id: zorglogboek
+    title: Zorglogboek
+    files:
+      - id: logboek
+        folder: Mevr. C. van Asperen
+        name: Zorglogboek_week_40.txt
+        content: |
+          Zorglogboek mevr. C. van Asperen - J. Mertens
+
+          zo 27-09  19:10  Weekdoos gevuld (ma 28-09 t/m zo 04-10), foto gemaakt. Nieuwe doos Lanoxin 0,125 mg
+                           aangebroken (30 st.), 7 in de weekdoos, 23 over in de doos. Doos in kastje boven
+                           het aanrecht.
+          ma 28-09  09:00  Goed geslapen. Wandelingetje in de tuin.
+          di 29-09  12:30  Terug van notaris, opgewekt. Vertelt mij iets over het testament. Ik weet niet wat ik
+                           moet zeggen.
+          wo 30-09  17:30  Fleur op bezoek geweest. Mevrouw strijdlustig, belt met de bank.
+          do 01-10  12:30  Vrije middag (voorstelling Noor). Mevrouw zegt dat ze "bezoek krijgt, niks bijzonders".
+          do 01-10  18:05  Terug. Mevrouw moe maar tevreden. Glas op het terras laten staan.
+          vr 02-10  11:00  Misselijk, eet geen ontbijtkoek. Overgegeven om 12:15.
+          vr 02-10  15:30  Zegt dat alles er geel uitziet, "alsof er een gele waas over de tuin ligt".
+          vr 02-10  16:00  Praktijk Bosman gebeld. Assistente: waarschijnlijk griepje, morgen weer bellen
+                           als het niet beter gaat.
+          vr 02-10  18:00  Neef Maarten komt eten, ik ga naar het koetshuis. Later geschreeuw gehoord.
+          za 03-10  08:30  Verward, weet niet welke dag het is. Pols traag en onregelmatig. Pillen wel genomen.
+          za 03-10  13:00  Dokter Bosman geweest. Hartfalen verergerd, rust houden, morgen bellen.
+          za 03-10  22:00  Naar bed geholpen. Erg zwak, zegt "dankjewel kind".
+          zo 04-10  07:30  Mevrouw levenloos aangetroffen. Dokter Bosman gebeld.
+          zo 04-10  09:05  Op verzoek van de dokter medicatie geteld en weekdoos gefotografeerd.
+                           Lanoxin doos: 23 st. Vakje zondag nog vol.
+      - id: medicatielijst
+        folder: Mevr. C. van Asperen
+        name: Medicatielijst.txt
+        content: |
+          Medicatielijst mevr. C. van Asperen (apotheek Ulvenhout, bijgewerkt 14-09-2026)
+
+          Lanoxin (digoxine) 0,125 mg    1x per dag, 's ochtends    klein wit rond tablet
+          Furosemide 40 mg               1x per dag, 's ochtends    wit rond tablet, groter
+          Metoprolol 50 mg               1x per dag, 's ochtends    roze tablet
+          Calcium/vitamine D             1x per dag                 groot wit kauwtablet
+  - type: calendar
+    id: rooster
+    title: Rooster
+    events:
+      - id: vrije-middag
+        title: Vrije middag - voorstelling Noor
+        start: 2026-10-01T12:30:00
+        end: 2026-10-01T18:00:00
+        location: Basisschool De Wilg, Breda
+        notes: Mevrouw zegt dat ze zelf redt.
+      - id: weekdoos
+        title: Weekdoos vullen
+        start: 2026-10-04T19:00:00
+        end: 2026-10-04T19:15:00
+  - type: photos
+    id: fotos
+    title: Foto's
+    photos:
+      - id: weekdoos-27-september
+        album: Weekdoos
+        title: Weekdoos ma 28-09 t/m zo 04-10
+        takenAt: 2026-09-27T19:10:00
+        image: weekdoos-27-september.png
+        description: >-
+          Een weekdoos met zeven vakjes, ma tot en met zo, net gevuld. In elk vakje liggen precies vier pillen: één
+          klein wit rond tablet (Lanoxin 0,125 mg), één groter wit rond tablet, één roze tablet en één groot wit
+          kauwtablet. Alle vakjes zijn gelijk.
+      - id: weekdoos-4-oktober
+        album: Weekdoos
+        title: Weekdoos zondagochtend
+        takenAt: 2026-10-04T09:05:00
+        image: weekdoos-4-oktober.png
+        description: >-
+          Dezelfde weekdoos op zondagochtend. De vakjes ma tot en met za zijn leeg. In het vakje van zondag liggen
+          zeven pillen: de gewone vier (één klein wit rond tablet, één groter wit rond tablet, één roze en één groot
+          wit kauwtablet), plus drie extra witte tabletten die iets groter zijn dan het kleine witte tablet en een
+          breukstreep hebben. Die drie staan niet op de medicatielijst.

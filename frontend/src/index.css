@@ -89,6 +89,7 @@ button:disabled {
 }
 
 input,
+select,
 textarea {
   font: inherit;
   color: inherit;
@@ -273,6 +274,12 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.case-sort {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
 }
 
 .team-list ul,
@@ -1641,7 +1648,7 @@ a.attachment-chip:hover {
   overflow-wrap: anywhere;
 }
 
-/* Small screens: the case navigation becomes a menu and mail and files show either the list or the opened item */
+/* Small screens: the case navigation becomes a menu and the apps show either the list or the opened item */
 
 @media (max-width: 48rem) {
   .app-header {

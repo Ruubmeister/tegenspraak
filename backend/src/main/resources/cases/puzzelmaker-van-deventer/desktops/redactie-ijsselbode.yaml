@@ -1,0 +1,147 @@
+ownerName: De IJsselbode
+ownerType: organisation
+description: De redactiecomputer van hoofdredacteur Hans Bloemendaal van De IJsselbode.
+apps:
+  - type: mail
+    id: mail
+    title: Mail
+    messages:
+      - id: klacht-zandbergen
+        folder: Inbox
+        from: r.zandbergen@zandbergenvastgoed.nl
+        to: h.bloemendaal@ijsselbode.nl
+        subject: Vrijwilliger Stadsarchief
+        sentAt: 2026-11-09T08:31:00
+        body: |
+          Hans,
+
+          Ik hoor dat jouw puzzelmannetje, Klaver, als vrijwilliger in het archief rondsnuffelt in de dossiers van
+          Havenkwartier Noord en daar verhalen over rondvertelt. Ik neem aan dat De IJsselbode daar niets mee te
+          maken heeft. Laat het rusten, zou ik zeggen. Sommige dozen kun je beter dicht laten.
+
+          Groet,
+          Robbert Zandbergen
+      - id: verhaal-wouter
+        folder: Inbox
+        from: wouter.klaver@kpnmail.nl
+        to: h.bloemendaal@ijsselbode.nl
+        subject: Een verhaal
+        sentAt: 2026-11-10T21:14:00
+        body: |
+          Hans,
+
+          Ik denk dat ik een nieuwsverhaal voor je heb, groter dan een puzzel. Iets met grond, een rapport en heel
+          veel geld van de gemeente. Ik wil het eerst helemaal rond hebben. Maandag 16 november kom ik langs.
+
+          Wouter
+      - id: inzending-1306
+        folder: Inbox
+        from: wouter.klaver@kpnmail.nl
+        to: h.bloemendaal@ijsselbode.nl
+        subject: Breker 1306
+        sentAt: 2026-11-12T09:14:00
+        body: |
+          Hans,
+
+          Hierbij de breker voor zaterdag. Deze keer een letterpuzzel. Verander er niets aan, ook de volgorde van
+          de omschrijvingen niet! Een oplossingsbalk is niet nodig.
+
+          Wouter
+      - id: reactie-hans
+        folder: Verzonden
+        from: h.bloemendaal@ijsselbode.nl
+        to: wouter.klaver@kpnmail.nl
+        subject: "Re: Breker 1306"
+        sentAt: 2026-11-12T09:40:00
+        body: |
+          Een letterpuzzel zonder oplossingsbalk? De lezers gaan klagen, Wouter. Maar goed, jij bent de baas van de
+          breker. Hij gaat ongewijzigd mee.
+
+          Hans
+  - type: files
+    id: bestanden
+    title: Bestanden
+    files:
+      - id: breker-1306
+        folder: Puzzels
+        name: Zaterdagbreker_1306.txt
+        content: |
+          DE ZATERDAGBREKER - nr. 1306 - zaterdag 14 november 2026
+          door Wouter Klaver
+
+          Thema: Rondje Deventer. Een letterpuzzel deze week. Wie goed begint, vindt wat ik verstopte.
+
+           1. Deventer lekkernij, taai en kruidig (4)
+           2. Kerk aan het Grote Kerkhof, genoemd naar een Angelsaksische zendeling (8)
+           3. De provincie waarin Deventer ligt (10)
+           4. Ronde stenen in de Bergstraat (5)
+           5. Hier meert de rondvaartboot aan, langs de IJssel (4)
+           6. Wat terugkomt als je in een lege kerk roept (4)
+           7. Als de Brink stil is en zelfs de puzzelaar slaapt (5)
+           8. Elk jaar in augustus staan er zes kilometer van langs de IJssel, vol boeken (6)
+           9. Wat je bij elke omschrijving hierboven zoekt (8)
+          10. Wat vroeger de hele stad omringde (4)
+          11. Sterke boom die eikels draagt (3)
+          12. Wat de IJssel is (6)
+
+          Geen oplossingsbalk deze week. De oplossing staat volgende week in de krant.
+      - id: breker-1305
+        folder: Puzzels
+        name: Zaterdagbreker_1305.txt
+        content: |
+          DE ZATERDAGBREKER - nr. 1305 - zaterdag 7 november 2026
+          door Wouter Klaver
+
+          Cryptogram. Vul de antwoorden in het diagram in; de letters in de grijze vakjes vormen de oplossing.
+          (24 omschrijvingen, zie de papieren krant.)
+
+          Oplossingsbalk: _ _ _ _ _   _ _ _ _ _ _ _ _
+
+          Oplossing vorige week: STADSWAAG
+      - id: jubileum
+        folder: Artikelen
+        name: Jubileum_25_jaar_Zaterdagbreker.txt
+        content: |
+          25 jaar Zaterdagbreker: Wouter Klaver breekt nog altijd hoofden
+          De IJsselbode, 3 oktober 2026
+
+          Op zaterdag 6 oktober 2001 stond de allereerste Zaterdagbreker in De IJsselbode. Sindsdien heeft Wouter
+          Klaver (63) er ruim 1300 gemaakt, zonder één week over te slaan. "Zelfs niet toen mijn vrouw Hennie
+          overleed", zegt hij. "Toen heb ik haar naam in de beginletters van de omschrijvingen verstopt. Bijna
+          niemand heeft het gezien."
+
+          Klaver is ook vrijwilliger bij het Stadsarchief en wint al twintig jaar elke woensdagavond het
+          torenuurwerk van de Bergkerk op. "Daarboven, tussen de tandwielen, bedenk ik mijn beste omschrijvingen."
+          Puzzelclub De Waag, met voorzitter Anneke Visser, bood hem bij het jubileum een gouden potlood aan.
+  - type: browser
+    id: browser
+    title: Browser
+    pages:
+      - id: instagram-zandbergen
+        url: https://www.instagram.com/zandbergenvastgoed/p/topavond-vischpoort
+        title: Zandbergen Vastgoed op Instagram
+        visitedAt: 2026-11-16T11:02:00
+        content: |
+          zandbergenvastgoed - gepost op vrijdag 13 november 2026 om 22:14
+          Locatie: Restaurant De Vischpoort, Zwolle
+
+          Topavond met onze partners! Havenkwartier Noord: on track. #havenkwartier #deventer #partners
+
+          Foto: tien mannen en vrouwen aan een lange gedekte tafel, met in het midden Robbert Zandbergen die een
+          glas heft. Op de achtergrond een klok aan de muur die tien over tien aangeeft.
+      - id: nieuws-overlijden
+        url: https://www.ijsselbode.nl/deventer/puzzelmaker-wouter-klaver-dood-gevonden
+        title: Puzzelmaker Wouter Klaver (63) dood gevonden - De IJsselbode
+        visitedAt: 2026-11-14T14:30:00
+        content: |
+          Wouter Klaver, al 25 jaar de maker van de Zaterdagbreker, is zaterdagochtend dood gevonden in zijn woning
+          aan de Bergstraat. Volgens de politie is hij vermoedelijk van de trap gevallen. Zijn laatste puzzel staat
+          vandaag in de krant.
+      - id: verkoop-havenkwartier
+        url: https://www.ijsselbode.nl/deventer/grond-havenkwartier-noord-verkocht
+        title: Grond Havenkwartier Noord verkocht aan Zandbergen - De IJsselbode
+        visitedAt: 2026-11-16T10:48:00
+        content: |
+          (Archief, 4 februari 2025) De gemeente Deventer heeft de grond van Havenkwartier Noord voor 3,1 miljoen
+          euro verkocht aan Zandbergen Vastgoed. Wethouder: "Door de zware bodemverontreiniging, met een sanering
+          van 6,2 miljoen, was er geen andere koper." Het bodemrapport is opgesteld door Bodemadvies Oost.

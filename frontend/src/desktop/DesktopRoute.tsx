@@ -18,7 +18,7 @@ export function DesktopRoute() {
   if (isError) {
     return <p className="status error">Deze computer kon niet worden geopend.</p>
   }
-  // A link to an attachment selects its mail or file; the key reopens the computer when that selection changes
+  // A link to an attachment selects its item; the key reopens the computer when that selection changes
   const appId = searchParams.get('app') ?? undefined
   const itemId = searchParams.get('item') ?? undefined
   return (
