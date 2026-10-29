@@ -31,9 +31,8 @@ interface ChatPanelProps {
 
 /**
  * The team's shared conversation with a character. Messages of teammates and replies that arrive later appear through
- * the team's live updates, and the conversation is marked read while it is on screen. The draft,
- * including up to three attached mails or files, is remembered per conversation, so the player can look up evidence
- * elsewhere and come back to it.
+ * the team's live updates, and the conversation is marked read while it is on screen. The draft, including its
+ * attachments, is remembered per conversation, so the player can look up evidence elsewhere and come back to it.
  */
 export function ChatPanel({ teamId, caseId, character, currentUsername }: ChatPanelProps) {
   const conversation = { teamId, caseId, characterId: character.id }

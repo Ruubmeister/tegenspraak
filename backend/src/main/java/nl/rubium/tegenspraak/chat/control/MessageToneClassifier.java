@@ -58,7 +58,7 @@ public class MessageToneClassifier {
     /**
      * @param lastCharacterReply what the character said before this message, so the tone is judged in context; null at
      *     the start of the conversation
-     * @param attachmentCount mails and files shown with the message
+     * @param attachmentCount desktop items shown with the message
      */
     public MessageTone classify(
             CharacterProfile character, String lastCharacterReply, String message, int attachmentCount) {

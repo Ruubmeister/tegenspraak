@@ -197,7 +197,7 @@ export interface ChatMessage {
   authorName: string | null
   content: string
   sentAt: string
-  /** Mails and files the author attached; empty for character messages and notices. */
+  /** Desktop items the author attached; empty for character messages and notices. */
   attachments: EvidenceItem[]
 }
 

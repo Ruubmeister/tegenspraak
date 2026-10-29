@@ -9,7 +9,7 @@ interface AttachmentLinksProps {
   attachments: EvidenceItem[]
 }
 
-/** Attachments of a sent message; each opens the mail or file on its computer. */
+/** Attachments of a sent message; each opens the item on its computer. */
 export function AttachmentLinks({ teamId, caseId, attachments }: AttachmentLinksProps) {
   if (attachments.length === 0) {
     return null

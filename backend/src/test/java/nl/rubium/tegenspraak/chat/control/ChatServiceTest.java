@@ -32,7 +32,6 @@ import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
 import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
 import nl.rubium.tegenspraak.casefile.entity.ContactIntroduction;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
-import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.chat.entity.CharacterMood;
 import nl.rubium.tegenspraak.chat.entity.CharacterMoodRepository;
 import nl.rubium.tegenspraak.chat.entity.ChatAttachment;
@@ -45,15 +44,14 @@ import nl.rubium.tegenspraak.chat.entity.MessageSender;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.Lock;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
 import nl.rubium.tegenspraak.desktop.entity.MailMessage;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import nl.rubium.tegenspraak.investigation.control.EvidenceItem;
-import nl.rubium.tegenspraak.investigation.control.EvidenceRef;
 import nl.rubium.tegenspraak.investigation.control.InvestigationService;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
-import nl.rubium.tegenspraak.investigation.control.UnlockTarget;
 import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +104,7 @@ class ChatServiceTest {
             List.of(new CharacterSecret(
                     "Hij koos het menu.",
                     "De speler laat het menu zien.",
-                    List.of(new RequiredEvidence("laptop-butler", "bestanden", "menu")),
+                    List.of(new ItemRef("laptop-butler", "bestanden", "menu")),
                     null,
                     null)),
             false,
@@ -143,9 +141,9 @@ class ChatServiceTest {
                                             "dagboek.txt",
                                             "Ik zag de tuinman.",
                                             new Lock("1234", "Verjaardag"))))));
-    private static final EvidenceRef DINNER_MAIL = new EvidenceRef("laptop-butler", "mail", "afspraak");
-    private static final EvidenceRef MENU_FILE = new EvidenceRef("laptop-butler", "bestanden", "menu");
-    private static final EvidenceRef LOCKED_DIARY = new EvidenceRef("laptop-butler", "bestanden", "dagboek");
+    private static final ItemRef DINNER_MAIL = new ItemRef("laptop-butler", "mail", "afspraak");
+    private static final ItemRef MENU_FILE = new ItemRef("laptop-butler", "bestanden", "menu");
+    private static final ItemRef LOCKED_DIARY = new ItemRef("laptop-butler", "bestanden", "dagboek");
     private static final CaseDefinition CASE_DEFINITION = new CaseDefinition(
             CASE_ID,
             CaseFixtures.manifestWithSetting("Geheim"),
@@ -160,24 +158,26 @@ class ChatServiceTest {
     private final ConsultationRequestRepository consultationRequestRepository =
             mock(ConsultationRequestRepository.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final CharacterPromptBuilder characterPromptBuilder = new CharacterPromptBuilder();
     private final ChatService chatService = new ChatService(
-            new CharacterPromptBuilder(),
+            characterPromptBuilder,
+            new ConversationMemory(chatMessageRepository, characterMoodRepository, characterPromptBuilder, 40),
+            new ConsultationRequests(
+                    consultationRequestRepository,
+                    new ConsultationSchedule(
+                            Clock.fixed(NOW, ZoneOffset.UTC),
+                            Duration.ofMinutes(2),
+                            Duration.ofMinutes(2),
+                            Duration.ofMinutes(1),
+                            3)),
             chatMessageRepository,
             characterMoodRepository,
-            consultationRequestRepository,
             messageToneClassifier,
             new CharacterReplyModel(chatModel, ToolCallingManager.builder().build()),
             investigationService,
             new ConversationLocks(),
-            new ConsultationSchedule(
-                    Clock.fixed(NOW, ZoneOffset.UTC),
-                    Duration.ofMinutes(2),
-                    Duration.ofMinutes(2),
-                    Duration.ofMinutes(1),
-                    3),
             new TransactionTemplate(mock(PlatformTransactionManager.class)),
-            eventPublisher,
-            40);
+            eventPublisher);
     private final Set<String> unlockedTargets = new HashSet<>();
 
     @BeforeEach
@@ -185,8 +185,6 @@ class ChatServiceTest {
         when(investigationService.requireAvailableCharacter(TEAM_ID, PLAYER_ID, CASE_ID, CHARACTER_ID))
                 .thenReturn(BUTLER);
         when(investigationService.getProgress(TEAM_ID, PLAYER_ID, CASE_ID))
-                .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
-        when(investigationService.getTeamProgress(TEAM_ID, CASE_ID))
                 .thenAnswer(invocation -> new TeamProgress(CASE_DEFINITION, unlockedTargets));
         when(characterMoodRepository.findByTeamIdAndCaseIdAndCharacterId(TEAM_ID, CASE_ID, CHARACTER_ID))
                 .thenReturn(Optional.empty());
@@ -727,7 +725,7 @@ class ChatServiceTest {
     @Test
     void sendMessage_givenUnknownAttachment_expectNotFoundAndModelNotCalled() {
         givenStoredHistoryNewestFirst();
-        EvidenceRef unknown = new EvidenceRef("laptop-butler", "mail", "bestaat-niet");
+        ItemRef unknown = new ItemRef("laptop-butler", "mail", "bestaat-niet");
 
         assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Hallo", List.of(unknown)))
                 .isInstanceOf(CaseContentNotFoundException.class);
@@ -736,7 +734,7 @@ class ChatServiceTest {
 
     @Test
     void sendMessage_givenFourAttachments_expectTooManyAttachmentsAndModelNotCalled() {
-        EvidenceRef fourth = new EvidenceRef("laptop-butler", "mail", "nog-een");
+        ItemRef fourth = new ItemRef("laptop-butler", "mail", "nog-een");
 
         assertThatThrownBy(() -> chatService.sendMessage(
                         PLAYER_ID,
@@ -885,73 +883,6 @@ class ChatServiceTest {
         assertThatThrownBy(() -> chatService.sendMessage(PLAYER_ID, "anouk", CONVERSATION, "Code?", List.of()))
                 .isInstanceOf(CharacterUnavailableException.class);
         verify(consultationRequestRepository, never()).save(any(ConsultationRequest.class));
-    }
-
-    @Test
-    void relayConsultationAnswer_givenAnswer_expectAnswerSentAsLastMessageAndReplyStored() {
-        givenStoredHistoryNewestFirst(characterMessage("Ik vraag het de kok."), playerMessage("anouk", "Code?"));
-        givenModelReplies("De kok zegt dat het 1234 is.");
-        ConsultationRequest request = pendingRequest();
-
-        chatService.relayConsultationAnswer(
-                request, new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
-
-        List<Message> sent = capturePromptMessages();
-        assertThat(sent)
-                .extracting(Message::getMessageType)
-                .containsExactly(MessageType.SYSTEM, MessageType.USER, MessageType.ASSISTANT, MessageType.USER);
-        assertThat(sent.getLast().getText())
-                .contains("Je hebt antwoord gekregen van De Kok", "Weet jij de code?", "Het is 1234.");
-        assertThat(savedMessages())
-                .extracting(ChatMessage::getSender, ChatMessage::getContent)
-                .startsWith(tuple(MessageSender.CHARACTER, "De kok zegt dat het 1234 is."));
-        assertThat(request.getStatus()).isEqualTo(ConsultationStatus.ANSWERED);
-        verify(consultationRequestRepository).save(request);
-    }
-
-    @Test
-    void relayConsultationAnswer_givenLockedItemUnlock_expectItemUnlockedAndNoticeStored() {
-        givenStoredHistoryNewestFirst();
-        givenModelReplies("De kok zegt dat het 1234 is.");
-        when(investigationService.unlockWithoutCode(
-                        TEAM_ID, CASE_ID, UnlockTarget.item("laptop-butler", "bestanden", "dagboek")))
-                .thenReturn(true);
-
-        chatService.relayConsultationAnswer(
-                pendingRequest(), new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
-
-        assertThat(savedMessages())
-                .extracting(ChatMessage::getSender, ChatMessage::getContent)
-                .containsExactly(
-                        tuple(MessageSender.CHARACTER, "De kok zegt dat het 1234 is."),
-                        tuple(MessageSender.NOTICE, "\"dagboek.txt\" op de computer van De Butler is ontgrendeld."));
-        verify(eventPublisher).publishEvent(TeamEvent.chat(TEAM_ID, CASE_ID, CHARACTER_ID));
-        verify(eventPublisher).publishEvent(TeamEvent.caseProgress(TEAM_ID, CASE_ID));
-    }
-
-    @Test
-    void relayConsultationAnswer_givenAlreadyUnlocked_expectNoUnlockNotice() {
-        givenStoredHistoryNewestFirst();
-        givenModelReplies("De kok zegt dat het 1234 is.");
-
-        chatService.relayConsultationAnswer(
-                pendingRequest(), new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234.");
-
-        assertThat(savedMessages()).extracting(ChatMessage::getSender).containsExactly(MessageSender.CHARACTER);
-    }
-
-    @Test
-    void relayConsultationAnswer_givenModelFails_expectNothingStoredAndRequestStillPending() {
-        givenStoredHistoryNewestFirst();
-        when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("API down"));
-        ConsultationRequest request = pendingRequest();
-
-        assertThatThrownBy(() -> chatService.relayConsultationAnswer(
-                        request, new ConsultationContact(SAFE_CODE, COOK), butlerConsulting(null), "Het is 1234."))
-                .isInstanceOf(CharacterUnavailableException.class);
-        verify(chatMessageRepository, never()).saveAll(anyList());
-        verify(investigationService, never()).unlockWithoutCode(any(), any(), any());
-        assertThat(request.getStatus()).isEqualTo(ConsultationStatus.PENDING);
     }
 
     private static ConsultationRequest pendingRequest() {

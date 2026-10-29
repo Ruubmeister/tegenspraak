@@ -1648,7 +1648,7 @@ a.attachment-chip:hover {
   overflow-wrap: anywhere;
 }
 
-/* Small screens: the case navigation becomes a menu and mail and files show either the list or the opened item */
+/* Small screens: the case navigation becomes a menu and the apps show either the list or the opened item */
 
 @media (max-width: 48rem) {
   .app-header {

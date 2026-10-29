@@ -12,6 +12,7 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.DesktopApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.Lock;
 import nl.rubium.tegenspraak.desktop.entity.LockableItem;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
@@ -105,7 +106,7 @@ public class InvestigationService {
     }
 
     /** A photo whose image the team may see: it exists, and neither its desktop nor the photo itself is locked. */
-    public Photo requireOpenPhoto(UUID teamId, UUID playerId, String caseId, EvidenceRef ref) {
+    public Photo requireOpenPhoto(UUID teamId, UUID playerId, String caseId, ItemRef ref) {
         return getProgress(teamId, playerId, caseId)
                 .findOpenEvidence(ref)
                 .map(EvidenceItem::item)

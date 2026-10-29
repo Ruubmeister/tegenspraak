@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Set;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import org.junit.jupiter.api.Test;
 
 class CharacterSecretTest {
 
-    private static final RequiredEvidence LETTER = new RequiredEvidence("landhuis", "mail", "brief");
-    private static final RequiredEvidence WILL = new RequiredEvidence("landhuis", "bestanden", "testament");
+    private static final ItemRef LETTER = new ItemRef("landhuis", "mail", "brief");
+    private static final ItemRef WILL = new ItemRef("landhuis", "bestanden", "testament");
 
     @Test
     void isEvidenceShown_givenNoRequiredEvidence_expectTrue() {

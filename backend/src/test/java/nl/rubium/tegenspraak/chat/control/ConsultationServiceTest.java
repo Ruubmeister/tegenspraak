@@ -79,7 +79,7 @@ class ConsultationServiceTest {
     private final ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
     private final CaseCatalog caseCatalog = mock(CaseCatalog.class);
     private final ChatModel chatModel = mock(ChatModel.class);
-    private final ChatService chatService = mock(ChatService.class);
+    private final ConsultationRelay consultationRelay = mock(ConsultationRelay.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final ConsultationService consultationService = new ConsultationService(
             consultationRequestRepository,
@@ -87,7 +87,7 @@ class ConsultationServiceTest {
             caseCatalog,
             new CharacterPromptBuilder(),
             new CharacterReplyModel(chatModel, ToolCallingManager.builder().build()),
-            chatService,
+            consultationRelay,
             new ConsultationSchedule(
                     Clock.fixed(NOW, ZoneOffset.UTC),
                     Duration.ofMinutes(2),
@@ -137,9 +137,7 @@ class ConsultationServiceTest {
 
         consultationService.answerDueConsultations();
 
-        verify(chatService)
-                .relayConsultationAnswer(
-                        request, new ConsultationContact(SAFE_CODE, COOK), BUTLER, "Hoi! Het is 1234.");
+        verify(consultationRelay).relay(request, new ConsultationContact(SAFE_CODE, COOK), BUTLER, "Hoi! Het is 1234.");
     }
 
     @Test
@@ -153,7 +151,7 @@ class ConsultationServiceTest {
         assertThat(request.getFailedAttempts()).isEqualTo(1);
         assertThat(request.getDueAt()).isEqualTo(NOW.plus(Duration.ofMinutes(1)));
         verify(consultationRequestRepository).save(request);
-        verify(chatService, never()).relayConsultationAnswer(any(), any(), any(), anyString());
+        verify(consultationRelay, never()).relay(any(), any(), any(), anyString());
     }
 
     @Test
@@ -161,7 +159,7 @@ class ConsultationServiceTest {
         ConsultationRequest request = request("kluiscode", 1);
         givenDueRequests(request);
         givenModelReplies("Hoi! Het is 1234.");
-        when(chatService.relayConsultationAnswer(any(), any(), any(), anyString()))
+        when(consultationRelay.relay(any(), any(), any(), anyString()))
                 .thenThrow(new CharacterUnavailableException("Empty reply"));
 
         consultationService.answerDueConsultations();
@@ -207,12 +205,12 @@ class ConsultationServiceTest {
         ConsultationRequest healthy = request("kluiscode", 0);
         givenDueRequests(broken, healthy);
         givenModelReplies("Het is 1234.");
-        when(chatService.relayConsultationAnswer(eq(broken), any(), any(), anyString()))
+        when(consultationRelay.relay(eq(broken), any(), any(), anyString()))
                 .thenThrow(new IllegalStateException("Database down"));
 
         consultationService.answerDueConsultations();
 
-        verify(chatService).relayConsultationAnswer(eq(healthy), any(), any(), anyString());
+        verify(consultationRelay).relay(eq(healthy), any(), any(), anyString());
     }
 
     private void givenDueRequests(ConsultationRequest... requests) {

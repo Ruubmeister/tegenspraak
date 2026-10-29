@@ -8,6 +8,7 @@ import java.util.List;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FileEntry;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import org.junit.jupiter.api.Test;
 
@@ -49,15 +50,14 @@ class CaseDefinitionTest {
 
     @Test
     void constructor_givenSecretRequiringExistingFile_expectValid() {
-        CharacterProfile butler = characterWithSecretRequiring(new RequiredEvidence("landhuis", "bestanden", "menu"));
+        CharacterProfile butler = characterWithSecretRequiring(new ItemRef("landhuis", "bestanden", "menu"));
 
         assertThatCode(() -> caseWithDesktop(butler)).doesNotThrowAnyException();
     }
 
     @Test
     void constructor_givenSecretRequiringUnknownItem_expectIllegalArgument() {
-        CharacterProfile butler =
-                characterWithSecretRequiring(new RequiredEvidence("landhuis", "bestanden", "testament"));
+        CharacterProfile butler = characterWithSecretRequiring(new ItemRef("landhuis", "bestanden", "testament"));
 
         assertThatThrownBy(() -> caseWithDesktop(butler))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -67,7 +67,7 @@ class CaseDefinitionTest {
 
     @Test
     void constructor_givenSecretRequiringUnknownDesktop_expectIllegalArgument() {
-        CharacterProfile butler = characterWithSecretRequiring(new RequiredEvidence("kasteel", "bestanden", "menu"));
+        CharacterProfile butler = characterWithSecretRequiring(new ItemRef("kasteel", "bestanden", "menu"));
 
         assertThatThrownBy(() -> caseWithDesktop(butler))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -160,7 +160,7 @@ class CaseDefinitionTest {
                 "demo", CaseFixtures.manifestWithSetting("Geheim"), List.of(characters), List.of(hall));
     }
 
-    private static CharacterProfile characterWithSecretRequiring(RequiredEvidence evidence) {
+    private static CharacterProfile characterWithSecretRequiring(ItemRef evidence) {
         CharacterSecret secret = new CharacterSecret("Feit", "Als ze het tonen.", List.of(evidence), null, null);
         return new CharacterProfile(
                 "de-butler",

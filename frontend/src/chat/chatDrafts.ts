@@ -3,7 +3,7 @@ import { isSameEvidence } from './evidenceApi'
 
 /**
  * Unsent messages per conversation, kept in session storage so a player can look up evidence elsewhere in the case
- * and come back to what they were typing. Mails and files can also be attached from the computer while the chat is
+ * and come back to what they were typing. Items can also be attached from the computer while the chat is
  * closed. Storage may be unavailable (private mode, blocked site data); drafts are then simply not remembered.
  */
 const DRAFT_KEY_PREFIX = 'tegenspraak.chat-draft'

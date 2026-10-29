@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 
 public record CaseDefinition(
         String id, CaseManifest manifest, List<CharacterProfile> characters, List<Desktop> desktops) {
@@ -77,16 +78,16 @@ public record CaseDefinition(
 
     private static boolean exists(ConsultationUnlock unlock, List<Desktop> desktops) {
         if (unlock.isItem()) {
-            return exists(new RequiredEvidence(unlock.desktop(), unlock.app(), unlock.item()), desktops);
+            return exists(unlock.itemRef(), desktops);
         }
         return desktops.stream().anyMatch(desktop -> desktop.id().equals(unlock.desktop()));
     }
 
-    private static boolean exists(RequiredEvidence evidence, List<Desktop> desktops) {
+    private static boolean exists(ItemRef ref, List<Desktop> desktops) {
         return desktops.stream()
-                .filter(desktop -> desktop.id().equals(evidence.desktop()))
-                .flatMap(desktop -> desktop.findApp(evidence.app()).stream())
-                .anyMatch(app -> app.findItem(evidence.item()).isPresent());
+                .filter(desktop -> desktop.id().equals(ref.desktopId()))
+                .flatMap(desktop -> desktop.findApp(ref.appId()).stream())
+                .anyMatch(app -> app.findItem(ref.itemId()).isPresent());
     }
 
     /**

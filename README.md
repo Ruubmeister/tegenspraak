@@ -21,12 +21,12 @@ The backend is a single service, split into feature packages that each follow bo
   one, and the last member to leave deletes the team with its progress
 - `chat`: a team's shared conversation with a character; the persona file becomes the LLM system prompt, and player
   messages reach the LLM as `[name]: ...` so the character can tell the detectives apart. A message can carry up to
-  three opened mails or files as attachments; only references are stored, and the character reads them in full.
+  three opened desktop items (mails, files, appointments, photos, web pages) as attachments; only references are stored, and the character reads them in full.
   Characters can ask each other for information; the answer is scheduled and arrives a few minutes later. Each player
   has their own read state per conversation, so contacts with new messages are marked
-- `desktop`: virtual desktops made of typed apps (`mail`, `files`)
-- `investigation`: what a team can see and use in a case: introduced contacts and desktops, mails and files opened
-  with their code. Unlocks are shared by the team
+- `desktop`: virtual desktops made of typed apps (`mail`, `files`, `calendar`, `photos`, `browser`)
+- `investigation`: what a team can see and use in a case: introduced contacts, and desktops and their items opened
+  with their code or by a contact's answer. Unlocks are shared by the team
 - `liveupdate`: pushes "something changed" signals to the team's open browsers as server-sent events
 - `verdict`: the team solves a case by typing answers to its open questions, which an LLM grades against the expected
   answers; a team gets a limited number of attempts per case (`tegenspraak.verdict.max-attempts`, 5)
@@ -138,7 +138,7 @@ it may reveal the whole truth. A grading failure stores nothing, so it does not 
 ### Secrets that need evidence
 
 A character gives up a secret once the `revealWhen` condition is met, as judged by its LLM. Players can bluff about
-evidence they do not have, so a secret can also list the mails or files the team must actually attach in the
+evidence they do not have, so a secret can also list the desktop items the team must actually attach in the
 conversation with that character:
 
 ```yaml
@@ -235,9 +235,9 @@ lock:
   hint: "Wachtwoordhint: etentje bij de ouders van D. (ddmm)"
 ```
 
-Codes are compared ignoring case and whitespace. Players see the hint and, for mails and files, the subject or name;
+Codes are compared ignoring case and whitespace. Players see the hint and, for items, the subject, name or title;
 the content is only sent once the team entered the code. A locked desktop shows no apps at all. After 5 wrong codes
-for one item within a minute the team has to wait (`tegenspraak.locks` in `application.yaml`). Mails, files and apps
+for one item within a minute the team has to wait (`tegenspraak.locks` in `application.yaml`). Items and apps
 need ids that are unique within their parent, because locks are addressed by them.
 
 Unknown properties or invalid ids fail startup, so mistakes are caught immediately. Only a character's name, role and

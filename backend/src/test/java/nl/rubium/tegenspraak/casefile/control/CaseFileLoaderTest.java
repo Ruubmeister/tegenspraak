@@ -12,11 +12,11 @@ import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.casefile.entity.ConsultationUnlock;
 import nl.rubium.tegenspraak.casefile.entity.ContactConsultation;
 import nl.rubium.tegenspraak.casefile.entity.Mood;
-import nl.rubium.tegenspraak.casefile.entity.RequiredEvidence;
 import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
 import nl.rubium.tegenspraak.desktop.entity.CalendarApp;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.FilesApp;
+import nl.rubium.tegenspraak.desktop.entity.ItemRef;
 import nl.rubium.tegenspraak.desktop.entity.MailApp;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
@@ -81,8 +81,7 @@ class CaseFileLoaderTest {
         assertThat(butler.secrets().get(1)).satisfies(secret -> {
             assertThat(secret.requiresEvidence())
                     .containsExactly(
-                            new RequiredEvidence("landhuis", "bestanden", "kluis"),
-                            new RequiredEvidence("landhuis", "mail", "brief"));
+                            new ItemRef("landhuis", "bestanden", "kluis"), new ItemRef("landhuis", "mail", "brief"));
             assertThat(secret.requiredCount()).isEqualTo(1);
         });
     }

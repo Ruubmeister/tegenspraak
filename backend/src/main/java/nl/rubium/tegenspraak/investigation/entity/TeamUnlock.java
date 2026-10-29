@@ -7,7 +7,10 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Something a team unlocked in a case: an introduced character, or a desktop, mail or file opened with its code. */
+/**
+ * Something a team unlocked in a case: a character that was introduced, or a desktop or item opened with its code or by
+ * a contact's answer.
+ */
 @Entity
 @Table(name = "team_unlock")
 public class TeamUnlock {

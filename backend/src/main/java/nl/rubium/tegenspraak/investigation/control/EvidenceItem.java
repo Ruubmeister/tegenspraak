@@ -12,10 +12,6 @@ import nl.rubium.tegenspraak.desktop.entity.Photo;
 /** A desktop item the team has opened, together with the desktop and app it was found in. */
 public record EvidenceItem(Desktop desktop, DesktopApp app, LockableItem item) {
 
-    public EvidenceRef ref() {
-        return new EvidenceRef(desktop.id(), app.id(), item.id());
-    }
-
     /** The subject of a mail, the name of a file or the title of an event, photo or page. */
     public String title() {
         return switch (item) {

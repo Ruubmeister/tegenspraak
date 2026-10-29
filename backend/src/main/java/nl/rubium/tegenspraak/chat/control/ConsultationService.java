@@ -35,7 +35,7 @@ public class ConsultationService {
     private final CaseCatalog caseCatalog;
     private final CharacterPromptBuilder characterPromptBuilder;
     private final CharacterReplyModel characterReplyModel;
-    private final ChatService chatService;
+    private final ConsultationRelay consultationRelay;
     private final ConsultationSchedule consultationSchedule;
     private final TransactionTemplate transactionTemplate;
     private final ApplicationEventPublisher eventPublisher;
@@ -46,7 +46,7 @@ public class ConsultationService {
             CaseCatalog caseCatalog,
             CharacterPromptBuilder characterPromptBuilder,
             CharacterReplyModel characterReplyModel,
-            ChatService chatService,
+            ConsultationRelay consultationRelay,
             ConsultationSchedule consultationSchedule,
             TransactionTemplate transactionTemplate,
             ApplicationEventPublisher eventPublisher) {
@@ -55,7 +55,7 @@ public class ConsultationService {
         this.caseCatalog = caseCatalog;
         this.characterPromptBuilder = characterPromptBuilder;
         this.characterReplyModel = characterReplyModel;
-        this.chatService = chatService;
+        this.consultationRelay = consultationRelay;
         this.consultationSchedule = consultationSchedule;
         this.transactionTemplate = transactionTemplate;
         this.eventPublisher = eventPublisher;
@@ -89,7 +89,7 @@ public class ConsultationService {
         ResolvedRequest consultation = resolved.get();
         try {
             String answer = contactAnswer(consultation, request.getQuestion());
-            chatService.relayConsultationAnswer(request, consultation.contact(), consultation.asker(), answer);
+            consultationRelay.relay(request, consultation.contact(), consultation.asker(), answer);
         } catch (CharacterUnavailableException e) {
             retryOrGiveUp(request, consultation);
         }
