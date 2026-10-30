@@ -24,6 +24,20 @@ spring:
         model: claude-sonnet-5-5
         max-tokens: 16000
 
+springdoc:
+  api-docs:
+    # Only the build needs the spec, see OpenApiSpecIT; the running application does not serve it
+    enabled: false
+  # A stable, readable spec file, so changes show up as small diffs
+  writer-with-order-by-keys: true
+  writer-with-default-pretty-printer: true
+  model-converters:
+    # Fields annotated with @Nullable may be null in the JSON
+    java-nullable-property-customizer:
+      enabled: true
+    polymorphic-converter:
+      enabled: true
+
 server:
   port: 8081
   servlet:

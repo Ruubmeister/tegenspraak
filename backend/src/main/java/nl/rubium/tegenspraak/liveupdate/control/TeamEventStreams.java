@@ -12,7 +12,6 @@ import nl.rubium.tegenspraak.liveupdate.entity.TeamEventType;
 import nl.rubium.tegenspraak.team.control.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.session.SessionInformation;
@@ -46,12 +45,10 @@ public class TeamEventStreams {
     private final Duration streamTimeout;
 
     public TeamEventStreams(
-            TeamService teamService,
-            SessionRegistry sessionRegistry,
-            @Value("${tegenspraak.live-updates.stream-timeout}") Duration streamTimeout) {
+            TeamService teamService, SessionRegistry sessionRegistry, LiveUpdateProperties liveUpdateProperties) {
         this.teamService = teamService;
         this.sessionRegistry = sessionRegistry;
-        this.streamTimeout = streamTimeout;
+        this.streamTimeout = liveUpdateProperties.streamTimeout();
     }
 
     /** The caller has checked that the player is a member of the team. */

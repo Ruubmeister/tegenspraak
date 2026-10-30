@@ -21,7 +21,6 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Component;
 
@@ -42,11 +41,11 @@ class ConversationMemory {
             ChatMessageRepository chatMessageRepository,
             CharacterMoodRepository characterMoodRepository,
             CharacterPromptBuilder characterPromptBuilder,
-            @Value("${tegenspraak.chat.max-history-messages}") int maxHistoryMessages) {
+            ChatProperties chatProperties) {
         this.chatMessageRepository = chatMessageRepository;
         this.characterMoodRepository = characterMoodRepository;
         this.characterPromptBuilder = characterPromptBuilder;
-        this.maxHistoryMessages = maxHistoryMessages;
+        this.maxHistoryMessages = chatProperties.maxHistoryMessages();
     }
 
     /** Latest messages in chronological order, starting with a player message as the LLM expects. */

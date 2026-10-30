@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
 import nl.rubium.tegenspraak.desktop.entity.ItemRef;
@@ -11,12 +12,13 @@ import nl.rubium.tegenspraak.desktop.entity.ItemRef;
  * the character also keeps the secret until it feels at least that good about the team.
  */
 public record CharacterSecret(
-        String fact, String revealWhen, List<ItemRef> requiresEvidence, Integer requiredCount, Mood minimumMood) {
+        @NotBlank String fact,
+        @NotBlank String revealWhen,
+        List<ItemRef> requiresEvidence,
+        Integer requiredCount,
+        Mood minimumMood) {
 
     public CharacterSecret {
-        if (fact == null || fact.isBlank() || revealWhen == null || revealWhen.isBlank()) {
-            throw new IllegalArgumentException("A secret needs a fact and a reveal condition");
-        }
         requiresEvidence = requiresEvidence == null ? List.of() : List.copyOf(requiresEvidence);
         if (Set.copyOf(requiresEvidence).size() != requiresEvidence.size()) {
             throw new IllegalArgumentException("A secret lists the same required evidence twice");

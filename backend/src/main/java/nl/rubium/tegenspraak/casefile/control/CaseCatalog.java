@@ -7,7 +7,6 @@ import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +17,9 @@ public class CaseCatalog {
     private final CaseFileLoader caseFileLoader;
     private final String casesLocation;
 
-    public CaseCatalog(CaseFileLoader caseFileLoader, @Value("${tegenspraak.cases.location}") String casesLocation) {
+    public CaseCatalog(CaseFileLoader caseFileLoader, CaseProperties caseProperties) {
         this.caseFileLoader = caseFileLoader;
-        this.casesLocation = casesLocation;
+        this.casesLocation = caseProperties.location();
         caseFileLoader
                 .loadAll(casesLocation)
                 .forEach(caseDefinition -> casesById.put(caseDefinition.id(), caseDefinition));

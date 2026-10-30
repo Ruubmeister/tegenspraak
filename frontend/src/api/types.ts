@@ -1,229 +1,92 @@
-// Mirrors the JSON returned by the backend.
+// The JSON of the backend, under the names the frontend uses. The shapes are generated from the backend's OpenAPI
+// spec into schema.ts; run "npm run generate:api" after the backend's OpenApiSpecIT updated openapi.json.
 
-export type PlayerRole = 'PLAYER' | 'ADMIN'
+import type { components } from './schema'
 
-export interface Player {
-  username: string
-  role: PlayerRole
-}
+type Schemas = components['schemas']
+
+export type Player = Schemas['PlayerResponse']
+
+export type PlayerRole = Player['role']
 
 /** An account as shown in user management. Only the admin can fetch these. */
-export interface UserAccount {
-  id: string
-  username: string
-  role: PlayerRole
-  createdAt: string
-}
+export type UserAccount = Schemas['UserResponse']
 
 /** Only members receive a team, including the join code they can share. */
-export interface Team {
-  id: string
-  name: string
-  joinCode: string
-  members: string[]
-}
+export type Team = Schemas['TeamResponse']
+
+export type CaseSummary = Schemas['CaseSummaryResponse']
 
 /** From easiest to hardest. */
-export type CaseDifficulty = 'oefenzaak' | 'makkelijk' | 'gemiddeld' | 'moeilijk' | 'expert'
+export type CaseDifficulty = CaseSummary['difficulty']
 
-export interface CaseSummary {
-  id: string
-  title: string
-  summary: string
-  difficulty: CaseDifficulty
-}
-
-export interface CharacterSummary {
-  id: string
-  name: string
-  role: string
-  description: string
-}
-
-export type OwnerType = 'person' | 'organisation'
+export type CharacterSummary = Schemas['CharacterSummary']
 
 /** Present while something is locked. The code itself never reaches the browser. */
-export interface Lock {
-  hint: string
-}
+export type Lock = Schemas['LockResponse']
 
-export interface DesktopSummary {
-  id: string
-  ownerName: string
-  ownerType: OwnerType
-  lock: Lock | null
-}
+export type DesktopSummary = Schemas['DesktopSummary']
 
-export interface CaseOverview {
-  id: string
-  title: string
-  introduction: string
-  characters: CharacterSummary[]
-  desktops: DesktopSummary[]
-}
+export type OwnerType = DesktopSummary['ownerType']
 
-export interface MailMessage {
-  id: string
-  folder: string
-  from: string
-  to: string
-  subject: string
-  sentAt: string
-  /** Null while the mail is locked. */
-  body: string | null
-  lock: Lock | null
-}
+export type CaseOverview = Schemas['CaseOverviewResponse']
 
-export interface MailApp {
-  type: 'mail'
-  id: string
-  title: string
-  messages: MailMessage[]
-}
+/** The body is null while the mail is locked. */
+export type MailMessage = Schemas['MailResponse']
 
-export interface FileEntry {
-  id: string
-  folder: string
-  name: string
-  /** Null while the file is locked. */
-  content: string | null
-  lock: Lock | null
-}
+export type MailApp = Schemas['MailAppResponse']
 
-export interface FilesApp {
-  type: 'files'
-  id: string
-  title: string
-  files: FileEntry[]
-}
+/** The content is null while the file is locked. */
+export type FileEntry = Schemas['FileResponse']
 
-export interface CalendarEvent {
-  id: string
-  title: string
-  start: string
-  end: string
-  /** Location, attendees and notes are hidden while the event is locked. */
-  location: string | null
-  attendees: string[]
-  notes: string | null
-  lock: Lock | null
-}
+export type FilesApp = Schemas['FilesAppResponse']
 
-export interface CalendarApp {
-  type: 'calendar'
-  id: string
-  title: string
-  events: CalendarEvent[]
-}
+/** Location, attendees and notes are hidden while the event is locked. */
+export type CalendarEvent = Schemas['EventResponse']
+
+export type CalendarApp = Schemas['CalendarAppResponse']
 
 /** The image itself is loaded from its own endpoint, which refuses it while the photo is locked. */
-export interface Photo {
-  id: string
-  album: string
-  title: string
-  takenAt: string | null
-  /** Null while the photo is locked. */
-  description: string | null
-  lock: Lock | null
-}
+export type Photo = Schemas['PhotoResponse']
 
-export interface PhotosApp {
-  type: 'photos'
-  id: string
-  title: string
-  photos: Photo[]
-}
+export type PhotosApp = Schemas['PhotosAppResponse']
 
-/** A visit in the browsing history. */
-export interface BrowserPage {
-  id: string
-  url: string
-  title: string
-  visitedAt: string
-  /** Null while the page is locked. */
-  content: string | null
-  lock: Lock | null
-}
+/** A visit in the browsing history; the content is null while the page is locked. */
+export type BrowserPage = Schemas['PageResponse']
 
-export interface BrowserApp {
-  type: 'browser'
-  id: string
-  title: string
-  pages: BrowserPage[]
-}
-
-/** Discriminated on "type". A new desktop app needs a member here, a case in DesktopAppView and an icon. */
-export type DesktopApp = MailApp | FilesApp | CalendarApp | PhotosApp | BrowserApp
+export type BrowserApp = Schemas['BrowserAppResponse']
 
 /** A locked desktop has no apps until the team enters its code. */
-export interface Desktop {
-  id: string
-  ownerName: string
-  ownerType: OwnerType
-  description: string
-  lock: Lock | null
-  apps: DesktopApp[]
-}
+export type Desktop = Schemas['DesktopResponse']
+
+/** Discriminated on "type". A new desktop app needs a case in DesktopAppView and an icon. */
+export type DesktopApp = Desktop['apps'][number]
+
+/** An opened desktop item that can be attached to a chat message. Carries the title only, never the content. */
+export type EvidenceItem = Schemas['EvidenceResponse']
+
+export type EvidenceKind = EvidenceItem['kind']
+
+/** The conversation is shared by the team; authorName is the member who wrote a PLAYER message. */
+export type ChatMessage = Schemas['ChatMessageResponse']
+
+/** NOTICE messages are game events in the chat, such as a newly introduced contact. */
+export type MessageSender = ChatMessage['sender']
+
+export type VerdictQuestion = Schemas['QuestionResponse']
+
+/** Only the number of correct answers is shown, not which answers were correct. */
+export type VerdictAttempt = Schemas['AttemptResponse']
+
+/** The epilogue reveals what really happened, so the backend only sends it once the case is solved or failed. */
+export type Verdict = Schemas['VerdictResponse']
 
 /**
- * Pushed by the backend when something changed for the team. It only says where to look; the data itself is loaded
- * through the regular endpoints.
+ * Pushed by the backend over server-sent events when something changed for the team. It only says where to look; the
+ * data itself is loaded through the regular endpoints. Not part of the OpenAPI spec, as EventSource is not a REST call.
  */
 export type TeamEvent =
   | { type: 'CHAT'; caseId: string; characterId: string }
   | { type: 'CASE'; caseId: string; characterId: null }
   | { type: 'VERDICT'; caseId: string; characterId: null }
   | { type: 'MEMBERS'; caseId: null; characterId: null }
-
-/** NOTICE messages are game events in the chat, such as a newly introduced contact. */
-export type MessageSender = 'PLAYER' | 'CHARACTER' | 'NOTICE'
-
-export type EvidenceKind = 'mail' | 'file' | 'event' | 'photo' | 'webpage'
-
-/** An opened desktop item that can be attached to a chat message. Carries the title only, never the content. */
-export interface EvidenceItem {
-  desktopId: string
-  appId: string
-  itemId: string
-  kind: EvidenceKind
-  title: string
-  ownerName: string
-}
-
-/** The conversation is shared by the team; authorName is the member who wrote a PLAYER message. */
-export interface ChatMessage {
-  id: string
-  sender: MessageSender
-  authorName: string | null
-  content: string
-  sentAt: string
-  /** Desktop items the author attached; empty for character messages and notices. */
-  attachments: EvidenceItem[]
-}
-
-export interface VerdictQuestion {
-  id: string
-  question: string
-}
-
-/** Only the number of correct answers is shown, not which answers were correct. */
-export interface VerdictAttempt {
-  number: number
-  submittedBy: string
-  submittedAt: string
-  correctAnswers: number
-  totalQuestions: number
-  /** The typed answer per question id; empty for attempts from before answers were typed. */
-  answers: Record<string, string>
-}
-
-/** The epilogue reveals what really happened, so the backend only sends it once the case is solved or failed. */
-export interface Verdict {
-  questions: VerdictQuestion[]
-  maxAttempts: number
-  attemptsLeft: number
-  solved: boolean
-  failed: boolean
-  attempts: VerdictAttempt[]
-  epilogue: string | null
-}

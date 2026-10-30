@@ -6,6 +6,7 @@ import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
 import nl.rubium.tegenspraak.desktop.entity.Desktop;
 import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
+import org.jspecify.annotations.Nullable;
 
 /**
  * What a team may see of a case. Excludes the setting, all persona details and characters that were not introduced
@@ -25,7 +26,11 @@ public record CaseOverviewResponse(
         }
     }
 
-    public record DesktopSummary(String id, String ownerName, OwnerType ownerType, LockResponse lock) {
+    public record DesktopSummary(
+            String id,
+            String ownerName,
+            OwnerType ownerType,
+            @Nullable LockResponse lock) {
 
         static DesktopSummary from(Desktop desktop, TeamProgress progress) {
             return new DesktopSummary(

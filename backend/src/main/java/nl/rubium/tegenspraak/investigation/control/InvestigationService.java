@@ -21,7 +21,6 @@ import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttempt;
 import nl.rubium.tegenspraak.investigation.entity.WrongCodeAttemptRepository;
 import nl.rubium.tegenspraak.liveupdate.entity.TeamEvent;
 import nl.rubium.tegenspraak.team.control.TeamService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,16 +49,15 @@ public class InvestigationService {
             WrongCodeAttemptRepository wrongCodeAttemptRepository,
             Clock clock,
             ApplicationEventPublisher eventPublisher,
-            @Value("${tegenspraak.locks.max-wrong-attempts}") int maxWrongAttempts,
-            @Value("${tegenspraak.locks.wrong-attempt-window}") Duration wrongAttemptWindow) {
+            LockProperties lockProperties) {
         this.caseCatalog = caseCatalog;
         this.teamService = teamService;
         this.teamUnlockRepository = teamUnlockRepository;
         this.wrongCodeAttemptRepository = wrongCodeAttemptRepository;
         this.clock = clock;
         this.eventPublisher = eventPublisher;
-        this.maxWrongAttempts = maxWrongAttempts;
-        this.wrongAttemptWindow = wrongAttemptWindow;
+        this.maxWrongAttempts = lockProperties.maxWrongAttempts();
+        this.wrongAttemptWindow = lockProperties.wrongAttemptWindow();
     }
 
     public TeamProgress getProgress(UUID teamId, UUID playerId, String caseId) {

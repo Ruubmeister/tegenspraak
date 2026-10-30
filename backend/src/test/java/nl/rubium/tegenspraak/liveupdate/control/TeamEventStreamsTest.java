@@ -32,7 +32,8 @@ class TeamEventStreamsTest {
 
     private final TeamService teamService = mock(TeamService.class);
     private final SessionRegistry sessionRegistry = mock(SessionRegistry.class);
-    private final TeamEventStreams streams = new TeamEventStreams(teamService, sessionRegistry, Duration.ofMinutes(30));
+    private final TeamEventStreams streams = new TeamEventStreams(
+            teamService, sessionRegistry, new LiveUpdateProperties(Duration.ofSeconds(25), Duration.ofMinutes(30)));
 
     @BeforeEach
     void setUp() {

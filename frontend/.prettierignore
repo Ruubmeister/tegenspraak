@@ -1,1 +1,4 @@
 dist
+# Generated: openapi.json by the backend (OpenApiSpecIT), schema.ts by npm run generate:api
+openapi.json
+src/api/schema.ts

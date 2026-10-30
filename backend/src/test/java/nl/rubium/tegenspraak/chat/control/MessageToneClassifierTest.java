@@ -24,7 +24,8 @@ class MessageToneClassifierTest {
             "de-butler", "De Butler", "Butler", "Altijd aanwezig.", null, null, null, null, false, null, null, null);
 
     private final ChatModel chatModel = mock(ChatModel.class);
-    private final MessageToneClassifier classifier = new MessageToneClassifier(chatModel, "claude-haiku-5-5");
+    private final MessageToneClassifier classifier =
+            new MessageToneClassifier(chatModel, new ChatProperties(40, "claude-haiku-5-5"));
 
     @BeforeEach
     void setUp() {

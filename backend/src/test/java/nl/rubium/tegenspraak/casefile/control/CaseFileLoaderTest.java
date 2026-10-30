@@ -3,6 +3,7 @@ package nl.rubium.tegenspraak.casefile.control;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.validation.Validation;
 import java.time.LocalDateTime;
 import java.util.List;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
@@ -26,7 +27,9 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 class CaseFileLoaderTest {
 
-    private final CaseFileLoader loader = new CaseFileLoader(new PathMatchingResourcePatternResolver());
+    private final CaseFileLoader loader = new CaseFileLoader(
+            new PathMatchingResourcePatternResolver(),
+            Validation.buildDefaultValidatorFactory().getValidator());
 
     @Test
     void loadAll_givenValidCaseFolder_expectIdsTakenFromFolderAndFileNames() {
@@ -179,8 +182,15 @@ class CaseFileLoaderTest {
         assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/invalid-solution"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("case.yaml")
-                .rootCause()
-                .hasMessageContaining("dader");
+                .hasMessageContaining("solution.questions[0].answer");
+    }
+
+    @Test
+    void loadAll_givenCharacterWithoutRole_expectStartupFailureNamingFileAndField() {
+        assertThatThrownBy(() -> loader.loadAll("classpath:test-cases/missing-field"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("de-butler.yaml")
+                .hasMessageContaining("role");
     }
 
     @Test
