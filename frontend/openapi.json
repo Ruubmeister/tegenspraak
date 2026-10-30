@@ -1,0 +1,1654 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "OpenAPI definition",
+    "version" : "v0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost",
+    "description" : "Generated server url"
+  } ],
+  "paths" : {
+    "/api/admin/users" : {
+      "get" : {
+        "operationId" : "listUsers",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "user-admin-controller" ]
+      },
+      "post" : {
+        "operationId" : "createUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "tags" : [ "user-admin-controller" ]
+      }
+    },
+    "/api/admin/users/{userId}" : {
+      "delete" : {
+        "operationId" : "deleteUser",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "userId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "user-admin-controller" ]
+      }
+    },
+    "/api/admin/users/{userId}/password" : {
+      "put" : {
+        "operationId" : "resetPassword",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "userId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "user-admin-controller" ]
+      }
+    },
+    "/api/auth/login" : {
+      "post" : {
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/auth/me" : {
+      "get" : {
+        "operationId" : "currentPlayer",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/auth/password" : {
+      "put" : {
+        "operationId" : "changePassword",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "auth-controller" ]
+      }
+    },
+    "/api/cases" : {
+      "get" : {
+        "operationId" : "listCases",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CaseSummaryResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "case-controller" ]
+      }
+    },
+    "/api/teams" : {
+      "get" : {
+        "operationId" : "getTeams",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TeamResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "team-controller" ]
+      },
+      "post" : {
+        "operationId" : "createTeam",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamResponse"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "tags" : [ "team-controller" ]
+      }
+    },
+    "/api/teams/join" : {
+      "post" : {
+        "operationId" : "joinTeam",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/JoinTeamRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "team-controller" ]
+      }
+    },
+    "/api/teams/{teamId}" : {
+      "get" : {
+        "operationId" : "getTeam",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "team-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}" : {
+      "get" : {
+        "operationId" : "getCase",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CaseOverviewResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/characters/{characterId}/messages" : {
+      "get" : {
+        "operationId" : "getConversation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "characterId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ChatMessageResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "chat-controller" ]
+      },
+      "post" : {
+        "operationId" : "sendMessage",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "characterId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SendMessageRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ChatMessageResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "chat-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/characters/{characterId}/messages/read" : {
+      "put" : {
+        "operationId" : "markRead",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "characterId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MarkReadRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "conversation-read-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/desktops/{desktopId}" : {
+      "get" : {
+        "operationId" : "getDesktop",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "desktopId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DesktopResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/desktops/{desktopId}/apps/{appId}/items/{itemId}/image" : {
+      "get" : {
+        "operationId" : "getPhotoImage",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "desktopId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "appId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "itemId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/desktops/{desktopId}/apps/{appId}/items/{itemId}/unlock" : {
+      "post" : {
+        "operationId" : "unlockItem",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "desktopId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "appId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "itemId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UnlockRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DesktopResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/desktops/{desktopId}/unlock" : {
+      "post" : {
+        "operationId" : "unlockDesktop",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "desktopId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UnlockRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DesktopResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/evidence" : {
+      "get" : {
+        "operationId" : "getEvidence",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/EvidenceResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "investigation-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/unread-conversations" : {
+      "get" : {
+        "operationId" : "getUnreadConversations",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "conversation-read-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/cases/{caseId}/verdict" : {
+      "get" : {
+        "operationId" : "getVerdict",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerdictResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "verdict-controller" ]
+      },
+      "post" : {
+        "operationId" : "submitVerdict",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "path",
+          "name" : "caseId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SubmitVerdictRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerdictResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "verdict-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/members/me" : {
+      "delete" : {
+        "operationId" : "leaveTeam",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "tags" : [ "team-controller" ]
+      }
+    },
+    "/api/teams/{teamId}/solved-cases" : {
+      "get" : {
+        "operationId" : "getSolvedCaseIds",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "verdict-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AppResponse" : {
+        "discriminator" : {
+          "mapping" : {
+            "browser" : "#/components/schemas/BrowserAppResponse",
+            "calendar" : "#/components/schemas/CalendarAppResponse",
+            "files" : "#/components/schemas/FilesAppResponse",
+            "mail" : "#/components/schemas/MailAppResponse",
+            "photos" : "#/components/schemas/PhotosAppResponse"
+          },
+          "propertyName" : "type"
+        },
+        "properties" : {
+          "type" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "type" ]
+      },
+      "AttachmentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "appId" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "desktopId" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "itemId" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "appId", "desktopId", "itemId" ]
+      },
+      "AttemptResponse" : {
+        "type" : "object",
+        "properties" : {
+          "answers" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          },
+          "correctAnswers" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "submittedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "submittedBy" : {
+            "type" : "string"
+          },
+          "totalQuestions" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "answers", "correctAnswers", "number", "submittedAt", "submittedBy", "totalQuestions" ]
+      },
+      "BrowserAppResponse" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/AppResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "pages" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/PageResponse"
+              }
+            },
+            "title" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "id", "pages", "title" ]
+        } ]
+      },
+      "CalendarAppResponse" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/AppResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "events" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/EventResponse"
+              }
+            },
+            "id" : {
+              "type" : "string"
+            },
+            "title" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "events", "id", "title" ]
+        } ]
+      },
+      "CaseOverviewResponse" : {
+        "type" : "object",
+        "properties" : {
+          "characters" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CharacterSummary"
+            }
+          },
+          "desktops" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DesktopSummary"
+            }
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "introduction" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "characters", "desktops", "id", "introduction", "title" ]
+      },
+      "CaseSummaryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "difficulty" : {
+            "type" : "string",
+            "enum" : [ "oefenzaak", "makkelijk", "gemiddeld", "moeilijk", "expert" ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "difficulty", "id", "summary", "title" ]
+      },
+      "ChangePasswordRequest" : {
+        "type" : "object",
+        "properties" : {
+          "currentPassword" : {
+            "type" : "string",
+            "maxLength" : 72,
+            "minLength" : 0
+          },
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 72,
+            "minLength" : 8
+          }
+        },
+        "required" : [ "currentPassword", "newPassword" ]
+      },
+      "CharacterSummary" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "description", "id", "name", "role" ]
+      },
+      "ChatMessageResponse" : {
+        "type" : "object",
+        "properties" : {
+          "attachments" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/EvidenceResponse"
+            }
+          },
+          "authorName" : {
+            "type" : [ "string", "null" ]
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "sender" : {
+            "type" : "string",
+            "enum" : [ "PLAYER", "CHARACTER", "NOTICE" ]
+          },
+          "sentAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "attachments", "authorName", "content", "id", "sender", "sentAt" ]
+      },
+      "CreateTeamRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "CreateUserRequest" : {
+        "type" : "object",
+        "properties" : {
+          "password" : {
+            "type" : "string",
+            "maxLength" : 72,
+            "minLength" : 8
+          },
+          "username" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 3,
+            "pattern" : "[A-Za-z0-9_.-]+"
+          }
+        },
+        "required" : [ "password", "username" ]
+      },
+      "DesktopResponse" : {
+        "type" : "object",
+        "properties" : {
+          "apps" : {
+            "type" : "array",
+            "items" : {
+              "oneOf" : [ {
+                "$ref" : "#/components/schemas/BrowserAppResponse"
+              }, {
+                "$ref" : "#/components/schemas/CalendarAppResponse"
+              }, {
+                "$ref" : "#/components/schemas/FilesAppResponse"
+              }, {
+                "$ref" : "#/components/schemas/MailAppResponse"
+              }, {
+                "$ref" : "#/components/schemas/PhotosAppResponse"
+              } ]
+            }
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "ownerName" : {
+            "type" : "string"
+          },
+          "ownerType" : {
+            "type" : "string",
+            "enum" : [ "person", "organisation" ]
+          }
+        },
+        "required" : [ "apps", "description", "id", "lock", "ownerName", "ownerType" ]
+      },
+      "DesktopSummary" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "ownerName" : {
+            "type" : "string"
+          },
+          "ownerType" : {
+            "type" : "string",
+            "enum" : [ "person", "organisation" ]
+          }
+        },
+        "required" : [ "id", "lock", "ownerName", "ownerType" ]
+      },
+      "EventResponse" : {
+        "type" : "object",
+        "properties" : {
+          "attendees" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "end" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "location" : {
+            "type" : [ "string", "null" ]
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "notes" : {
+            "type" : [ "string", "null" ]
+          },
+          "start" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "attendees", "end", "id", "location", "lock", "notes", "start", "title" ]
+      },
+      "EvidenceResponse" : {
+        "type" : "object",
+        "properties" : {
+          "appId" : {
+            "type" : "string"
+          },
+          "desktopId" : {
+            "type" : "string"
+          },
+          "itemId" : {
+            "type" : "string"
+          },
+          "kind" : {
+            "type" : "string",
+            "enum" : [ "mail", "file", "event", "photo", "webpage" ]
+          },
+          "ownerName" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "appId", "desktopId", "itemId", "kind", "ownerName", "title" ]
+      },
+      "FileResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : [ "string", "null" ]
+          },
+          "folder" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "content", "folder", "id", "lock", "name" ]
+      },
+      "FilesAppResponse" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/AppResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "files" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/FileResponse"
+              }
+            },
+            "id" : {
+              "type" : "string"
+            },
+            "title" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "files", "id", "title" ]
+        } ]
+      },
+      "JoinTeamRequest" : {
+        "type" : "object",
+        "properties" : {
+          "joinCode" : {
+            "type" : "string",
+            "maxLength" : 20,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "joinCode" ]
+      },
+      "LockResponse" : {
+        "type" : "object",
+        "properties" : {
+          "hint" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "hint" ]
+      },
+      "LoginRequest" : {
+        "type" : "object",
+        "properties" : {
+          "password" : {
+            "type" : "string",
+            "maxLength" : 72,
+            "minLength" : 0
+          },
+          "username" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "password", "username" ]
+      },
+      "MailAppResponse" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/AppResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "messages" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/MailResponse"
+              }
+            },
+            "title" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "id", "messages", "title" ]
+        } ]
+      },
+      "MailResponse" : {
+        "type" : "object",
+        "properties" : {
+          "body" : {
+            "type" : [ "string", "null" ]
+          },
+          "folder" : {
+            "type" : "string"
+          },
+          "from" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "sentAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "subject" : {
+            "type" : "string"
+          },
+          "to" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "body", "folder", "from", "id", "lock", "sentAt", "subject", "to" ]
+      },
+      "MarkReadRequest" : {
+        "type" : "object",
+        "properties" : {
+          "messageId" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        },
+        "required" : [ "messageId" ]
+      },
+      "PageResponse" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : [ "string", "null" ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "visitedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "content", "id", "lock", "title", "url", "visitedAt" ]
+      },
+      "PhotoResponse" : {
+        "type" : "object",
+        "properties" : {
+          "album" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : [ "string", "null" ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "lock" : {
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/LockResponse"
+            }, {
+              "type" : "null"
+            } ]
+          },
+          "takenAt" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "album", "description", "id", "lock", "takenAt", "title" ]
+      },
+      "PhotosAppResponse" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/AppResponse"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "string"
+            },
+            "photos" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/PhotoResponse"
+              }
+            },
+            "title" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "id", "photos", "title" ]
+        } ]
+      },
+      "PlayerResponse" : {
+        "type" : "object",
+        "properties" : {
+          "role" : {
+            "type" : "string",
+            "enum" : [ "PLAYER", "ADMIN" ]
+          },
+          "username" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "role", "username" ]
+      },
+      "QuestionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "question" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "question" ]
+      },
+      "ResetPasswordRequest" : {
+        "type" : "object",
+        "properties" : {
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 72,
+            "minLength" : 8
+          }
+        },
+        "required" : [ "newPassword" ]
+      },
+      "SendMessageRequest" : {
+        "type" : "object",
+        "properties" : {
+          "attachments" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/AttachmentRequest"
+            },
+            "maxItems" : 3,
+            "minItems" : 0
+          },
+          "content" : {
+            "type" : "string",
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "content" ]
+      },
+      "SubmitVerdictRequest" : {
+        "type" : "object",
+        "properties" : {
+          "answers" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "answers" ]
+      },
+      "TeamResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "joinCode" : {
+            "type" : "string"
+          },
+          "members" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "joinCode", "members", "name" ]
+      },
+      "UnlockRequest" : {
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "code" ]
+      },
+      "UserResponse" : {
+        "type" : "object",
+        "properties" : {
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "PLAYER", "ADMIN" ]
+          },
+          "username" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "createdAt", "id", "role", "username" ]
+      },
+      "VerdictResponse" : {
+        "type" : "object",
+        "properties" : {
+          "attempts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/AttemptResponse"
+            }
+          },
+          "attemptsLeft" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "epilogue" : {
+            "type" : [ "string", "null" ]
+          },
+          "failed" : {
+            "type" : "boolean"
+          },
+          "maxAttempts" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/QuestionResponse"
+            }
+          },
+          "solved" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "attempts", "attemptsLeft", "epilogue", "failed", "maxAttempts", "questions", "solved" ]
+      }
+    }
+  }
+}

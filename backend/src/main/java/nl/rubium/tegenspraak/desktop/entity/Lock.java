@@ -1,19 +1,17 @@
 package nl.rubium.tegenspraak.desktop.entity;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.Locale;
 
 /**
  * A code that must be entered before a desktop or one of its items opens. The hint is shown to the player; the code never
  * leaves the server. Codes are compared without case and whitespace, so "Kat 2019" matches "kat2019".
  */
-public record Lock(String code, String hint) {
+public record Lock(String code, @NotBlank String hint) {
 
     public Lock {
         if (code == null || normalize(code).isEmpty()) {
             throw new IllegalArgumentException("A lock needs a code");
-        }
-        if (hint == null || hint.isBlank()) {
-            throw new IllegalArgumentException("A lock needs a hint");
         }
     }
 

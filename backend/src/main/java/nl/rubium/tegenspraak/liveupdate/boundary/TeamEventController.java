@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak.liveupdate.boundary;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
@@ -25,7 +26,11 @@ public class TeamEventController {
         this.teamEventStreams = teamEventStreams;
     }
 
-    /** nginx buffers proxied responses by default, which would hold the events back; the header turns that off. */
+    /**
+     * nginx buffers proxied responses by default, which would hold the events back; the header turns that off. Left out
+     * of the OpenAPI spec: the browser reads it with EventSource, and the frontend types the events itself.
+     */
+    @Hidden
     @GetMapping(path = "/api/teams/{teamId}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamEvents(
             @PathVariable UUID teamId,

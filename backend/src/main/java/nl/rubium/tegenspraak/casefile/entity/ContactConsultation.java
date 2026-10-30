@@ -1,5 +1,6 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -10,27 +11,19 @@ import java.util.List;
  * {@code minimumMood}, the character only offers to ask once it feels at least that good about the team.
  */
 public record ContactConsultation(
-        String id,
-        String character,
-        String about,
-        String when,
-        String answer,
+        @NotBlank String id,
+        @NotBlank String character,
+        @NotBlank String about,
+        @NotBlank String when,
+        @NotBlank String answer,
         Mood minimumMood,
         List<ConsultationUnlock> unlocks) {
 
     public ContactConsultation {
-        if (isBlank(id) || isBlank(character) || isBlank(about) || isBlank(when) || isBlank(answer)) {
-            throw new IllegalArgumentException(
-                    "A consultation needs an id, a character, a topic, a condition and an answer");
-        }
         unlocks = unlocks == null ? List.of() : List.copyOf(unlocks);
     }
 
     public boolean allows(Mood mood) {
         return minimumMood == null || mood.isAtLeast(minimumMood);
-    }
-
-    private static boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }

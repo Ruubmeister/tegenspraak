@@ -114,7 +114,11 @@ class ConsultationRelayTest {
     private final ConsultationRelay consultationRelay = new ConsultationRelay(
             characterPromptBuilder,
             new CharacterReplyModel(chatModel, ToolCallingManager.builder().build()),
-            new ConversationMemory(chatMessageRepository, characterMoodRepository, characterPromptBuilder, 40),
+            new ConversationMemory(
+                    chatMessageRepository,
+                    characterMoodRepository,
+                    characterPromptBuilder,
+                    new ChatProperties(40, "claude-haiku-5-5")),
             new ConversationLocks(),
             chatMessageRepository,
             consultationRequestRepository,

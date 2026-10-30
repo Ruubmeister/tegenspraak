@@ -104,8 +104,7 @@ class InvestigationServiceTest {
             wrongCodeAttemptRepository,
             Clock.fixed(NOW, ZoneOffset.UTC),
             eventPublisher,
-            5,
-            Duration.ofMinutes(1));
+            new LockProperties(5, Duration.ofMinutes(1)));
     private final List<String> unlockedTargets = new ArrayList<>();
     private final List<WrongCodeAttempt> recentWrongAttempts = new ArrayList<>();
 
