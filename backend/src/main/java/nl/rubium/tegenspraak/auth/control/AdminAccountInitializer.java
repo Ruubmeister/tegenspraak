@@ -6,7 +6,6 @@ import nl.rubium.tegenspraak.auth.entity.PlayerAccountRepository;
 import nl.rubium.tegenspraak.auth.entity.PlayerRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,11 @@ public class AdminAccountInitializer implements ApplicationRunner {
     public AdminAccountInitializer(
             PlayerAccountRepository playerAccountRepository,
             PlayerAccountService playerAccountService,
-            @Value("${tegenspraak.admin.username}") String adminUsername,
-            @Value("${tegenspraak.admin.initial-password:}") String initialPassword) {
+            AdminProperties adminProperties) {
         this.playerAccountRepository = playerAccountRepository;
         this.playerAccountService = playerAccountService;
-        this.adminUsername = adminUsername;
-        this.initialPassword = initialPassword;
+        this.adminUsername = adminProperties.username();
+        this.initialPassword = adminProperties.initialPassword();
     }
 
     @Override

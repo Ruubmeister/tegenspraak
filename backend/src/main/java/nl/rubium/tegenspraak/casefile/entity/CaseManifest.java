@@ -1,17 +1,13 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
-import java.util.Objects;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CaseManifest(
-        String title,
-        String summary,
-        CaseDifficulty difficulty,
-        String introduction,
-        String setting,
-        CaseSolution solution) {
-
-    public CaseManifest {
-        Objects.requireNonNull(difficulty, "A case needs a difficulty");
-        Objects.requireNonNull(solution, "A case needs a solution");
-    }
-}
+        @NotBlank String title,
+        @NotBlank String summary,
+        @NotNull CaseDifficulty difficulty,
+        @NotBlank String introduction,
+        @NotBlank String setting,
+        @NotNull @Valid CaseSolution solution) {}

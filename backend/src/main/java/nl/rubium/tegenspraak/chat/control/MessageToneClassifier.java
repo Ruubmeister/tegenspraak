@@ -13,7 +13,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,10 +48,9 @@ public class MessageToneClassifier {
     private final ChatModel chatModel;
     private final String model;
 
-    public MessageToneClassifier(
-            ChatModel chatModel, @Value("${tegenspraak.chat.tone-classifier-model}") String model) {
+    public MessageToneClassifier(ChatModel chatModel, ChatProperties chatProperties) {
         this.chatModel = chatModel;
-        this.model = model;
+        this.model = chatProperties.toneClassifierModel();
     }
 
     /**

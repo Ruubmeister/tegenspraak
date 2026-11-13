@@ -2,6 +2,8 @@ package nl.rubium.tegenspraak.investigation.boundary;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import nl.rubium.tegenspraak.desktop.entity.BrowserApp;
@@ -18,6 +20,7 @@ import nl.rubium.tegenspraak.desktop.entity.OwnerType;
 import nl.rubium.tegenspraak.desktop.entity.Photo;
 import nl.rubium.tegenspraak.desktop.entity.PhotosApp;
 import nl.rubium.tegenspraak.investigation.control.TeamProgress;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A desktop as a team sees it. A locked desktop has no apps; a locked item shows its title but no content. Locked
@@ -29,9 +32,10 @@ public record DesktopResponse(
         String ownerName,
         OwnerType ownerType,
         String description,
-        LockResponse lock,
+        @Nullable LockResponse lock,
         List<AppResponse> apps) {
 
+    /** The OpenAPI spec does not read the names from @JsonSubTypes, so the mapping repeats them for the frontend. */
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
     @JsonSubTypes({
         @JsonSubTypes.Type(value = MailAppResponse.class, name = "mail"),
@@ -40,6 +44,15 @@ public record DesktopResponse(
         @JsonSubTypes.Type(value = PhotosAppResponse.class, name = "photos"),
         @JsonSubTypes.Type(value = BrowserAppResponse.class, name = "browser")
     })
+    @Schema(
+            discriminatorProperty = "type",
+            discriminatorMapping = {
+                @DiscriminatorMapping(value = "mail", schema = MailAppResponse.class),
+                @DiscriminatorMapping(value = "files", schema = FilesAppResponse.class),
+                @DiscriminatorMapping(value = "calendar", schema = CalendarAppResponse.class),
+                @DiscriminatorMapping(value = "photos", schema = PhotosAppResponse.class),
+                @DiscriminatorMapping(value = "browser", schema = BrowserAppResponse.class)
+            })
     public sealed interface AppResponse
             permits MailAppResponse, FilesAppResponse, CalendarAppResponse, PhotosAppResponse, BrowserAppResponse {}
 
@@ -60,26 +73,41 @@ public record DesktopResponse(
             String to,
             String subject,
             LocalDateTime sentAt,
-            String body,
-            LockResponse lock) {}
+            @Nullable String body,
+            @Nullable LockResponse lock) {}
 
-    public record FileResponse(String id, String folder, String name, String content, LockResponse lock) {}
+    public record FileResponse(
+            String id,
+            String folder,
+            String name,
+            @Nullable String content,
+            @Nullable LockResponse lock) {}
 
     public record EventResponse(
             String id,
             String title,
             LocalDateTime start,
             LocalDateTime end,
-            String location,
+            @Nullable String location,
             List<String> attendees,
-            String notes,
-            LockResponse lock) {}
+            @Nullable String notes,
+            @Nullable LockResponse lock) {}
 
     public record PhotoResponse(
-            String id, String album, String title, LocalDateTime takenAt, String description, LockResponse lock) {}
+            String id,
+            String album,
+            String title,
+            @Nullable LocalDateTime takenAt,
+            @Nullable String description,
+            @Nullable LockResponse lock) {}
 
     public record PageResponse(
-            String id, String url, String title, LocalDateTime visitedAt, String content, LockResponse lock) {}
+            String id,
+            String url,
+            String title,
+            LocalDateTime visitedAt,
+            @Nullable String content,
+            @Nullable LockResponse lock) {}
 
     static DesktopResponse from(Desktop desktop, TeamProgress progress) {
         boolean open = progress.isOpen(desktop);

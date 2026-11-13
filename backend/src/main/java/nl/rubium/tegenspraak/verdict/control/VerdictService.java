@@ -13,7 +13,6 @@ import nl.rubium.tegenspraak.team.control.TeamService;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAnswer;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttempt;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttemptRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -38,13 +37,13 @@ public class VerdictService {
             TeamService teamService,
             VerdictGrader verdictGrader,
             ApplicationEventPublisher eventPublisher,
-            @Value("${tegenspraak.verdict.max-attempts}") int maxAttempts) {
+            VerdictProperties verdictProperties) {
         this.caseCatalog = caseCatalog;
         this.verdictAttemptRepository = verdictAttemptRepository;
         this.teamService = teamService;
         this.verdictGrader = verdictGrader;
         this.eventPublisher = eventPublisher;
-        this.maxAttempts = maxAttempts;
+        this.maxAttempts = verdictProperties.maxAttempts();
     }
 
     public VerdictProgress getProgress(UUID teamId, UUID playerId, String caseId) {

@@ -90,10 +90,12 @@ class ConsultationServiceTest {
             consultationRelay,
             new ConsultationSchedule(
                     Clock.fixed(NOW, ZoneOffset.UTC),
-                    Duration.ofMinutes(2),
-                    Duration.ofMinutes(5),
-                    Duration.ofMinutes(1),
-                    3),
+                    new ConsultationProperties(
+                            Duration.ofMinutes(2),
+                            Duration.ofMinutes(5),
+                            Duration.ofSeconds(15),
+                            Duration.ofMinutes(1),
+                            3)),
             new TransactionTemplate(mock(PlatformTransactionManager.class)),
             eventPublisher);
 

@@ -1,5 +1,8 @@
 package nl.rubium.tegenspraak.desktop.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,18 +12,18 @@ import java.util.List;
  */
 public record CalendarEvent(
         String id,
-        String title,
-        LocalDateTime start,
-        LocalDateTime end,
+        @NotBlank String title,
+        @NotNull LocalDateTime start,
+        @NotNull LocalDateTime end,
         String location,
         List<String> attendees,
         String notes,
-        Lock lock)
+        @Valid Lock lock)
         implements LockableItem {
 
     public CalendarEvent {
-        if (start == null || end == null || end.isBefore(start)) {
-            throw new IllegalArgumentException("Event '" + id + "' needs a start and an end that is not before it");
+        if (start != null && end != null && end.isBefore(start)) {
+            throw new IllegalArgumentException("Event '" + id + "' ends before it starts");
         }
         attendees = attendees == null ? List.of() : List.copyOf(attendees);
     }

@@ -1,21 +1,20 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 /** The questions a team must answer correctly to solve the case, and the epilogue shown afterwards. */
-public record CaseSolution(List<SolutionQuestion> questions, String epilogue) {
+public record CaseSolution(
+        @NotEmpty @Valid List<SolutionQuestion> questions,
+        @NotBlank String epilogue) {
 
     public CaseSolution {
-        if (questions == null || questions.isEmpty()) {
-            throw new IllegalArgumentException("A solution needs at least one question");
-        }
-        if (epilogue == null || epilogue.isBlank()) {
-            throw new IllegalArgumentException("A solution needs an epilogue");
-        }
-        questions = List.copyOf(questions);
+        questions = questions == null ? List.of() : List.copyOf(questions);
         requireUniqueQuestionIds(questions);
     }
 

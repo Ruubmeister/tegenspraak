@@ -1,5 +1,7 @@
 package nl.rubium.tegenspraak.casefile.control;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import nl.rubium.tegenspraak.casefile.entity.CaseDefinition;
 import nl.rubium.tegenspraak.casefile.entity.CaseManifest;
 import nl.rubium.tegenspraak.casefile.entity.CharacterProfile;
@@ -34,6 +37,8 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
  * </pre>
  *
  * Folder and file names are the ids. Any invalid or missing file fails startup, so broken case content is never served.
+ * Required fields are checked with Bean Validation once a file is read; rules that span several fields or files are
+ * checked by the records themselves.
  */
 @Component
 public class CaseFileLoader {
@@ -42,12 +47,14 @@ public class CaseFileLoader {
     private static final String CASE_FILE = "case.yaml";
 
     private final ResourcePatternResolver resourceResolver;
+    private final Validator validator;
     private final YAMLMapper yamlMapper = YAMLMapper.builder()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
 
-    public CaseFileLoader(ResourcePatternResolver resourceResolver) {
+    public CaseFileLoader(ResourcePatternResolver resourceResolver, Validator validator) {
         this.resourceResolver = resourceResolver;
+        this.validator = validator;
     }
 
     public List<CaseDefinition> loadAll(String location) {
@@ -102,11 +109,27 @@ public class CaseFileLoader {
 
     private <T> T read(Resource resource, Class<T> type, String injectedId) {
         InjectableValues.Std injectables = new InjectableValues.Std().addValue("id", injectedId);
+        T value;
         try (InputStream input = resource.getInputStream()) {
-            return yamlMapper.readerFor(type).with(injectables).readValue(input);
+            value = yamlMapper.readerFor(type).with(injectables).readValue(input);
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Invalid case file " + resource.getDescription(), e);
         }
+        requireValid(value, resource);
+        return value;
+    }
+
+    /** Lists every missing field at once, such as "solution.questions[0].answer must not be blank". */
+    private <T> void requireValid(T value, Resource resource) {
+        Set<ConstraintViolation<T>> violations = validator.validate(value);
+        if (violations.isEmpty()) {
+            return;
+        }
+        String details = violations.stream()
+                .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+                .sorted()
+                .collect(Collectors.joining("; "));
+        throw new IllegalStateException("Invalid case file " + resource.getDescription() + ": " + details);
     }
 
     private Resource[] findResources(String pattern) {

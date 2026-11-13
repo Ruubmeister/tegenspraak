@@ -1,6 +1,8 @@
 package nl.rubium.tegenspraak.casefile.entity;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,17 +13,17 @@ import java.util.Optional;
  */
 public record CharacterProfile(
         @JacksonInject("id") String id,
-        String name,
-        String role,
-        String description,
+        @NotBlank String name,
+        @NotBlank String role,
+        @NotBlank String description,
         String personality,
         String speechStyle,
         List<String> knownFacts,
-        List<CharacterSecret> secrets,
+        @Valid List<CharacterSecret> secrets,
         Boolean hidden,
-        List<ContactIntroduction> introduces,
+        @Valid List<ContactIntroduction> introduces,
         Mood startingMood,
-        List<ContactConsultation> consults) {
+        @Valid List<ContactConsultation> consults) {
 
     public CharacterProfile {
         knownFacts = knownFacts == null ? List.of() : List.copyOf(knownFacts);

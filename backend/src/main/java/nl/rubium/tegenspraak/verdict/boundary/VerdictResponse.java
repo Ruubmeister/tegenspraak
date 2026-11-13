@@ -8,6 +8,7 @@ import nl.rubium.tegenspraak.casefile.entity.SolutionQuestion;
 import nl.rubium.tegenspraak.verdict.control.VerdictProgress;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAnswer;
 import nl.rubium.tegenspraak.verdict.entity.VerdictAttempt;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The questions without their answers, plus the team's attempts. An attempt only tells how many answers were correct,
@@ -20,7 +21,7 @@ public record VerdictResponse(
         boolean solved,
         boolean failed,
         List<AttemptResponse> attempts,
-        String epilogue) {
+        @Nullable String epilogue) {
 
     public record QuestionResponse(String id, String question) {
 

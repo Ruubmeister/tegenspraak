@@ -37,7 +37,9 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
             // Tests answer due consultations themselves, so the scheduler must not get there first
             "tegenspraak.consultations.poll-interval=1h",
             // Test players have no registered session, so a heartbeat would close their event streams
-            "tegenspraak.live-updates.heartbeat-interval=1h"
+            "tegenspraak.live-updates.heartbeat-interval=1h",
+            // Serves the spec for OpenApiSpecIT; the same setting for all tests keeps one shared application context
+            "springdoc.api-docs.enabled=true"
         })
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)

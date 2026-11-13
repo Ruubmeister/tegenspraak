@@ -47,7 +47,12 @@ class VerdictServiceTest {
     private final VerdictGrader verdictGrader = mock(VerdictGrader.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final VerdictService verdictService = new VerdictService(
-            caseCatalog, verdictAttemptRepository, teamService, verdictGrader, eventPublisher, MAX_ATTEMPTS);
+            caseCatalog,
+            verdictAttemptRepository,
+            teamService,
+            verdictGrader,
+            eventPublisher,
+            new VerdictProperties(MAX_ATTEMPTS));
     private final List<VerdictAttempt> storedAttempts = new ArrayList<>();
 
     @BeforeEach

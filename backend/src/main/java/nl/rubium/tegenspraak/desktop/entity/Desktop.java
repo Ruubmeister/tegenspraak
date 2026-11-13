@@ -1,6 +1,9 @@
 package nl.rubium.tegenspraak.desktop.entity;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,11 +13,11 @@ import java.util.Optional;
  */
 public record Desktop(
         @JacksonInject("id") String id,
-        String ownerName,
-        OwnerType ownerType,
-        String description,
-        Lock lock,
-        List<DesktopApp> apps) {
+        @NotBlank String ownerName,
+        @NotNull OwnerType ownerType,
+        @NotBlank String description,
+        @Valid Lock lock,
+        @Valid List<DesktopApp> apps) {
 
     public Desktop {
         apps = apps == null ? List.of() : List.copyOf(apps);

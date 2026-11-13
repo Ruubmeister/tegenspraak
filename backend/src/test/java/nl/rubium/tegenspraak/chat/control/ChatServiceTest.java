@@ -161,15 +161,21 @@ class ChatServiceTest {
     private final CharacterPromptBuilder characterPromptBuilder = new CharacterPromptBuilder();
     private final ChatService chatService = new ChatService(
             characterPromptBuilder,
-            new ConversationMemory(chatMessageRepository, characterMoodRepository, characterPromptBuilder, 40),
+            new ConversationMemory(
+                    chatMessageRepository,
+                    characterMoodRepository,
+                    characterPromptBuilder,
+                    new ChatProperties(40, "claude-haiku-5-5")),
             new ConsultationRequests(
                     consultationRequestRepository,
                     new ConsultationSchedule(
                             Clock.fixed(NOW, ZoneOffset.UTC),
-                            Duration.ofMinutes(2),
-                            Duration.ofMinutes(2),
-                            Duration.ofMinutes(1),
-                            3)),
+                            new ConsultationProperties(
+                                    Duration.ofMinutes(2),
+                                    Duration.ofMinutes(2),
+                                    Duration.ofSeconds(15),
+                                    Duration.ofMinutes(1),
+                                    3))),
             chatMessageRepository,
             characterMoodRepository,
             messageToneClassifier,

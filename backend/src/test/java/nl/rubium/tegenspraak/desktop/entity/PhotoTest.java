@@ -3,12 +3,17 @@ package nl.rubium.tegenspraak.desktop.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class PhotoTest {
+
+    private static final Validator VALIDATOR =
+            Validation.buildDefaultValidatorFactory().getValidator();
 
     @ParameterizedTest
     @ValueSource(strings = {"../geheim.jpg", "map/foto.jpg", "foto.svg", "Foto.JPG", "foto", ""})
@@ -17,10 +22,12 @@ class PhotoTest {
     }
 
     @Test
-    void constructor_givenMissingDescription_expectIllegalArgument() {
-        assertThatThrownBy(() -> new Photo("strand", "Vakantie", "Strand", null, "strand.jpg", " ", null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("strand");
+    void validate_givenMissingDescription_expectDescriptionViolation() {
+        Photo photo = new Photo("strand", "Vakantie", "Strand", null, "strand.jpg", " ", null);
+
+        assertThat(VALIDATOR.validate(photo))
+                .extracting(violation -> violation.getPropertyPath().toString())
+                .containsExactly("description");
     }
 
     @ParameterizedTest

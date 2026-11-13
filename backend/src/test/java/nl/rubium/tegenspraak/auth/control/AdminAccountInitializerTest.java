@@ -68,6 +68,7 @@ class AdminAccountInitializerTest {
     }
 
     private AdminAccountInitializer initializer(String initialPassword) {
-        return new AdminAccountInitializer(playerAccountRepository, playerAccountService, "admin", initialPassword);
+        return new AdminAccountInitializer(
+                playerAccountRepository, playerAccountService, new AdminProperties("admin", initialPassword));
     }
 }

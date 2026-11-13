@@ -1,7 +1,6 @@
 package nl.rubium.tegenspraak.chat.control;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -46,19 +45,10 @@ class ConsultationScheduleTest {
         assertThat(schedule.retryDueAt(3)).isEmpty();
     }
 
-    @Test
-    void constructor_givenMaximumBelowMinimum_expectIllegalArgument() {
-        assertThatThrownBy(() -> schedule(Duration.ofMinutes(5), Duration.ofMinutes(2), 3))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void constructor_givenNoAttempts_expectIllegalArgument() {
-        assertThatThrownBy(() -> schedule(Duration.ofMinutes(2), Duration.ofMinutes(5), 0))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     private static ConsultationSchedule schedule(Duration minDelay, Duration maxDelay, int maxAttempts) {
-        return new ConsultationSchedule(CLOCK, minDelay, maxDelay, Duration.ofMinutes(1), maxAttempts);
+        return new ConsultationSchedule(
+                CLOCK,
+                new ConsultationProperties(
+                        minDelay, maxDelay, Duration.ofSeconds(15), Duration.ofMinutes(1), maxAttempts));
     }
 }

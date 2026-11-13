@@ -3,10 +3,15 @@ package nl.rubium.tegenspraak.desktop.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class LockTest {
+
+    private static final Validator VALIDATOR =
+            Validation.buildDefaultValidatorFactory().getValidator();
 
     private final Lock lock = new Lock("Kat 2019", "Naam van de kat en het jaar");
 
@@ -27,8 +32,10 @@ class LockTest {
     }
 
     @Test
-    void constructor_givenMissingHint_expectIllegalArgument() {
-        assertThatThrownBy(() -> new Lock("1234", null)).isInstanceOf(IllegalArgumentException.class);
+    void validate_givenMissingHint_expectHintViolation() {
+        assertThat(VALIDATOR.validate(new Lock("1234", null)))
+                .extracting(violation -> violation.getPropertyPath().toString())
+                .containsExactly("hint");
     }
 
     @Test

@@ -4,15 +4,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ContactConsultationTest {
 
+    private static final Validator VALIDATOR =
+            Validation.buildDefaultValidatorFactory().getValidator();
+
     @Test
-    void constructor_givenBlankAnswer_expectIllegalArgument() {
-        assertThatThrownBy(() -> new ContactConsultation("vraag", "de-kok", "Onderwerp", "Als.", " ", null, null))
-                .isInstanceOf(IllegalArgumentException.class);
+    void validate_givenBlankAnswer_expectAnswerViolation() {
+        ContactConsultation consultation =
+                new ContactConsultation("vraag", "de-kok", "Onderwerp", "Als.", " ", null, null);
+
+        assertThat(VALIDATOR.validate(consultation))
+                .extracting(violation -> violation.getPropertyPath().toString())
+                .containsExactly("answer");
     }
 
     @Test
